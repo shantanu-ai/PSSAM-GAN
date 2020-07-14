@@ -94,3 +94,14 @@ class Utils:
             list_to_write,
             orient='columns'
         ).to_csv(file_name)
+
+    @staticmethod
+    def create_tensors_to_train_DCN(group, dL):
+        np_df_X = group[0]
+        print(np_df_X.shape)
+        np_ps_score = group[1]
+        np_df_Y_f = group[2]
+        np_df_Y_cf = group[3]
+        tensor = dL.convert_to_tensor_DCN(np_df_X, np_ps_score,
+                                          np_df_Y_f, np_df_Y_cf)
+        return tensor

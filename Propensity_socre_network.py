@@ -13,7 +13,7 @@ class Propensity_socre_network:
         batch_size = train_parameters["batch_size"]
         lr = train_parameters["lr"]
         shuffle = train_parameters["shuffle"]
-        model_save_path = train_parameters["model_save_path"].format(epochs, lr)
+        model_save_path = train_parameters["model_save_path"]
         train_set = train_parameters["train_set"]
 
         input_nodes = train_parameters["input_nodes"]
@@ -21,11 +21,10 @@ class Propensity_socre_network:
 
         network = Propensity_net_NN(phase, input_nodes).to(device)
 
-        data_loader_train = torch.utils.data.DataLoader(train_set, batch_size=32,
-                                                        shuffle=shuffle, num_workers=1)
-
-        min_accuracy = 0
-        phases = ['train', 'val']
+        data_loader_train = torch.utils.data.DataLoader(train_set,
+                                                        batch_size=batch_size,
+                                                        shuffle=shuffle,
+                                                        num_workers=1)
 
         optimizer = optim.Adam(network.parameters(), lr=lr)
         for epoch in range(epochs):

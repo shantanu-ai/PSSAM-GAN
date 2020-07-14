@@ -4,11 +4,12 @@ import torch
 import torch.nn as nn
 import torch.optim as optim
 
+from Constants import Constants
 from DCN import DCN
 
 
 class DCN_network:
-    def train(self, train_parameters, device):
+    def train(self, train_parameters, device, train_mode=Constants.DCN_TRAIN_PD):
         epochs = train_parameters["epochs"]
         treated_batch_size = train_parameters["treated_batch_size"]
         control_batch_size = train_parameters["control_batch_size"]
@@ -19,8 +20,6 @@ class DCN_network:
         control_set_train = train_parameters["control_set_train"]
 
         input_nodes = train_parameters["input_nodes"]
-
-        phases = ['train', 'val']
 
         print("Saved model path: {0}".format(model_save_path))
 
@@ -34,7 +33,7 @@ class DCN_network:
                                                                 shuffle=shuffle,
                                                                 num_workers=1)
 
-        network = DCN(training_flag=True, input_nodes=input_nodes).to(device)
+        network = DCN(training_mode=train_mode, input_nodes=input_nodes).to(device)
         optimizer = optim.Adam(network.parameters(), lr=lr)
         lossF = nn.MSELoss()
         min_loss = 100000.0
@@ -137,12 +136,12 @@ class DCN_network:
                 #     min_loss = dataset_loss
         torch.save(network.state_dict(), model_save_path)
 
-    def eval(self, eval_parameters, device, input_nodes):
+    def eval(self, eval_parameters, device, input_nodes, train_mode):
         print(".. Evaluation started ..")
         treated_set = eval_parameters["treated_set"]
         control_set = eval_parameters["control_set"]
         model_path = eval_parameters["model_save_path"]
-        network = DCN(training_flag=False, input_nodes=input_nodes).to(device)
+        network = DCN(training_mode=train_mode, input_nodes=input_nodes).to(device)
         network.load_state_dict(torch.load(model_path, map_location=device))
         network.eval()
         treated_data_loader = torch.utils.data.DataLoader(treated_set,

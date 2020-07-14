@@ -10,9 +10,9 @@ from Utils import Utils
 # training_flag = "eval" / "train_constant_dropout" / "train_PD"
 
 class DCN(nn.Module):
-    def __init__(self, training_flag, input_nodes):
+    def __init__(self, training_mode, input_nodes):
         super(DCN, self).__init__()
-        self.training = training_flag
+        self.training = training_mode
 
         # shared layer
         self.shared1 = nn.Linear(in_features=input_nodes, out_features=200)
@@ -50,13 +50,13 @@ class DCN(nn.Module):
         else:
             x = x.float()
 
-        if self.training == Constants.evaluation:
+        if self.training == Constants.DCN_EVALUATION:
             y1, y0 = self.__eval_net(x)
-        elif self.training == Constants.train_PD:
+        elif self.training == Constants.DCN_TRAIN_PD:
             y1, y0 = self.__train_net_PD(x, ps_score)
-        elif self.training == Constants.train_constant_dropout:
+        elif self.training == Constants.DCN_TRAIN_CONSTANT_DROPOUT:
             y1, y0 = self.__train_net_constant_dropout(x, ps_score)
-        elif self.training == Constants.train_no_dropout:
+        elif self.training == Constants.DCN_TRAIN_NO_DROPOUT:
             y1, y0 = self.__train_net_no_droput(x)
 
         return y1, y0

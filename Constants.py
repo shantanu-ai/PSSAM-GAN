@@ -1,10 +1,19 @@
 class Constants:
-    evaluation = "eval"
-    train_constant_dropout = "train_constant_dropout"
-    train_PD = "train_PD"
-    train_no_dropout = "train_with_no_dropout"
-
     # ps score neural net training parameters
+    PROP_SCORE_NN_EPOCHS = 50
+    PROP_SCORE_NN_LR = 0.001
+    PROP_SCORE_NN_BATCH_SIZE = 32
+    PROP_SCORE_NN_MODEL_PATH = "./Propensity_Model/NN_PS_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
 
     # DCN training parameters
+    DCN_EPOCHS = 100
+    DCN_LR = 0.0001
+    DCN_MODEL_PATH_PD = "./DCNModel/NN_DCN_PD_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
+    DCN_MODEL_PATH_CONSTANT_DROPOUT = "./DCNModel/NN_DCN_CONSTANT_DROPOUT_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
+    DCN_MODEL_PATH_NO_DROPOUT = "./DCNModel/NN_DCN_NO_DROPOUT_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
 
+    # train DCN types
+    DCN_EVALUATION = "eval"
+    DCN_TRAIN_CONSTANT_DROPOUT = "train_constant_dropout"
+    DCN_TRAIN_PD = "train_PD"
+    DCN_TRAIN_NO_DROPOUT = "train_with_no_dropout"

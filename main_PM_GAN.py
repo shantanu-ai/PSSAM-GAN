@@ -1,9 +1,8 @@
 # from Graphs import Graphs
 from Experiments import Experiments
-
-from Model25_10_25 import Model_25_1_25
 # from DCN_PD_test import DCN_PD_Deep
 
 if __name__ == '__main__':
     print("Using original data")
-    Experiments().run_all_experiments(iterations=100, running_mode="original_data")
+    Experiments().run_all_experiments(iterations=1,
+                                      running_mode="original_data")
