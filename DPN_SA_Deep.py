@@ -22,38 +22,6 @@ class DPN_SA_Deep:
                                        iter_id, device, run_parameters["input_nodes"],
                                        is_synthetic)
 
-        # using SAE
-        sparse_classifier, \
-        sae_classifier_stacked_all_layer_active, sae_classifier_stacked_cur_layer_active = \
-            self.__train_propensity_net_SAE(ps_train_set,
-                                            np_covariates_X_train,
-                                            np_covariates_Y_train,
-                                            dL,
-                                            iter_id, device,
-                                            run_parameters["input_nodes"],
-                                            is_synthetic)
-        # using Logistic Regression
-        LR_model = self.__train_propensity_net_LR(np_covariates_X_train, np_covariates_Y_train,
-                                                  dL,
-                                                  iter_id, device,
-                                                  run_parameters["input_nodes"],
-                                                  is_synthetic)
-
-        # using Logistic Regression Lasso
-        LR_model_lasso = self.__train_propensity_net_LR_Lasso(np_covariates_X_train,
-                                                              np_covariates_Y_train,
-                                                              dL,
-                                                              iter_id, device,
-                                                              run_parameters["input_nodes"],
-                                                              is_synthetic)
-
-        return {
-            "sparse_classifier": sparse_classifier,
-            "sae_classifier_stacked_all_layer_active": sae_classifier_stacked_all_layer_active,
-            "sae_classifier_stacked_cur_layer_active": sae_classifier_stacked_cur_layer_active,
-            "LR_model": LR_model,
-            "LR_model_lasso": LR_model_lasso
-        }
 
     def test_DCN(self, iter_id, np_covariates_X_test, np_covariates_Y_test, dL,
                  sparse_classifier,
@@ -227,8 +195,8 @@ class DPN_SA_Deep:
                                                               ps_score_list_train_NN,
                                                               is_synthetic)
 
-        model_path = "./DCNModel/NN_DCN_model_iter_id_" + str(iter_id) + "_epoch_{0}_lr_{1}.pth"
-        self.__train_DCN(data_loader_dict_train_NN, model_path, dL, device,
+        model_path_PD = "./DCNModel/NN_DCN_model_iter_id_" + str(iter_id) + "_epoch_{0}_lr_{1}.pth"
+        self.__train_DCN(data_loader_dict_train_NN, model_path_PD, dL, device,
                          input_nodes)
 
     def __train_propensity_net_SAE(self,

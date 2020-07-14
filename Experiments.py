@@ -16,23 +16,8 @@ class Experiments:
         print(device)
         results_list = []
 
-        train_parameters_SAE = {
-            "epochs": 400,
-            "lr": 0.001,
-            "batch_size": 32,
-            "shuffle": True,
-            "sparsity_probability": 0.8,
-            "weight_decay": 0.0003,
-            "BETA": 0.1,
-        }
         run_parameters = self.__get_run_parameters(running_mode)
-
-        print(str(train_parameters_SAE))
         file1 = open(run_parameters["summary_file_name"], "a")
-        file1.write(str(train_parameters_SAE))
-        file1.write("\n")
-        file1.write("With batch norm")
-        file1.write("\n")
         for iter_id in range(iterations):
             print("########### 400 epochs ###########")
             iter_id += 1
@@ -46,11 +31,11 @@ class Experiments:
                 = self.load_data(running_mode, dL, csv_path, split_size)
 
             dp_sa = DPN_SA_Deep()
-            trained_models = dp_sa.train_eval_DCN(iter_id,
-                                                  np_covariates_X_train,
-                                                  np_covariates_Y_train,
-                                                  dL, device, run_parameters,
-                                                  is_synthetic=run_parameters["is_synthetic"])
+            dp_sa.train_eval_DCN(iter_id,
+                                 np_covariates_X_train,
+                                 np_covariates_Y_train,
+                                 dL, device, run_parameters,
+                                 is_synthetic=run_parameters["is_synthetic"])
 
             sparse_classifier = trained_models["sparse_classifier"]
             LR_model = trained_models["LR_model"]
