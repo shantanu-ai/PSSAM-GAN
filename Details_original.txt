@@ -1,0 +1,26 @@
+Iter: 1, MSE_NN_PD (No PS Match): 2.145412981413527, MSE_NN_no_dropout (PS Match): 2.9743159045525265, MSE_NN_dropout_5 (PS Match): 3.944173508788192, MSE_NN_dropout_2 (PS Match): 2.347707937001193
+
+##################################################
+
+Using NN PD (No PS Match), MSE: 2.145412981413527, SD: 0.0
+Using NN PD (No PS Match), true ATE: 3.911244789719999, SD: 0.0
+Using NN PD (No PS Match), predicted ATE: 3.590627132256826, SD: 0.0
+##################################################
+##################################################
+
+Using NN No Dropout (PS Match), MSE: 2.9743159045525265, SD: 0.0
+Using NN No Dropout (PS Match), true ATE: 3.911244789719999, SD: 0.0
+Using NN No Dropout (PS Match), predicted ATE: 3.937778494755427, SD: 0.0
+##################################################
+##################################################
+
+Using NN Dropout 0.5 (PS Match), MSE: 3.944173508788192, SD: 0.0
+Using NN Dropout 0.5 (PS Match), true ATE: 3.911244789719999, SD: 0.0
+Using NN Dropout 0.5 (PS Match), predicted ATE: 2.6778198885917663, SD: 0.0
+##################################################
+##################################################
+
+Using NN Dropout 0.2 (PS Match), MSE: 2.347707937001193, SD: 0.0
+Using NN Dropout 0.2 (PS Match), true ATE: 3.911244789719999, SD: 0.0
+Using NN Dropout 0.2 (PS Match), predicted ATE: 3.552247834006945, SD: 0.0
+##################################################

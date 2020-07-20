@@ -66,6 +66,7 @@ class DataLoader:
         # col of X -> x1 .. x25, Y_f, Y_cf, T, Ps
         X = Utils.concat_np_arr(X, np.array([ps_list]).T, axis=1)
         # print("Big X: {0}".format(X.shape))
+
         df_X = pd.DataFrame(X)
         treated_df_X, treated_ps_score, treated_df_Y_f, treated_df_Y_cf = \
             self.__preprocess_data_for_DCN(df_X, treatment_index=1,
@@ -83,11 +84,13 @@ class DataLoader:
             self.__convert_to_numpy_DCN(control_df_X, control_ps_score, control_df_Y_f,
                                         control_df_Y_cf)
 
-        # print(".. Treated Statistics ..")
-        # print(np_treated_df_X.shape)
+        print(" Treated Statistics ==>")
+        print(np_treated_df_X.shape)
+        # print(np_treated_ps_score.shape)
 
-        # print(".. Control Statistics ..")
-        # print(np_control_df_X.shape)
+        print(" Control Statistics ==>")
+        print(np_control_df_X.shape)
+        # print(np_control_ps_score.shape)
 
         return {
             "treated_data": (np_treated_df_X, np_treated_ps_score,
@@ -95,16 +98,6 @@ class DataLoader:
             "control_data": (np_control_df_X, np_control_ps_score,
                              np_control_df_Y_f, np_control_df_Y_cf)
         }
-
-    @staticmethod
-    def convert_to_tensor_DCN(np_df_X,
-                              np_ps_score,
-                              np_df_Y_f,
-                              np_df_Y_cf):
-        return Utils.convert_to_tensor_DCN(np_df_X,
-                                           np_ps_score,
-                                           np_df_Y_f,
-                                           np_df_Y_cf)
 
     @staticmethod
     def __convert_to_numpy(df):

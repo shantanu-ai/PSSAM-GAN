@@ -33,7 +33,8 @@ class DCN_network:
                                                                 shuffle=shuffle,
                                                                 num_workers=1)
 
-        network = DCN(training_mode=train_mode, input_nodes=input_nodes).to(device)
+        network = DCN(training_mode=train_mode,
+                      input_nodes=input_nodes).to(device)
         optimizer = optim.Adam(network.parameters(), lr=lr)
         lossF = nn.MSELoss()
         min_loss = 100000.0
@@ -130,10 +131,10 @@ class DCN_network:
                 print("epoch: {0}, Treated + Control loss: {1}".format(epoch, dataset_loss))
             # if epoch % 2 == 1:
             #     print("epoch: {0}, Treated + Control loss: {1}".format(epoch, dataset_loss))
-                # if dataset_loss < min_loss:
-                #     print("Current loss: {0}, over previous: {1}, Saving model".
-                #           format(dataset_loss, min_loss))
-                #     min_loss = dataset_loss
+            # if dataset_loss < min_loss:
+            #     print("Current loss: {0}, over previous: {1}, Saving model".
+            #           format(dataset_loss, min_loss))
+            #     min_loss = dataset_loss
         torch.save(network.state_dict(), model_save_path)
 
     def eval(self, eval_parameters, device, input_nodes, train_mode):

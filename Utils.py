@@ -15,6 +15,10 @@ class Utils:
         return data.to_numpy()
 
     @staticmethod
+    def convert_to_col_vector(np_arr):
+        return np_arr.reshape(np_arr.shape[0], 1)
+
+    @staticmethod
     def test_train_split(covariates_X, treatment_Y, split_size=0.8):
         return sklearn.train_test_split(covariates_X, treatment_Y, train_size=split_size)
 
@@ -98,10 +102,9 @@ class Utils:
     @staticmethod
     def create_tensors_to_train_DCN(group, dL):
         np_df_X = group[0]
-        print(np_df_X.shape)
         np_ps_score = group[1]
         np_df_Y_f = group[2]
         np_df_Y_cf = group[3]
-        tensor = dL.convert_to_tensor_DCN(np_df_X, np_ps_score,
+        tensor = Utils.convert_to_tensor_DCN(np_df_X, np_ps_score,
                                           np_df_Y_f, np_df_Y_cf)
         return tensor

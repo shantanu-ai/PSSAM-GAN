@@ -1,0 +1,2 @@
+,iter_id,MSE_NN_PD,true_ATE_NN_PD,predicted_ATE_NN_PD,MSE_NN_no_dropout,true_ATE_NN_no_dropout,predicted_ATE_NN_no_dropout,MSE_NN_dropout_5,true_ATE_NN_dropout_5,predicted_ATE_NN_dropout_5,MSE_NN_dropout_2,true_ATE_NN_dropout_2,predicted_ATE_NN_dropout_2
+0,1,0,0,0,3.3895063304609465,4.2855583614466655,4.035107355117798,0,0,0,0,0,0

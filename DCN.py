@@ -7,12 +7,12 @@ from Constants import Constants
 from Utils import Utils
 
 
-# training_flag = "eval" / "train_constant_dropout" / "train_PD"
+# training_mode = "eval" / "train_constant_dropout" / "train_PD"
 
 class DCN(nn.Module):
     def __init__(self, training_mode, input_nodes):
         super(DCN, self).__init__()
-        self.training = training_mode
+        self.training_mode = training_mode
 
         # shared layer
         self.shared1 = nn.Linear(in_features=input_nodes, out_features=200)
@@ -50,31 +50,16 @@ class DCN(nn.Module):
         else:
             x = x.float()
 
-        if self.training == Constants.DCN_EVALUATION:
+        if self.training_mode == Constants.DCN_EVALUATION:
             y1, y0 = self.__eval_net(x)
-        elif self.training == Constants.DCN_TRAIN_PD:
-            y1, y0 = self.__train_net_PD(x, ps_score)
-        elif self.training == Constants.DCN_TRAIN_CONSTANT_DROPOUT:
-            y1, y0 = self.__train_net_constant_dropout(x, ps_score)
-        elif self.training == Constants.DCN_TRAIN_NO_DROPOUT:
+        elif self.training_mode == Constants.DCN_TRAIN_PD:
+            y1, y0 = self.__train_net_PD(x, ps_score=ps_score)
+        elif self.training_mode == Constants.DCN_TRAIN_CONSTANT_DROPOUT_5:
+            y1, y0 = self.__train_net_constant_dropout(x, ps_score=0.5)
+        elif self.training_mode == Constants.DCN_TRAIN_CONSTANT_DROPOUT_2:
+            y1, y0 = self.__train_net_constant_dropout(x, ps_score=0.2)
+        elif self.training_mode == Constants.DCN_TRAIN_NO_DROPOUT:
             y1, y0 = self.__train_net_no_droput(x)
-
-        return y1, y0
-
-    def __train_net_no_droput(self, x):
-        # shared layers
-        x = F.relu(self.shared1(x))
-        x = F.relu(self.shared2(x))
-
-        # potential outcome1 Y(1)
-        y1 = F.relu(self.hidden1_Y1(x))
-        y1 = F.relu(self.hidden2_Y1(y1))
-        y1 = self.out_Y1(y1)
-
-        # potential outcome1 Y(0)
-        y0 = F.relu(self.hidden1_Y0(x))
-        y0 = F.relu(self.hidden2_Y0(y0))
-        y0 = self.out_Y0(y0)
 
         return y1, y0
 
@@ -119,6 +104,23 @@ class DCN(nn.Module):
         y0_mask = Utils.get_dropout_mask(dropout_prob, self.hidden1_Y0(x))
         y0 = F.relu(y0_mask * self.hidden1_Y0(x))
         y0 = F.relu(y0_mask * self.hidden2_Y0(y0))
+        y0 = self.out_Y0(y0)
+
+        return y1, y0
+
+    def __train_net_no_droput(self, x):
+        # shared layers
+        x = F.relu(self.shared1(x))
+        x = F.relu(self.shared2(x))
+
+        # potential outcome1 Y(1)
+        y1 = F.relu(self.hidden1_Y1(x))
+        y1 = F.relu(self.hidden2_Y1(y1))
+        y1 = self.out_Y1(y1)
+
+        # potential outcome1 Y(0)
+        y0 = F.relu(self.hidden1_Y0(x))
+        y0 = F.relu(self.hidden2_Y0(y0))
         y0 = self.out_Y0(y0)
 
         return y1, y0
