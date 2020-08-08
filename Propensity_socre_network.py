@@ -59,8 +59,7 @@ class Propensity_socre_network:
         torch.save(network.state_dict(), model_save_path)
 
     @staticmethod
-    def eval(eval_parameters, device, phase):
-        print(".. Propensity score evaluation started using NN..")
+    def eval(eval_parameters, device, phase, eval_from_GAN=False):
         eval_set = eval_parameters["eval_set"]
         model_path = eval_parameters["model_path"]
         input_nodes = eval_parameters["input_nodes"]
@@ -75,13 +74,14 @@ class Propensity_socre_network:
         for batch in data_loader:
             covariates, treatment = batch
             covariates = covariates.to(device)
-            covariates = covariates[:, :-2]
+            if not eval_from_GAN:
+                covariates = covariates[:, :-2]
             treatment = treatment.squeeze().to(device)
 
             eval_set_size += covariates.size(0)
 
             treatment_pred = network(covariates)
-            total_correct += Utils.get_num_correct(treatment_pred, treatment)
+            # total_correct += Utils.get_num_correct(treatment_pred, treatment)
 
             treatment_pred = treatment_pred.squeeze()
             prop_score_list.append(treatment_pred[1].item())
@@ -90,7 +90,6 @@ class Propensity_socre_network:
         # print("correct: {0}/{1}, accuracy: {2}".
         #           format(total_correct, eval_set_size, pred_accuracy))
 
-        print(".. Propensity score evaluation completed using NN..")
         return prop_score_list
 
     @staticmethod
@@ -116,7 +115,7 @@ class Propensity_socre_network:
             eval_set_size += covariates.size(0)
 
             treatment_pred = network(covariates)
-            total_correct += Utils.get_num_correct(treatment_pred, treatment)
+            # total_correct += Utils.get_num_correct(treatment_pred, treatment)
 
             treatment_pred = treatment_pred.squeeze()
             prop_dict["treatment"] = treatment.item()

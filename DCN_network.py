@@ -1,5 +1,6 @@
 from collections import OrderedDict
 
+import numpy as np
 import torch
 import torch.nn as nn
 import torch.optim as optim
@@ -67,19 +68,17 @@ class DCN_network:
                     covariates_X, ps_score, y_f, y_cf = batch
                     covariates_X = covariates_X.to(device)
                     ps_score = ps_score.squeeze().to(device)
-
                     train_set_size += covariates_X.size(0)
                     treatment_pred = network(covariates_X, ps_score)
                     # treatment_pred[0] -> y1
                     # treatment_pred[1] -> y0
-                    predicted_ITE = treatment_pred[0] - treatment_pred[1]
-                    true_ITE = y_f - y_cf
+                    yf_predicted = treatment_pred[0]
                     if torch.cuda.is_available():
-                        loss = lossF(predicted_ITE.float().cuda(),
-                                     true_ITE.float().cuda()).to(device)
+                        loss = lossF(yf_predicted.float().cuda(),
+                                     y_f.float().cuda()).to(device)
                     else:
-                        loss = lossF(predicted_ITE.float(),
-                                     true_ITE.float()).to(device)
+                        loss = lossF(yf_predicted.float(),
+                                     y_f.float()).to(device)
                     optimizer.zero_grad()
                     loss.backward()
                     optimizer.step()
@@ -111,34 +110,24 @@ class DCN_network:
                     treatment_pred = network(covariates_X, ps_score)
                     # treatment_pred[0] -> y1
                     # treatment_pred[1] -> y0
-                    predicted_ITE = treatment_pred[0] - treatment_pred[1]
-                    true_ITE = y_cf - y_f
+                    yf_predicted = treatment_pred[1]
                     if torch.cuda.is_available():
-                        loss = lossF(predicted_ITE.float().cuda(),
-                                     true_ITE.float().cuda()).to(device)
+                        loss = lossF(yf_predicted.float().cuda(),
+                                     y_f.float().cuda()).to(device)
                     else:
-                        loss = lossF(predicted_ITE.float(),
-                                     true_ITE.float()).to(device)
+                        loss = lossF(yf_predicted.float(),
+                                     y_f.float()).to(device)
                     optimizer.zero_grad()
                     loss.backward()
                     optimizer.step()
                     total_loss += loss.item()
                 dataset_loss = dataset_loss + total_loss
 
-            # print("epoch: {0}, train_set_size: {1} loss: {2}".
-            #       format(epoch, train_set_size, total_loss))
             if epoch % 10 == 9:
                 print("epoch: {0}, Treated + Control loss: {1}".format(epoch, dataset_loss))
-            # if epoch % 2 == 1:
-            #     print("epoch: {0}, Treated + Control loss: {1}".format(epoch, dataset_loss))
-            # if dataset_loss < min_loss:
-            #     print("Current loss: {0}, over previous: {1}, Saving model".
-            #           format(dataset_loss, min_loss))
-            #     min_loss = dataset_loss
         torch.save(network.state_dict(), model_save_path)
 
     def eval(self, eval_parameters, device, input_nodes, train_mode):
-        print(".. Evaluation started ..")
         treated_set = eval_parameters["treated_set"]
         control_set = eval_parameters["control_set"]
         model_path = eval_parameters["model_save_path"]
@@ -211,6 +200,36 @@ class DCN_network:
             "true_ITE": true_ITE_list,
             "predicted_ITE": predicted_ITE_list,
             "ITE_dict_list": ITE_dict_list
+        }
+
+    @staticmethod
+    def eval_semi_supervised(eval_parameters, device, input_nodes, train_mode, treated_flag):
+        eval_set = eval_parameters["eval_set"]
+        model_path = eval_parameters["model_save_path"]
+        network = DCN(training_mode=train_mode, input_nodes=input_nodes).to(device)
+        network.load_state_dict(torch.load(model_path, map_location=device))
+        network.eval()
+        treated_data_loader = torch.utils.data.DataLoader(eval_set,
+                                                          shuffle=False, num_workers=1)
+
+        y_f_list = []
+        y_cf_list = []
+
+        for batch in treated_data_loader:
+            covariates_X, ps_score = batch
+            covariates_X = covariates_X.to(device)
+            ps_score = ps_score.squeeze().to(device)
+            treatment_pred = network(covariates_X, ps_score)
+            if treated_flag:
+                y_f_list.append(treatment_pred[0].item())
+                y_cf_list.append(treatment_pred[1].item())
+            else:
+                y_f_list.append(treatment_pred[1].item())
+                y_cf_list.append(treatment_pred[0].item())
+
+        return {
+            "y_f_list": np.array(y_f_list),
+            "y_cf_list": np.array(y_cf_list)
         }
 
     @staticmethod

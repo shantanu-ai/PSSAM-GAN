@@ -7,14 +7,16 @@ class Constants:
 
     # DCN training parameters
     DCN_EPOCHS = 100
-    DCN_LR = 0.0001
+    DCN_LR = 0.001
     DCN_MODEL_PATH_PD_PM_MATCH_FALSE = "./DCNModel/NN_DCN_PD_PM_MATCH_FALSE_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
     DCN_MODEL_PATH_PD_PM_MATCH_TRUE = "./DCNModel/NN_DCN_PD_PM_MATCH_TRUE_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
 
     DCN_MODEL_PATH_CONSTANT_DROPOUT_5 = "./DCNModel/NN_DCN_CONSTANT_DROPOUT_5_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
     DCN_MODEL_PATH_CONSTANT_DROPOUT_2 = "./DCNModel/NN_DCN_CONSTANT_DROPOUT_2_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
 
+    DCN_MODEL_SEMI_SUPERVISED_PATH = "./DCNModel/NN_DCN_SEMI_SUPERVISED_NO_DROPOUT_PM_MATCH_FALSE_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
     DCN_MODEL_PATH_NO_DROPOUT_PM_MATCH_FALSE = "./DCNModel/NN_DCN_NO_DROPOUT_PM_MATCH_FALSE_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
+
     DCN_MODEL_PATH_NO_DROPOUT_PM_MATCH_TRUE = "./DCNModel/NN_DCN_NO_DROPOUT_PM_MATCH_TRUE_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
 
     # train DCN types

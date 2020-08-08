@@ -1,13 +1,13 @@
 import math
-
-import numpy as np
-import sklearn.model_selection as sklearn
-import torch
-import torch.nn.functional as F
-from torch.distributions import Bernoulli
 from collections import namedtuple
 from itertools import product
+
+import numpy as np
 import pandas as pd
+import sklearn.model_selection as sklearn
+import torch
+from torch.distributions import Bernoulli
+
 
 class Utils:
     @staticmethod
@@ -20,7 +20,7 @@ class Utils:
 
     @staticmethod
     def test_train_split(covariates_X, treatment_Y, split_size=0.8):
-        return sklearn.train_test_split(covariates_X, treatment_Y, train_size=split_size)
+        return sklearn.train_test_split(covariates_X, treatment_Y, train_size=split_size, random_state=42)
 
     @staticmethod
     def convert_to_tensor(X, Y):
@@ -40,6 +40,12 @@ class Utils:
         return processed_dataset
 
     @staticmethod
+    def convert_to_tensor_DCN_PS(tensor_x, ps_score):
+        tensor_ps_score = torch.from_numpy(ps_score)
+        processed_dataset = torch.utils.data.TensorDataset(tensor_x, tensor_ps_score)
+        return processed_dataset
+
+    @staticmethod
     def concat_np_arr(X, Y, axis=1):
         return np.concatenate((X, Y), axis)
 
@@ -56,11 +62,11 @@ class Utils:
         if prob < 0:
             return
         if prob == 1:
-            return -(prob * math.log(prob))
+            return -(prob * math.log2(prob))
         elif prob == 0:
-            return -((1 - prob) * math.log(1 - prob))
+            return -((1 - prob) * math.log2(1 - prob))
         else:
-            return -(prob * math.log(prob)) - ((1 - prob) * math.log(1 - prob))
+            return -(prob * math.log2(prob)) - ((1 - prob) * math.log2(1 - prob))
 
     @staticmethod
     def get_dropout_probability(entropy, gama=1):
@@ -69,6 +75,10 @@ class Utils:
     @staticmethod
     def get_dropout_mask(prob, x):
         return Bernoulli(torch.full_like(x, 1 - prob)).sample() / (1 - prob)
+
+    @staticmethod
+    def get_dropout_probability_tensor(entropy, gama=1):
+        return 1 - (gama * 0.5) - (entropy * 0.5)
 
     @staticmethod
     def KL_divergence(rho, rho_hat, device):
@@ -106,5 +116,5 @@ class Utils:
         np_df_Y_f = group[2]
         np_df_Y_cf = group[3]
         tensor = Utils.convert_to_tensor_DCN(np_df_X, np_ps_score,
-                                          np_df_Y_f, np_df_Y_cf)
+                                             np_df_Y_f, np_df_Y_cf)
         return tensor

@@ -1,16 +1,18 @@
+import numpy as np
+
 from Constants import Constants
 from DCN_network import DCN_network
-from PS_Manager import PS_Manager
+from PS_Matching import PS_Matching
 from Propensity_socre_network import Propensity_socre_network
 from Utils import Utils
 
 
 class PM_GAN:
-    def train_eval_DCN(self, iter_id, np_covariates_X_train,
-                       np_covariates_Y_train,
-                       dL, device,
-                       run_parameters,
-                       is_synthetic=False):
+    def train_DCN(self, iter_id, np_covariates_X_train,
+                  np_covariates_Y_train,
+                  dL, device,
+                  run_parameters,
+                  is_synthetic=False):
         print("----------- Training phase ------------")
         ps_train_set = dL.convert_to_tensor(np_covariates_X_train, np_covariates_Y_train)
 
@@ -35,7 +37,7 @@ class PM_GAN:
         is_synthetic = run_parameters["is_synthetic"]
         input_nodes = run_parameters["input_nodes"]
 
-        # testing using NN
+        # get propensity scores using NN
         ps_net_NN = Propensity_socre_network()
         ps_eval_parameters_NN = {
             "eval_set": ps_test_set,
@@ -50,112 +52,72 @@ class PM_GAN:
                                                         np_covariates_Y_test,
                                                         ps_score_list_NN,
                                                         is_synthetic)
-        MSE_NN_PD = 0
-        true_ATE_NN_PD = 0
-        predicted_ATE_NN_PD = 0
 
-        MSE_NN_dropout_2 = 0
-        true_ATE_NN_dropout_2 = 0
-        predicted_ATE_NN_dropout_2 = 0
-
-        MSE_NN_dropout_5 = 0
-        true_ATE_NN_dropout_5 = 0
-        predicted_ATE_NN_dropout_5 = 0
-
-        # test using PD - DCN-PD - Model 1
-        # model_path = Constants.DCN_MODEL_PATH_PD.format(iter_id,
-        #                                                 Constants.DCN_EPOCHS,
-        #                                                 Constants.DCN_LR)
-        # print("############### DCN Testing using NN PD ###############")
+        # test using PM Match No PD - Model 1
+        # model_path = Constants.DCN_MODEL_PATH_NO_DROPOUT_PM_MATCH_TRUE \
+        #     .format(iter_id,
+        #             Constants.DCN_EPOCHS,
+        #             Constants.DCN_LR)
+        # print("############### DCN Testing using PM Match No PD ###############")
+        # print("--" * 25)
         # print(model_path)
         # print("--" * 25)
-        # MSE_NN_PD, true_ATE_NN_PD, predicted_ATE_NN_PD = self.__test_DCN_NN(iter_id,
-        #                                                                     dL,
-        #                                                                     device,
-        #                                                                     data_loader_dict_NN,
-        #                                                                     run_parameters["nn_DCN_PD_iter_file"],
-        #                                                                     model_path,
-        #                                                                     input_nodes)
+        # MSE_PM_Match_No_PD, true_ATE_PM_Match_No_PD, predicted_ATE_PM_Match_No_PD = \
+        #     self.__test_DCN_NN(iter_id,
+        #                        dL,
+        #                        device,
+        #                        data_loader_dict_NN,
+        #                        run_parameters[
+        #                            "nn_DCN_PS_Match_No_PD_iter_file"],
+        #                        model_path,
+        #                        input_nodes)
 
-        # test using no dropout - PM Match - Model 2
-        model_path = Constants.DCN_MODEL_PATH_NO_DROPOUT_PM_MATCH_FALSE.format(iter_id,
-                                                                               Constants.DCN_EPOCHS,
-                                                                               Constants.DCN_LR)
-        print("############### DCN Testing using NN no Dropout ###############")
+        # test using PM Match PD - Model 2
+        # model_path = Constants.DCN_MODEL_PATH_PD_PM_MATCH_TRUE.format(iter_id,
+        #                                                               Constants.DCN_EPOCHS,
+        #                                                               Constants.DCN_LR)
+        # print("--" * 25)
+        # print("############### Model 1: DCN Testing using PM Match PD  ###############")
+        # print(model_path)
+        # print("--" * 25)
+        # MSE_PM_Match_PD, true_ATE_PM_Match_PD, predicted_ATE_PM_Match_PD = \
+        #     self.__test_DCN_NN(iter_id,
+        #                        dL,
+        #                        device,
+        #                        data_loader_dict_NN,
+        #                        run_parameters["nn_DCN_PS_Match_PD_iter_file"],
+        #                        model_path,
+        #                        input_nodes)
+
+        # test using No PM Match PD - Model 3
+        model_path = Constants.DCN_MODEL_PATH_PD_PM_MATCH_FALSE.format(iter_id,
+                                                                       Constants.DCN_EPOCHS,
+                                                                       Constants.DCN_LR)
+        print("--" * 25)
+        print("############### Model 2: DCN Testing using No PM Match PD (DCN-PD)  ###############")
         print(model_path)
         print("--" * 25)
-        MSE_NN_no_dropout, true_ATE_NN_no_dropout, predicted_ATE_NN_no_dropout = \
+        MSE_No_PM_Match_PD, true_ATE_No_PM_Match_PD, predicted_ATE_No_PM_Match_PD = \
             self.__test_DCN_NN(iter_id,
                                dL,
                                device,
                                data_loader_dict_NN,
-                               run_parameters[
-                                   "nn_DCN_No_Dropout_iter_file"],
+                               run_parameters["nn_DCN_No_PS_Match_PD_iter_file"],
                                model_path,
                                input_nodes)
-        model_path = Constants.DCN_MODEL_PATH_NO_DROPOUT_PM_MATCH_TRUE.format(iter_id,
-                                                                               Constants.DCN_EPOCHS,
-                                                                               Constants.DCN_LR)
-        MSE_NN_no_dropout_pm_match, true_ATE_NN_no_dropout_pm_match, predicted_ATE_NN_no_dropout_pm_match = \
-            self.__test_DCN_NN(iter_id,
-                               dL,
-                               device,
-                               data_loader_dict_NN,
-                               run_parameters[
-                                   "nn_DCN_No_Dropout_iter_file"],
-                               model_path,
-                               input_nodes)
-
-        # # using NN Constant Dropout 0.5 Model 3
-        # model_path = Constants.DCN_MODEL_PATH_CONSTANT_DROPOUT_5.format(iter_id,
-        #                                                                 Constants.DCN_EPOCHS,
-        #                                                                 Constants.DCN_LR)
-        # print("############### DCN Testing using NN Constant dropout 0.5 ###############")
-        # print(model_path)
-        # print("--" * 25)
-        # MSE_NN_dropout_5, true_ATE_NN_dropout_5, predicted_ATE_NN_dropout_5 = \
-        #     self.__test_DCN_NN(iter_id,
-        #                        dL,
-        #                        device,
-        #                        data_loader_dict_NN,
-        #                        run_parameters[
-        #                            "nn_DCN_Const_Dropout_5_iter_file"],
-        #                        model_path,
-        #                        input_nodes)
-        #
-        # # using NN Constant Dropout 0.2 Model 4
-        # model_path = Constants.DCN_MODEL_PATH_CONSTANT_DROPOUT_2.format(iter_id,
-        #                                                                 Constants.DCN_EPOCHS,
-        #                                                                 Constants.DCN_LR)
-        # print("############### DCN Testing using NN NN Constant dropout 0.2 ###############")
-        # print(model_path)
-        # print("--" * 25)
-        # MSE_NN_dropout_2, true_ATE_NN_dropout_2, predicted_ATE_NN_dropout_2 = \
-        #     self.__test_DCN_NN(iter_id,
-        #                        dL,
-        #                        device,
-        #                        data_loader_dict_NN,
-        #                        run_parameters[
-        #                            "nn_DCN_Const_Dropout_2_iter_file"],
-        #                        model_path,
-        #                        input_nodes)
 
         return {
-            "MSE_NN_PD": MSE_NN_PD,
-            "true_ATE_NN_PD": true_ATE_NN_PD,
-            "predicted_ATE_NN_PD": predicted_ATE_NN_PD,
+            "MSE_PM_Match_No_PD": 0,
+            "true_ATE_PM_Match_No_PD": 0,
+            "predicted_ATE_PM_Match_No_PD": 0,
 
-            "MSE_NN_no_dropout": MSE_NN_no_dropout,
-            "true_ATE_NN_no_dropout": true_ATE_NN_no_dropout,
-            "predicted_ATE_NN_no_dropout": predicted_ATE_NN_no_dropout,
+            "MSE_PM_Match_PD": 0,
+            "true_ATE_PM_Match_PD": 0,
+            "predicted_ATE_PM_Match_PD": 0,
 
-            "MSE_NN_dropout_5": MSE_NN_dropout_5,
-            "true_ATE_NN_dropout_5": true_ATE_NN_dropout_5,
-            "predicted_ATE_NN_dropout_5": predicted_ATE_NN_dropout_5,
-
-            "MSE_NN_dropout_2": MSE_NN_dropout_2,
-            "true_ATE_NN_dropout_2": true_ATE_NN_dropout_2,
-            "predicted_ATE_NN_dropout_2": predicted_ATE_NN_dropout_2
+            "MSE_No_PM_Match_PD": MSE_No_PM_Match_PD,
+            "true_ATE_No_PM_Match_PD": true_ATE_No_PM_Match_PD,
+            "predicted_ATE_No_PM_Match_PD": predicted_ATE_No_PM_Match_PD
         }
 
     def __train_propensity_net_NN(self, ps_train_set,
@@ -170,70 +132,53 @@ class PM_GAN:
                                                               ps_score_list_train_NN,
                                                               is_synthetic)
 
-        # train using PD - DCN-PD Model 1
-        # need to change the model path name to incorporate ps_match=True
-        # model_path_PD = Constants.DCN_MODEL_PATH_PD
-        # print("############### DCN Training using NN PD (No PS Match) ###############")
+        # train using PM Match No PD Model 1
+        # model_path_no_dropout = Constants.DCN_MODEL_PATH_NO_DROPOUT_PM_MATCH_TRUE
         # print("--" * 25)
-        # self.__train_DCN(data_loader_dict_train_NN, iter_id, model_path_PD, dL, device,
-        #                  input_nodes, train_mode=Constants.DCN_TRAIN_PD,
-        #                  ps_match=True)
-        #
-        # model_path_PD = Constants.DCN_MODEL_PATH_PD
-        # print("############### DCN Training using NN PD (No PS Match) ###############")
-        # print("--" * 25)
-        # self.__train_DCN(data_loader_dict_train_NN, iter_id, model_path_PD, dL, device,
-        #                  input_nodes, train_mode=Constants.DCN_TRAIN_PD,
-        #                  ps_match=False)
-
-        # train using no dropout Model 2
-        model_path_no_dropout = Constants.DCN_MODEL_PATH_NO_DROPOUT_PM_MATCH_TRUE
-        print("############### DCN Training using NN No Dropout (PS Match) ###############")
-        print("--" * 25)
-        self.__train_DCN(data_loader_dict_train_NN, iter_id,
-                         model_path_no_dropout,
-                         dL, device,
-                         input_nodes,
-                         train_mode=Constants.DCN_TRAIN_NO_DROPOUT,
-                         ps_match=True)
-
-        model_path_no_dropout = Constants.DCN_MODEL_PATH_NO_DROPOUT_PM_MATCH_FALSE
-        print("############### DCN Training using NN No Dropout (PS Match) ###############")
-        print("--" * 25)
-        self.__train_DCN(data_loader_dict_train_NN, iter_id,
-                         model_path_no_dropout,
-                         dL, device,
-                         input_nodes,
-                         train_mode=Constants.DCN_TRAIN_NO_DROPOUT,
-                         ps_match=False)
-
-        # train using constant dropout 0.5 Model 3
-        # model_path_constant_dropout = Constants.DCN_MODEL_PATH_CONSTANT_DROPOUT_5
-        # print("############### DCN Training using NN Dropout 0.5 (PS Match) ###############")
+        # print("############### DCN Training using PM Match No PD ###############")
         # print("--" * 25)
         # self.__train_DCN(data_loader_dict_train_NN, iter_id,
-        #                  model_path_constant_dropout,
+        #                  model_path_no_dropout,
         #                  dL, device,
         #                  input_nodes,
-        #                  train_mode=Constants.DCN_TRAIN_CONSTANT_DROPOUT_5)
-        #
-        # # train using constant dropout 0.2 Model 4
-        # model_path_constant_dropout = Constants.DCN_MODEL_PATH_CONSTANT_DROPOUT_2
-        # print("############### DCN Training using NN Dropout 0.2 (PS Match) ###############")
+        #                  train_mode=Constants.DCN_TRAIN_NO_DROPOUT,
+        #                  ps_match=True)
+
+        # train using PM Match PD Model 2
+        # model_path_PD = Constants.DCN_MODEL_PATH_PD_PM_MATCH_TRUE
+        # print("--" * 25)
+        # print("############### Model 1: DCN Training using PM Match PD ###############")
         # print("--" * 25)
         # self.__train_DCN(data_loader_dict_train_NN, iter_id,
-        #                  model_path_constant_dropout, dL, device,
+        #                  model_path_PD,
+        #                  dL, device,
         #                  input_nodes,
-        #                  train_mode=Constants.DCN_TRAIN_CONSTANT_DROPOUT_2)
+        #                  train_mode=Constants.DCN_TRAIN_PD,
+        #                  ps_match=True)
+
+        # train using No PM Match PD (DCN-PD) Model 3
+        model_path_PD = Constants.DCN_MODEL_PATH_PD_PM_MATCH_FALSE
+        print("--" * 25)
+        print("############### Model 2: DCN Training using No PM Match PD (DCN-PD) ###############")
+        print("--" * 25)
+        self.__train_DCN(data_loader_dict_train_NN, iter_id,
+                         model_path_PD,
+                         dL,
+                         device,
+                         input_nodes,
+                         train_mode=Constants.DCN_TRAIN_PD,
+                         ps_match=False)
 
     def __train_DCN(self, data_loader_dict_train, iter_id, model_path, dL,
                     device, input_nodes, train_mode=Constants.DCN_TRAIN_PD, ps_match=True):
-
         if ps_match:
-            psm = PS_Manager()
             tensor_treated_train, tensor_control_train = \
-                psm.match_using_prop_score(data_loader_dict_train["treated_data"],
-                                           data_loader_dict_train["control_data"], dL)
+                self.__execute_PM_training(iter_id,
+                                           data_loader_dict_train,
+                                           dL,
+                                           input_nodes,
+                                           train_mode,
+                                           device)
 
         else:
             tensor_treated_train = \
@@ -241,6 +186,12 @@ class PM_GAN:
             tensor_control_train = \
                 Utils.create_tensors_to_train_DCN(data_loader_dict_train["control_data"], dL)
 
+        self.__execute_DCN_train(tensor_treated_train, tensor_control_train, model_path, iter_id,
+                                 input_nodes, device, train_mode)
+
+    @staticmethod
+    def __execute_DCN_train(tensor_treated_train, tensor_control_train, model_path, iter_id,
+                            input_nodes, device, train_mode):
         DCN_train_parameters = {
             "epochs": Constants.DCN_EPOCHS,
             "lr": Constants.DCN_LR,
@@ -259,6 +210,110 @@ class PM_GAN:
         dcn = DCN_network()
         dcn.train(DCN_train_parameters, device, train_mode=train_mode)
 
+    def __execute_PM_training(self, iter_id, data_loader_dict_train, dL, input_nodes,
+                              train_mode, device):
+        tuple_treated = data_loader_dict_train["treated_data"]
+        tuple_control = data_loader_dict_train["control_data"]
+
+        psm = PS_Matching()
+        prop_score_NN_model_path = Constants.PROP_SCORE_NN_MODEL_PATH \
+            .format(iter_id, Constants.PROP_SCORE_NN_EPOCHS, Constants.PROP_SCORE_NN_LR)
+
+        gan_response = \
+            psm.match_using_prop_score(tuple_treated,
+                                       tuple_control, dL,
+                                       prop_score_NN_model_path,
+                                       device)
+        tuple_unmatched_control = gan_response["tuple_unmatched_control"]
+        tuple_matched_control = gan_response["tuple_matched_control"]
+        treated_generated = gan_response["treated_generated"]
+        ps_score_list_treated = gan_response["ps_score_list_treated"]
+
+        print("### DCN semi supervised training using PS Matching ###")
+        tensor_treated = \
+            Utils.create_tensors_to_train_DCN(tuple_treated, dL)
+        tensor_matched_control = \
+            Utils.create_tensors_to_train_DCN(tuple_matched_control, dL)
+
+        tensor_all_control = Utils.create_tensors_to_train_DCN(
+            data_loader_dict_train["control_data"], dL)
+
+        model_path_semi_supervised = Constants.DCN_MODEL_SEMI_SUPERVISED_PATH
+        self.__execute_DCN_train(tensor_treated, tensor_all_control, model_path_semi_supervised,
+                                 iter_id,
+                                 input_nodes, device, train_mode,
+                                 epochs=100)
+
+        print("### DCN supervised evaluation for GAN generated treated samples ###")
+        ps_score_list_treated_np = np.array(ps_score_list_treated)
+        eval_set = Utils.convert_to_tensor_DCN_PS(treated_generated.detach().cpu(),
+                                                  ps_score_list_treated_np)
+        DCN_test_parameters = {
+            "eval_set": eval_set,
+            "model_save_path": model_path_semi_supervised.format(iter_id,
+                                                                 Constants.DCN_EPOCHS,
+                                                                 Constants.DCN_LR)
+        }
+        dcn = DCN_network()
+        response_dict = dcn.eval_semi_supervised(DCN_test_parameters, device, input_nodes,
+                                                 Constants.DCN_EVALUATION, treated_flag=True)
+
+        tensor_treated_all = self.get_treated_tensor_all_ds(treated_generated, ps_score_list_treated_np,
+                                                            response_dict,
+                                                            tuple_treated, device)
+
+        tensor_control_all = self.get_control_all_ds(tuple_unmatched_control, tuple_matched_control)
+
+        print("### DCN training using all dataset ###")
+        # return tensor_treated_all, tensor_control_all
+
+        return tensor_treated_all, tensor_all_control
+
+    @staticmethod
+    def get_treated_tensor_all_ds(treated_generated, ps_score_list_treated_np, response_dict,
+                                  tuple_treated, device):
+        np_treated_generated = treated_generated.detach().cpu().numpy()
+        np_ps_score_list_gen_treated = ps_score_list_treated_np
+        np_treated_gen_f = Utils.convert_to_col_vector(response_dict["y_f_list"])
+        np_treated_gen_cf = Utils.convert_to_col_vector(response_dict["y_cf_list"])
+
+        np_original_X = tuple_treated[0]
+        np_original_ps_score = tuple_treated[1]
+        np_original_Y_f = tuple_treated[2]
+        np_original_Y_cf = tuple_treated[3]
+
+        np_treated_x = np.concatenate((np_treated_generated, np_original_X), axis=0)
+        np_treated_ps = np.concatenate((np_ps_score_list_gen_treated, np_original_ps_score), axis=0)
+        np_treated_yf = np.concatenate((np_treated_gen_f, np_original_Y_f), axis=0)
+        np_treated_y_cf = np.concatenate((np_treated_gen_cf, np_original_Y_cf), axis=0)
+
+        tensor_treated = Utils.convert_to_tensor_DCN(np_treated_x, np_treated_ps,
+                                                     np_treated_yf, np_treated_y_cf)
+
+        return tensor_treated
+
+    @staticmethod
+    def get_control_all_ds(tuple_unmatched_control, tuple_matched_control):
+        np_control_unmatched_X = tuple_unmatched_control[0]
+        np_ps_score_list_control_unmatched = tuple_unmatched_control[1]
+        np_control_unmatched_f = tuple_unmatched_control[2]
+        np_control_unmatched_cf = tuple_unmatched_control[3]
+
+        np_control_matched_X = tuple_matched_control[0]
+        np_ps_score_list_control_matched = tuple_matched_control[1]
+        np_control_matched_f = tuple_matched_control[2]
+        np_control_matched_cf = tuple_matched_control[3]
+
+        np_control_x = np.concatenate((np_control_unmatched_X, np_control_matched_X), axis=0)
+        np_control_ps = np.concatenate((np_ps_score_list_control_unmatched, np_ps_score_list_control_matched), axis=0)
+        np_control_f = np.concatenate((np_control_unmatched_f, np_control_matched_f), axis=0)
+        np_control_cf = np.concatenate((np_control_unmatched_cf, np_control_matched_cf), axis=0)
+
+        tensor_control = Utils.convert_to_tensor_DCN(np_control_x, np_control_ps,
+                                                     np_control_f, np_control_cf)
+
+        return tensor_control
+
     def __test_DCN_NN(self, iter_id,
                       dL,
                       device,
@@ -266,10 +321,11 @@ class PM_GAN:
                       iter_file,
                       model_path,
                       input_nodes):
-        MSE_NN_PD, true_ATE_NN_PD, predicted_ATE_NN_PD, ITE_dict_list = self.__do_test_DCN(data_loader_dict_NN,
-                                                                                           dL, device,
-                                                                                           model_path,
-                                                                                           input_nodes)
+        MSE_NN_PD, true_ATE_NN_PD, predicted_ATE_NN_PD, ITE_dict_list = \
+            self.__do_test_DCN(data_loader_dict_NN,
+                               dL, device,
+                               model_path,
+                               input_nodes)
         Utils.write_to_csv(iter_file.format(iter_id), ITE_dict_list)
 
         return MSE_NN_PD, true_ATE_NN_PD, predicted_ATE_NN_PD
