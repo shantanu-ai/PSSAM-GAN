@@ -2,16 +2,11 @@ import numpy as np
 import torch
 from sklearn.neighbors import NearestNeighbors
 
-from GAN_Manager import GAN_Manager
 from Utils import Utils
 
 
-class PS_Matching:
-    def match_using_prop_score(self, tuple_treated, tuple_control, dL,
-                               prop_score_NN_model_path, device):
-        print("Propensity score Matching starts: ")
-        matched_controls = []
-
+class PSM_Manager:
+    def match_using_prop_score(self, tuple_treated, tuple_control):
         # do ps match
         np_treated_df_X, np_treated_ps_score, np_treated_df_Y_f, np_treated_df_Y_cf = tuple_treated
         np_control_df_X, np_control_ps_score, np_control_df_Y_f, np_control_df_Y_cf = tuple_control
@@ -21,48 +16,14 @@ class PS_Matching:
             Utils.convert_to_col_vector(np_treated_ps_score),
             Utils.convert_to_col_vector(np_control_ps_score))
 
-        print("Matched Control: {0}".format(len(matched_control_indices)))
-        print("Unmatched Control: {0}".format(len(unmatched_control_indices)))
-
         tuple_matched_control, tuple_unmatched_control = self.filter_matched_and_unmatched_control_samples(
             np_control_df_X, np_control_ps_score,
             np_control_df_Y_f,
             np_control_df_Y_cf, matched_control_indices,
             unmatched_control_indices)
-
-        # generate matched treated for unmatched controls using variable
-        # tuple_unmatched_control
-        # create GAN code here
-        print("Matched Control: {0}".format(tuple_matched_control[0].shape))
-        print("Matched Treated: {0}".format(tuple_treated[0].shape))
-
-        tensor_unmatched_control = \
-            Utils.create_tensors_to_train_DCN(tuple_unmatched_control, dL)
-
-        GAN_train_parameters = {
-            "epochs": 10000,
-            "lr": 0.005,
-            "shuffle": True,
-            "train_set": tensor_unmatched_control,
-            "discriminator_in_nodes": 25,
-            "generator_out_nodes": 25,
-            "batch_size": 64,
-            "prop_score_NN_model_path": prop_score_NN_model_path,
-            "BETA": 1
-        }
-
-        gan = GAN_Manager()
-        generator = gan.train_GAN(GAN_train_parameters, device=device)
-        treated_generated, ps_score_list_treated = gan.eval_GAN(len(unmatched_control_indices), generator,
-                                                                prop_score_NN_model_path,
-                                                                device)
-
-        # return all the controls + generated treated
         return {
-            "tuple_unmatched_control": tuple_unmatched_control,
             "tuple_matched_control": tuple_matched_control,
-            "treated_generated": treated_generated,
-            "ps_score_list_treated": ps_score_list_treated
+            "tuple_unmatched_control": tuple_unmatched_control
         }
 
     def filter_matched_and_unmatched_control_samples(self, np_control_df_X, np_control_ps_score,

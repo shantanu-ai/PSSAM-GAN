@@ -14,6 +14,9 @@ class Propensity_socre_network:
     def set_train_mode(self, phase):
         self.phase = phase
 
+    def get_ps_model(self):
+        return self.network
+
     def train(self, train_parameters, device):
         print(".. PS Training started ..")
         epochs = train_parameters["epochs"]

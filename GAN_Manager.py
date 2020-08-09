@@ -1,22 +1,34 @@
 import numpy as np
 import torch
+import torch.nn as nn
 import torch.optim as optim
+from torch.autograd.variable import Variable
 
+from Constants import Constants
 from GAN import Generator, Discriminator
-from Propensity_socre_network import Propensity_socre_network
 from Utils import Utils
 
 
 class GAN_Manager:
+    def __init__(self, discriminator_in_nodes, generator_out_nodes, ps_model, device):
+        self.discriminator = Discriminator(in_nodes=discriminator_in_nodes).to(device)
+        self.discriminator.apply(self.__weights_init)
+
+        self.generator = Generator(out_nodes=generator_out_nodes).to(device)
+        self.generator.apply(self.__weights_init)
+
+        self.loss = nn.BCELoss()
+        self.ps_model = ps_model
+
+    def get_generator(self):
+        return self.generator
+
     def train_GAN(self, train_parameters, device):
         epochs = train_parameters["epochs"]
         train_set = train_parameters["train_set"]
         lr = train_parameters["lr"]
         shuffle = train_parameters["shuffle"]
-        discriminator_in_nodes = train_parameters["discriminator_in_nodes"]
-        generator_out_nodes = train_parameters["generator_out_nodes"]
         batch_size = train_parameters["batch_size"]
-        prop_score_NN_model_path = train_parameters["prop_score_NN_model_path"]
         BETA = train_parameters["BETA"]
 
         data_loader_train = torch.utils.data.DataLoader(train_set,
@@ -24,79 +36,59 @@ class GAN_Manager:
                                                         shuffle=shuffle,
                                                         num_workers=1)
 
-        generator = Generator(out_nodes=generator_out_nodes).to(device)
-        discriminator = Discriminator(in_nodes=discriminator_in_nodes).to(device)
-
-        loss_func = torch.nn.BCELoss()
-        optimizer_G = optim.Adam(generator.parameters(), lr=lr, betas=(0.4, 0.999))
-        optimizer_D = optim.Adam(discriminator.parameters(), lr=lr, betas=(0.4, 0.999))
-
-        Tensor = torch.cuda.FloatTensor if torch.cuda.is_available() else torch.FloatTensor
-        print("GAN Training started..")
+        g_optimizer = optim.Adam(self.generator.parameters(), lr=lr)
+        d_optimizer = optim.Adam(self.discriminator.parameters(), lr=lr)
 
         for epoch in range(epochs):
             epoch += 1
-            generator.train()
-            discriminator.train()
+
             total_G_loss = 0
             total_D_loss = 0
             total_prop_loss = 0
-            total_size = 0
+            total_d_pred_real = 0
+            total_d_pred_fake = 0
 
             for batch in data_loader_train:
-                covariates_X, ps_score, y_f, y_cf = batch
-                covariates_X = covariates_X.to(device)
-                covariates_X_size = covariates_X.size(0)
-                total_size += covariates_X_size
-                ps_score = ps_score.squeeze().to(device)
+                covariates_X_control, ps_score_control, y_f, y_cf = batch
+                covariates_X_control = covariates_X_control.to(device)
+                covariates_X_control_size = covariates_X_control.size(0)
+                ps_score_control = ps_score_control.squeeze().to(device)
 
-                # Labels - Real, Fake
-                valid_labels = Tensor(covariates_X_size, 1).fill_(1.0)
-                fake_labels = Tensor(covariates_X_size, 1).fill_(0.0)
+                # 1. Train Discriminator
+                real_data = covariates_X_control
 
-                optimizer_G.zero_grad()
-                gen_input = Tensor(np.random.normal(0, 1, (covariates_X_size, 25)))
-                gen_treated = generator(gen_input)
+                # Generate fake data
+                fake_data = self.generator(self.__noise(covariates_X_control_size)).detach()
+                # Train D
+                d_error, d_pred_real, d_pred_fake = self.__train_discriminator(d_optimizer,
+                                                                               real_data, fake_data)
+                total_D_loss += d_error
+                total_d_pred_real += d_pred_real
+                total_d_pred_fake += d_pred_fake
 
-                # train generator
-                output_g = discriminator(gen_treated)
-                generator_loss = loss_func(output_g, valid_labels)
-                prop_loss = self.__cal_propensity_loss(ps_score, prop_score_NN_model_path,
-                                                       gen_treated, device)
-                g_loss = generator_loss + (BETA * prop_loss)
-                # g_loss = generator_loss
-                g_loss.backward()
-                optimizer_G.step()
-                total_G_loss += g_loss.item()
-                total_prop_loss += prop_loss.item()
-                # total_prop_loss += 0
+                # 2. Train Generator
+                # Generate fake data
+                fake_data = self.generator(self.__noise(covariates_X_control_size))
+                # Train G
+                error_g, prop_loss = self.__train_generator(g_optimizer, fake_data, BETA, ps_score_control,
+                                                            device)
+                total_G_loss += error_g
+                total_prop_loss += prop_loss
 
-                # train discriminator
-                optimizer_D.zero_grad()
-                output_d_real = discriminator(covariates_X)
-                output_d_fake = discriminator(gen_treated.detach().cpu())
-                real_loss = loss_func(output_d_real, valid_labels)
-                fake_loss = loss_func(output_d_fake, fake_labels)
-                d_loss = (real_loss + fake_loss) / 2
-                d_loss.backward()
-                optimizer_D.step()
-                total_D_loss += d_loss.item()
+            if epoch % 1000 == 0:
+                print("Epoch: {0}, D_loss: {1}, D_score_real: {2}, D_score_Fake: {3}, G_loss: {4}, "
+                      "Prop_loss: {5}"
+                      .format(epoch,
+                              total_D_loss, total_d_pred_real, total_d_pred_fake, total_G_loss, total_prop_loss))
 
-            print("Epoch: {0}, G_loss: {1}, D_loss: {2}, Prop_loss: {3}, "
-                  .format(epoch, total_G_loss, total_D_loss, total_prop_loss))
+    def eval_GAN(self, eval_size, device):
+        treated_g = self.generator(self.__noise(eval_size))
+        ps_score_list_treated = self.__get_propensity_score(treated_g, device)
+        return treated_g, ps_score_list_treated
 
-        return generator
-
-    def eval_GAN(self, eval_size, generator, prop_score_NN_model_path, device):
-        Tensor = torch.cuda.FloatTensor if torch.cuda.is_available() else torch.FloatTensor
-        gen_input = Tensor(np.random.normal(0, 1, (eval_size, 25)))
-        generator.eval()
-        gen_treated = generator(gen_input)
-        ps_score_list_treated = self.__get_propensity_score(gen_treated, prop_score_NN_model_path, device)
-        return gen_treated, ps_score_list_treated
-
-    def __cal_propensity_loss(self, ps_score_control, prop_score_NN_model_path, gen_treated, device):
-        ps_score_list_treated = self.__get_propensity_score(gen_treated, prop_score_NN_model_path, device)
+    def __cal_propensity_loss(self, ps_score_control,
+                              gen_treated, device):
+        ps_score_list_treated = self.__get_propensity_score(gen_treated, device)
 
         Tensor = torch.cuda.DoubleTensor if torch.cuda.is_available() else torch.DoubleTensor
         ps_score_treated = Tensor(ps_score_list_treated)
@@ -104,18 +96,81 @@ class GAN_Manager:
         prop_loss = torch.sum((torch.sub(ps_score_treated, ps_score_control)) ** 2)
         return prop_loss
 
-    @staticmethod
-    def __get_propensity_score(gen_treated, prop_score_NN_model_path, device):
+    def __get_propensity_score(self, gen_treated, device):
+        # Assign Treated
         Y = np.ones(gen_treated.size(0))
-        eval_set = Utils.convert_to_tensor(gen_treated.detach().cpu().numpy(), Y)
-
-        eval_parameters_ps_net = {
-            "eval_set": eval_set,
-            "model_path": prop_score_NN_model_path,
-            "input_nodes": 25
+        eval_set = Utils.convert_to_tensor(gen_treated.detach().numpy(), Y)
+        ps_eval_parameters_NN = {
+            "eval_set": eval_set
         }
-        ps_net_NN = Propensity_socre_network()
-        ps_score_list_treated = ps_net_NN.eval(eval_parameters_ps_net, device,
-                                               phase="eval", eval_from_GAN=True)
-
+        ps_score_list_treated = self.ps_model.eval(ps_eval_parameters_NN, device,
+                                                   eval_from_GAN=True)
         return ps_score_list_treated
+
+    @staticmethod
+    def __noise(_size):
+        n = Variable(torch.normal(mean=0, std=1, size=(_size, 25)))
+        # print(n.size())
+        if torch.cuda.is_available(): return n.cuda()
+        return n
+
+    @staticmethod
+    def __weights_init(m):
+        if type(m) == nn.Linear:
+            nn.init.xavier_uniform_(m.weight)
+            torch.nn.init.zeros_(m.bias)
+
+    @staticmethod
+    def __real_data_target(size):
+        data = Variable(torch.ones(size, 1))
+        if torch.cuda.is_available(): return data.cuda()
+        return data
+
+    @staticmethod
+    def __fake_data_target(size):
+        data = Variable(torch.zeros(size, 1))
+        if torch.cuda.is_available(): return data.cuda()
+        return data
+
+    def __train_discriminator(self, optimizer, real_data, fake_data):
+        # Reset gradients
+        optimizer.zero_grad()
+
+        # 1.1 Train on Real Data
+        prediction_real = self.discriminator(real_data)
+        real_score = torch.mean(prediction_real).item()
+
+        # Calculate error and back propagate
+        error_real = self.loss(prediction_real, self.__real_data_target(real_data.size(0)))
+        error_real.backward()
+
+        # 1.2 Train on Fake Data
+        prediction_fake = self.discriminator(fake_data)
+        fake_score = torch.mean(prediction_fake).item()
+        # Calculate error and backpropagate
+        error_fake = self.loss(prediction_fake, self.__fake_data_target(real_data.size(0)))
+        error_fake.backward()
+
+        # 1.3 Update weights with gradients
+        optimizer.step()
+        loss_D = error_real + error_fake
+        # Return error
+        return loss_D.item(), real_score, fake_score
+
+    def __train_generator(self, optimizer, fake_data, BETA, ps_score_control,
+                          device):
+        # 2. Train Generator
+        # Reset gradients
+        optimizer.zero_grad()
+        # Sample noise and generate fake data
+        predicted_D = self.discriminator(fake_data)
+        # Calculate error and back propagate
+        error_g = self.loss(predicted_D, self.__real_data_target(predicted_D.size(0)))
+        prop_loss = self.__cal_propensity_loss(ps_score_control,
+                                               fake_data, device)
+        error = error_g + (BETA * prop_loss)
+        error.backward()
+        # Update weights with gradients
+        optimizer.step()
+        # Return error
+        return error_g.item(), prop_loss.item()

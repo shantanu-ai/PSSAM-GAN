@@ -40,12 +40,6 @@ class Utils:
         return processed_dataset
 
     @staticmethod
-    def convert_to_tensor_DCN_PS(tensor_x, ps_score):
-        tensor_ps_score = torch.from_numpy(ps_score)
-        processed_dataset = torch.utils.data.TensorDataset(tensor_x, tensor_ps_score)
-        return processed_dataset
-
-    @staticmethod
     def concat_np_arr(X, Y, axis=1):
         return np.concatenate((X, Y), axis)
 
@@ -127,4 +121,32 @@ class Utils:
         np_df_Y_cf = group[3]
         tensor = Utils.convert_to_tensor_DCN(np_df_X, np_ps_score,
                                              np_df_Y_f, np_df_Y_cf)
+        return tensor
+
+    @staticmethod
+    def convert_to_tensor_DCN_PS(tensor_x, ps_score):
+        tensor_ps_score = torch.from_numpy(ps_score)
+        processed_dataset = torch.utils.data.TensorDataset(tensor_x, tensor_ps_score)
+        return processed_dataset
+
+    @staticmethod
+    def convert_to_tensor_DCN_semi_supervised(X, ps_score, T, Y_f, Y_cf):
+        tensor_x = torch.stack([torch.Tensor(i) for i in X])
+        tensor_ps_score = torch.from_numpy(ps_score)
+        tensor_T = torch.from_numpy(T)
+        tensor_y_f = torch.from_numpy(Y_f)
+        tensor_y_cf = torch.from_numpy(Y_cf)
+        processed_dataset = torch.utils.data.TensorDataset(tensor_x, tensor_ps_score, tensor_T,
+                                                           tensor_y_f, tensor_y_cf)
+        return processed_dataset
+
+    @staticmethod
+    def create_tensors_to_train_DCN_semi_supervised(group):
+        np_df_X = group[0]
+        np_ps_score = group[1]
+        T = group[2]
+        np_df_Y_f = group[3]
+        np_df_Y_cf = group[4]
+        tensor = Utils.convert_to_tensor_DCN_semi_supervised(np_df_X, np_ps_score, T,
+                                                             np_df_Y_f, np_df_Y_cf)
         return tensor

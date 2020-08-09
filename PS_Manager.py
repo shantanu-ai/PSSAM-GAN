@@ -30,4 +30,4 @@ class PS_Manager:
         }
         ps_score_list_test = ps_net_NN.eval(ps_eval_parameters_NN, device)
 
-        return ps_score_list_train, ps_score_list_test
+        return ps_score_list_train, ps_score_list_test, ps_net_NN

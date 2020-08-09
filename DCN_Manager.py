@@ -15,7 +15,7 @@ class DCN_Manager:
         self.dcn_y1 = DCN_Y1().to(device)
         self.dcn_y0 = DCN_Y0().to(device)
 
-    def train(self, train_parameters, device, train_mode=Constants.DCN_TRAIN_PD):
+    def train(self, train_parameters, device, train_mode):
         epochs = train_parameters["epochs"]
         treated_batch_size = train_parameters["treated_batch_size"]
         control_batch_size = train_parameters["control_batch_size"]
@@ -30,13 +30,11 @@ class DCN_Manager:
 
         treated_data_loader_train = torch.utils.data.DataLoader(treated_set_train,
                                                                 batch_size=treated_batch_size,
-                                                                shuffle=shuffle,
-                                                                num_workers=1)
+                                                                shuffle=shuffle)
 
         control_data_loader_train = torch.utils.data.DataLoader(control_set_train,
                                                                 batch_size=control_batch_size,
-                                                                shuffle=shuffle,
-                                                                num_workers=1)
+                                                                shuffle=shuffle)
 
         optimizer_shared = optim.Adam(self.dcn_shared.parameters(), lr=lr)
         optimizer_y1 = optim.Adam(self.dcn_y1.parameters(), lr=lr)
@@ -45,8 +43,6 @@ class DCN_Manager:
 
         min_loss = 100000.0
         dataset_loss = 0.0
-        print(".. Training started ..")
-        print(device)
         for epoch in range(epochs):
             self.dcn_shared.train()
             self.dcn_y1.train()
@@ -204,7 +200,7 @@ class DCN_Manager:
             "y0_hat_list": y0_hat_list
         }
 
-    def eval_semi_supervised(self, eval_parameters, device, input_nodes, train_mode, treated_flag):
+    def eval_semi_supervised(self, eval_parameters, device, treated_flag):
         eval_set = eval_parameters["eval_set"]
 
         self.dcn_shared.eval()

@@ -8,6 +8,8 @@ from Constants import Constants
 from DCN_Experiments import DCN_Experiments
 from Metrics import Metrics
 from PS_Manager import PS_Manager
+from PS_Treated_Generator import PS_Treated_Generator
+from TARNet_Experiments import TARNet_Experiments
 from Utils import Utils
 from dataloader import DataLoader
 
@@ -15,7 +17,6 @@ from dataloader import DataLoader
 class Experiments:
     def __init__(self, running_mode, csv_path, split_size):
         self.dL = DataLoader()
-        self.ps_model = None
         self.running_mode = running_mode
         self.np_covariates_X_train, self.np_covariates_X_test, self.np_covariates_Y_train, \
         self.np_covariates_Y_test \
@@ -35,10 +36,12 @@ class Experiments:
             print("iter_id: {0}".format(iter_id))
             print("--" * 20)
             input_nodes = run_parameters["input_nodes"]
+
             # get propensity score for classifier training and testing
-            ps_score_list_train, ps_score_list_test = self.__get_ps_model(ps_model_type, iter_id,
-                                                                          run_parameters["input_nodes"],
-                                                                          device)
+            ps_score_list_train, ps_score_list_test, ps_model = self.__get_ps_model(ps_model_type,
+                                                                                    iter_id,
+                                                                                    run_parameters["input_nodes"],
+                                                                                    device)
             data_loader_dict_train = self.dL.prepare_tensor_for_DCN(self.np_covariates_X_train,
                                                                     self.np_covariates_Y_train,
                                                                     ps_score_list_train,
@@ -47,174 +50,323 @@ class Experiments:
                                                                    self.np_covariates_Y_test,
                                                                    ps_score_list_test,
                                                                    run_parameters["is_synthetic"])
+            tensor_treated_train_original = \
+                Utils.create_tensors_from_tuple(data_loader_dict_train["treated_data"])
+            tensor_control_train_original = \
+                Utils.create_tensors_from_tuple(data_loader_dict_test["control_data"])
+
             # Execute PM GAN
+            ps_t = PS_Treated_Generator(data_loader_dict_train, ps_model)
+
+            balanced_dataset_dict = ps_t.simulate_treated_semi_supervised(input_nodes, iter_id, device)
+            tensor_treated_balanced_dcn = balanced_dataset_dict["tensor_treated_balanced_dcn"]
+            tensor_control_balanced_dcn = balanced_dataset_dict["tensor_control_balanced_dcn"]
+            tensor_treated_balanced_tarnet = balanced_dataset_dict["tensor_treated_balanced_tarnet"]
+            tuple_control_balanced_tarnet = balanced_dataset_dict["tuple_control_balanced_tarnet"]
 
             # run DCN Models
-            dcn_experiments = DCN_Experiments(data_loader_dict_train, data_loader_dict_test,
-                                              input_nodes, device)
-            dcn_pd_models_eval_dict = dcn_experiments.evaluate_DCN_Model()
+            dcn_experiments = DCN_Experiments(input_nodes, device)
+            dcn_pd_models_eval_dict = dcn_experiments.evaluate_DCN_Model(tensor_treated_train_original,
+                                                                         tensor_control_train_original,
+                                                                         tensor_treated_balanced_dcn,
+                                                                         tensor_control_balanced_dcn,
+                                                                         data_loader_dict_test)
             dcn_pd_eval = dcn_pd_models_eval_dict["dcn_pd_eval_dict"]
-            dcn_pd_PEHE, dcn_pd_ATE = self.process_evaluated_metric(dcn_pd_eval["y1_true_list"],
-                                                                    dcn_pd_eval["y0_true_list"],
-                                                                    dcn_pd_eval["y1_hat_list"],
-                                                                    dcn_pd_eval["y0_hat_list"],
-                                                                    dcn_pd_eval["ITE_dict_list"],
-                                                                    run_parameters["DCN_PD"],
-                                                                    iter_id)
+            print("---" * 20)
+            print("--> 1. Model 1: DCN - PD Supervised Training Evaluation: ")
+            dcn_pd_PEHE, dcn_pd_ATE_metric, dcn_pd_true_ATE, dcn_pd_predicted_ATE = \
+                self.__process_evaluated_metric(
+                    dcn_pd_eval["y1_true_list"],
+                    dcn_pd_eval["y0_true_list"],
+                    dcn_pd_eval["y1_hat_list"],
+                    dcn_pd_eval["y0_hat_list"],
+                    dcn_pd_eval["ITE_dict_list"],
+                    dcn_pd_eval["true_ITE"],
+                    dcn_pd_eval["predicted_ITE"],
+                    run_parameters["DCN_PD"],
+                    iter_id)
+
+            dcn_pm_gan_eval = dcn_pd_models_eval_dict["dcn_pm_gan_eval_dict"]
+            print("--> 2. Model 2: PM GAN - No dropout Supervised Training Evaluation: ")
+            dcn_pm_gan_PEHE, dcn_pm_gan_ATE_metric, dcn_pm_gan_true_ATE, dcn_pm_gan_predicted_ATE = \
+                self.__process_evaluated_metric(
+                    dcn_pm_gan_eval["y1_true_list"],
+                    dcn_pm_gan_eval["y0_true_list"],
+                    dcn_pm_gan_eval["y1_hat_list"],
+                    dcn_pm_gan_eval["y0_hat_list"],
+                    dcn_pm_gan_eval["ITE_dict_list"],
+                    dcn_pm_gan_eval["true_ITE"],
+                    dcn_pm_gan_eval["predicted_ITE"],
+                    run_parameters["DCN_PM_GAN"],
+                    iter_id)
+            print("---" * 20)
+
+            # run TARNet Models
+            tarnet_experiments = TARNet_Experiments(input_nodes, device)
+            tarnet_experiments_models_eval_dict = tarnet_experiments.evaluate_TARNet_Model(
+                data_loader_dict_test["treated_data"],
+                data_loader_dict_test["control_data"],
+                tensor_treated_balanced_tarnet,
+                tuple_control_balanced_tarnet,
+                data_loader_dict_test)
+
+            tarnet_pd_eval = tarnet_experiments_models_eval_dict["tarnet_pd_eval_dict"]
+            print("---" * 20)
+            print("--> 1. Model 1: DCN - PD Supervised Training Evaluation: ")
+            tarnet_PEHE, tarnet_ATE_metric, tarnet_true_ATE, tarnet_predicted_ATE = \
+                self.__process_evaluated_metric(
+                    tarnet_pd_eval["y1_true_list"],
+                    tarnet_pd_eval["y0_true_list"],
+                    tarnet_pd_eval["y1_hat_list"],
+                    tarnet_pd_eval["y0_hat_list"],
+                    tarnet_pd_eval["ITE_dict_list"],
+                    tarnet_pd_eval["true_ITE"],
+                    tarnet_pd_eval["predicted_ITE"],
+                    run_parameters["TARNET"],
+                    iter_id)
+
+            tarnet_pm_gan_eval = tarnet_experiments_models_eval_dict["tarnet_pm_gan_eval_dict"]
+            print("--> 2. Model 2: PM GAN - No dropout Supervised Training Evaluation: ")
+            tarnet_pm_gan_PEHE, tarnet_pm_gan_ATE_metric, tarnet_pm_gan_true_ATE, tarnet_pm_gan_predicted_ATE = \
+                self.__process_evaluated_metric(
+                    tarnet_pm_gan_eval["y1_true_list"],
+                    tarnet_pm_gan_eval["y0_true_list"],
+                    tarnet_pm_gan_eval["y1_hat_list"],
+                    tarnet_pm_gan_eval["y0_hat_list"],
+                    tarnet_pm_gan_eval["ITE_dict_list"],
+                    tarnet_pm_gan_eval["true_ITE"],
+                    tarnet_pm_gan_eval["predicted_ITE"],
+                    run_parameters["TARNET_PM_GAN"],
+                    iter_id)
+            print("---" * 20)
+
             result_dict = OrderedDict()
             result_dict["iter_id"] = iter_id
             result_dict["PEHE_DCN_PD"] = dcn_pd_PEHE
-            result_dict["ATE_Metric_DCN_PD"] = dcn_pd_ATE
-            result_dict["true_ATE_DCN_PD"] = dcn_pd_eval["true_ITE"]
-            result_dict["predicted_DCN_PD"] = dcn_pd_eval["predicted_ITE"]
+            result_dict["ATE_Metric_DCN_PD"] = dcn_pd_ATE_metric
+            result_dict["true_ATE_DCN_PD"] = dcn_pd_true_ATE
+            result_dict["predicted_DCN_PD"] = dcn_pd_predicted_ATE
 
+            result_dict["PEHE_DCN_PM_GAN"] = dcn_pm_gan_PEHE
+            result_dict["ATE_Metric_DCN_PM_GAN"] = dcn_pm_gan_ATE_metric
+            result_dict["true_ATE_DCN_PM_GAN"] = dcn_pm_gan_true_ATE
+            result_dict["predicted_DCN_PM_GAN"] = dcn_pm_gan_predicted_ATE
 
-            pm_gan = PM_GAN()
+            result_dict["tarnet_PEHE"] = tarnet_PEHE
+            result_dict["tarnet_ATE_metric"] = tarnet_ATE_metric
+            result_dict["tarnet_true_ATE"] = tarnet_true_ATE
+            result_dict["tarnet_predicted_ATE"] = tarnet_predicted_ATE
 
-            # train DCN network
-            pm_gan.train_DCN(iter_id,
-                             np_covariates_X_train,
-                             np_covariates_Y_train,
-                             dL, device, run_parameters,
-                             is_synthetic=run_parameters["is_synthetic"])
-
-            # test DCN network
-            reply = pm_gan.test_DCN(iter_id,
-                                    np_covariates_X_test,
-                                    np_covariates_Y_test,
-                                    dL,
-                                    device, run_parameters)
-
-            MSE_PM_Match_No_PD = reply["MSE_PM_Match_No_PD"]
-            true_ATE_PM_Match_No_PD = reply["true_ATE_PM_Match_No_PD"]
-            predicted_ATE_PM_Match_No_PD = reply["predicted_ATE_PM_Match_No_PD"]
-
-            MSE_PM_Match_PD = reply["MSE_PM_Match_PD"]
-            true_ATE_PM_Match_PD = reply["true_ATE_PM_Match_PD"]
-            predicted_ATE_NN_no_dropout = reply["predicted_ATE_PM_Match_PD"]
-
-            MSE_No_PM_Match_PD = reply["MSE_No_PM_Match_PD"]
-            true_ATE_No_PM_Match_PD = reply["true_ATE_No_PM_Match_PD"]
-            predicted_ATE_No_PM_Match_PD = reply["predicted_ATE_No_PM_Match_PD"]
+            result_dict["tarnet_pm_gan_PEHE"] = tarnet_pm_gan_PEHE
+            result_dict["tarnet_pm_gan_ATE_metric"] = tarnet_pm_gan_ATE_metric
+            result_dict["tarnet_pm_gan_true_ATE"] = tarnet_pm_gan_true_ATE
+            result_dict["tarnet_pm_gan_predicted_ATE"] = tarnet_pm_gan_predicted_ATE
 
             file1.write("\nToday's date: {0}\n".format(date.today()))
-            file1.write("Iter: {0}, MSE_NN_PM_PD(GAN): {1}, MSE_NN_DCN_PD: {2}\n"
-                        .format(iter_id, MSE_PM_Match_PD, MSE_No_PM_Match_PD))
-
-            result_dict = OrderedDict()
-            result_dict["iter_id"] = iter_id
-            result_dict["MSE_PM_Match_No_PD"] = MSE_PM_Match_No_PD
-            result_dict["true_ATE_PM_Match_No_PD"] = true_ATE_PM_Match_No_PD
-            result_dict["predicted_ATE_PM_Match_No_PD"] = predicted_ATE_PM_Match_No_PD
-
-            result_dict["MSE_PM_Match_PD"] = MSE_PM_Match_PD
-            result_dict["true_ATE_PM_Match_PD"] = true_ATE_PM_Match_PD
-            result_dict["predicted_ATE_NN_no_dropout"] = predicted_ATE_NN_no_dropout
-
-            result_dict["MSE_No_PM_Match_PD"] = MSE_No_PM_Match_PD
-            result_dict["true_ATE_No_PM_Match_PD"] = true_ATE_No_PM_Match_PD
-            result_dict["predicted_ATE_No_PM_Match_PD"] = predicted_ATE_No_PM_Match_PD
+            file1.write("Iter: {0}, PEHE_DCN_PD: {1}, PEHE_DCN_PM_GAN: {2},  "
+                        "PEHE_TARNET: {3},  PEHE_TARNET_PM_GAN: {4}, \n"
+                        .format(iter_id, dcn_pd_PEHE, dcn_pm_gan_PEHE,
+                                tarnet_PEHE, tarnet_pm_gan_PEHE))
             results_list.append(result_dict)
 
-        MSE_set_PM_Match_No_PD = []
-        true_ATE_set_PM_Match_No_PD = []
-        predicted_ATE_set_PM_Match_No_PD = []
+        PEHE_set_DCN_PD = []
+        ATE_Metric_set_DCN_PD = []
+        true_ATE_set_DCN_PD = []
+        predicted_ATE_DCN_PD = []
 
-        MSE_set_PM_Match_PD = []
-        true_ATE_set_PM_Match_PD = []
-        predicted_ATE_set_PM_Match_PD = []
+        PEHE_set_DCN_PM_GAN = []
+        ATE_Metric_set_DCN_PM_GAN = []
+        true_ATE_set_DCN_PM_GAN = []
+        predicted_ATE_DCN_PM_GAN = []
 
-        MSE_set_No_PM_Match_PD = []
-        true_ATE_set_No_PM_Match_PD = []
-        predicted_ATE_No_PM_Match_PD = []
+        PEHE_set_Tarnet = []
+        ATE_Metric_set_Tarnet = []
+        true_ATE_set_Tarnet = []
+        predicted_ATE_Tarnet = []
+
+        PEHE_set_Tarnet_PM_GAN = []
+        ATE_Metric_set_Tarnet_PM_GAN = []
+        true_ATE_set_Tarnet_PM_GAN = []
+        predicted_ATE_Tarnet_PM_GAN = []
 
         for result in results_list:
-            MSE_set_PM_Match_No_PD.append(result["MSE_PM_Match_No_PD"])
-            true_ATE_set_PM_Match_No_PD.append(result["true_ATE_PM_Match_No_PD"])
-            predicted_ATE_set_PM_Match_No_PD.append(result["predicted_ATE_PM_Match_No_PD"])
+            PEHE_set_DCN_PD.append(result["PEHE_DCN_PD"])
+            ATE_Metric_set_DCN_PD.append(result["ATE_Metric_DCN_PD"])
+            true_ATE_set_DCN_PD.append(result["true_ATE_DCN_PD"])
+            predicted_ATE_DCN_PD.append(result["predicted_DCN_PD"])
 
-            MSE_set_PM_Match_PD.append(result["MSE_PM_Match_PD"])
-            true_ATE_set_PM_Match_PD.append(result["true_ATE_PM_Match_PD"])
-            predicted_ATE_set_PM_Match_PD.append(result["predicted_ATE_NN_no_dropout"])
+            PEHE_set_DCN_PM_GAN.append(result["PEHE_DCN_PM_GAN"])
+            ATE_Metric_set_DCN_PM_GAN.append(result["ATE_Metric_DCN_PM_GAN"])
+            true_ATE_set_DCN_PM_GAN.append(result["true_ATE_DCN_PM_GAN"])
+            predicted_ATE_DCN_PM_GAN.append(result["predicted_DCN_PM_GAN"])
 
-            MSE_set_No_PM_Match_PD.append(result["MSE_No_PM_Match_PD"])
-            true_ATE_set_No_PM_Match_PD.append(result["true_ATE_No_PM_Match_PD"])
-            predicted_ATE_No_PM_Match_PD.append(result["predicted_ATE_No_PM_Match_PD"])
+            PEHE_set_Tarnet.append(result["tarnet_PEHE"])
+            ATE_Metric_set_Tarnet.append(result["tarnet_ATE_metric"])
+            true_ATE_set_Tarnet.append(result["tarnet_true_ATE"])
+            predicted_ATE_Tarnet.append(result["tarnet_predicted_ATE"])
 
-        MSE_mean_PM_Match_No_PD = np.mean(np.array(MSE_set_PM_Match_No_PD))
-        std_MSE_PM_Match_No_PD = np.std(MSE_set_PM_Match_No_PD)
-        Mean_ATE_PM_Match_No_PD_true = np.mean(np.array(true_ATE_set_PM_Match_No_PD))
-        std_ATE_PM_Match_No_PD_true = np.std(true_ATE_set_PM_Match_No_PD)
-        Mean_ATE_PM_Match_No_PD_predicted = np.mean(np.array(predicted_ATE_set_PM_Match_No_PD))
-        std_ATE_PM_Match_No_PD_predicted = np.std(predicted_ATE_set_PM_Match_No_PD)
+            PEHE_set_Tarnet_PM_GAN.append(result["tarnet_pm_gan_PEHE"])
+            ATE_Metric_set_Tarnet_PM_GAN.append(result["tarnet_pm_gan_ATE_metric"])
+            true_ATE_set_Tarnet_PM_GAN.append(result["tarnet_pm_gan_true_ATE"])
+            predicted_ATE_Tarnet_PM_GAN.append(result["tarnet_pm_gan_predicted_ATE"])
 
-        MSE_mean_PM_Match_PD = np.mean(np.array(MSE_set_PM_Match_PD))
-        std_MSE_PM_Match_PD = np.std(MSE_set_PM_Match_PD)
-        Mean_ATE_PM_Match_PD_true = np.mean(np.array(true_ATE_set_PM_Match_PD))
-        std_ATE_PM_Match_PD_true = np.std(true_ATE_set_PM_Match_PD)
-        Mean_ATE_PM_Match_PD_predicted = np.mean(np.array(predicted_ATE_set_PM_Match_PD))
-        std_ATE_PM_Match_PD_predicted = np.std(predicted_ATE_set_PM_Match_PD)
+        PEHE_set_DCN_PD_mean = np.mean(np.array(PEHE_set_DCN_PD))
+        PEHE_set_DCN_PD_std = np.std(PEHE_set_DCN_PD)
+        ATE_Metric_set_DCN_PD_mean = np.mean(np.array(ATE_Metric_set_DCN_PD))
+        ATE_Metric_set_DCN_PD_std = np.std(ATE_Metric_set_DCN_PD)
+        true_ATE_set_DCN_PD_mean = np.mean(np.array(true_ATE_set_DCN_PD))
+        true_ATE_set_DCN_PD_std = np.std(true_ATE_set_DCN_PD)
+        predicted_ATE_DCN_PD_mean = np.mean(np.array(predicted_ATE_DCN_PD))
+        predicted_ATE_DCN_PD_std = np.std(predicted_ATE_DCN_PD)
 
-        MSE_mean_No_PM_Match_PD = np.mean(np.array(MSE_set_No_PM_Match_PD))
-        std_MSE_No_PM_Match_PD = np.std(MSE_set_No_PM_Match_PD)
-        Mean_ATE_No_PM_Match_PD_true = np.mean(np.array(true_ATE_set_No_PM_Match_PD))
-        std_ATE_No_PM_Match_PD_true = np.std(true_ATE_set_No_PM_Match_PD)
-        Mean_ATE_No_PM_Match_PD_predicted = np.mean(np.array(predicted_ATE_No_PM_Match_PD))
-        std_ATE_No_PM_Match_PD_predicted = np.std(predicted_ATE_No_PM_Match_PD)
+        PEHE_set_DCN_PM_GAN_mean = np.mean(np.array(PEHE_set_DCN_PM_GAN))
+        PEHE_set_DCN_PM_GAN_std = np.std(PEHE_set_DCN_PM_GAN)
+        ATE_Metric_set_DCN_PM_GAN_mean = np.mean(np.array(ATE_Metric_set_DCN_PM_GAN))
+        ATE_Metric_set_DCN_PM_GAN_std = np.std(ATE_Metric_set_DCN_PM_GAN)
+        true_ATE_set_DCN_PM_GAN_mean = np.mean(np.array(true_ATE_set_DCN_PM_GAN))
+        true_ATE_set_DCN_PM_GAN_std = np.std(true_ATE_set_DCN_PM_GAN)
+        predicted_ATE_DCN_PM_GAN_mean = np.mean(np.array(predicted_ATE_DCN_PM_GAN))
+        predicted_ATE_DCN_PM_GAN_std = np.std(predicted_ATE_DCN_PM_GAN)
 
+        PEHE_set_Tarnet_mean = np.mean(np.array(PEHE_set_Tarnet))
+        PEHE_set_Tarnet_std = np.std(PEHE_set_Tarnet)
+        ATE_Metric_set_Tarnet_mean = np.mean(np.array(ATE_Metric_set_Tarnet))
+        ATE_Metric_set_Tarnet_std = np.std(ATE_Metric_set_Tarnet)
+        true_ATE_set_Tarnet_mean = np.mean(np.array(true_ATE_set_Tarnet))
+        true_ATE_set_Tarnet_std = np.std(true_ATE_set_Tarnet)
+        predicted_ATE_Tarnet_mean = np.mean(np.array(predicted_ATE_Tarnet))
+        predicted_ATE_Tarnet_std = np.std(predicted_ATE_Tarnet)
+
+        PEHE_set_Tarnet_PM_GAN_mean = np.mean(np.array(PEHE_set_Tarnet_PM_GAN))
+        PEHE_set_Tarnet_PM_GAN_std = np.std(PEHE_set_Tarnet_PM_GAN)
+        ATE_Metric_set_Tarnet_PM_GAN_mean = np.mean(np.array(ATE_Metric_set_Tarnet_PM_GAN))
+        ATE_Metric_set_Tarnet_PM_GAN_std = np.std(ATE_Metric_set_Tarnet_PM_GAN)
+        true_ATE_set_Tarnet_PM_GAN_mean = np.mean(np.array(true_ATE_set_Tarnet_PM_GAN))
+        true_ATE_set_Tarnet_PM_GAN_std = np.std(true_ATE_set_Tarnet_PM_GAN)
+        predicted_ATE_Tarnet_PM_GAN_mean = np.mean(np.array(predicted_ATE_Tarnet_PM_GAN))
+        predicted_ATE_Tarnet_PM_GAN_std = np.std(predicted_ATE_Tarnet_PM_GAN)
+
+        print("###" * 20)
+        print("DCN Models")
         print("--" * 20)
-        print("Using PM Match no PD, MSE: {0}, SD: {1}"
-              .format(MSE_mean_PM_Match_No_PD, std_MSE_PM_Match_No_PD))
-        print("Using PM Match no PD, true ATE: {0}, SD: {1}"
-              .format(Mean_ATE_PM_Match_No_PD_true, std_ATE_PM_Match_No_PD_true))
-        print("Using PM Match no PD, predicted ATE: {0}, SD: {1}"
-              .format(Mean_ATE_PM_Match_No_PD_predicted,
-                      std_ATE_PM_Match_No_PD_predicted))
+
+        print("Model 1: DCN_PD")
+        print("DCN_PD, PEHE: {0}, SD: {1}"
+              .format(PEHE_set_DCN_PD_mean, PEHE_set_DCN_PD_std))
+        print("DCN_PD, ATE Metric: {0}, SD: {1}"
+              .format(ATE_Metric_set_DCN_PD_mean, ATE_Metric_set_DCN_PD_std))
+        print("DCN_PD, True ATE: {0}, SD: {1}"
+              .format(true_ATE_set_DCN_PD_mean, true_ATE_set_DCN_PD_std))
+        print("DCN_PD, predicted ATE: {0}, SD: {1}"
+              .format(predicted_ATE_DCN_PD_mean,
+                      predicted_ATE_DCN_PD_std))
         print("--" * 20)
 
-        print("Using PM Match PD(GAN), MSE: {0}, SD: {1}"
-              .format(MSE_mean_PM_Match_PD, std_MSE_PM_Match_PD))
-        print("Using PM Match PD(GAN), true ATE: {0}, SD: {1}"
-              .format(Mean_ATE_PM_Match_PD_true, std_ATE_PM_Match_PD_true))
-        print("Using PM Match PD(GAN), predicted ATE: {0}, SD: {1}"
-              .format(Mean_ATE_PM_Match_PD_predicted,
-                      std_ATE_PM_Match_PD_predicted))
+        print("Model 2: DCN PM GAN")
+        print("DCN PM GAN, PEHE: {0}, SD: {1}"
+              .format(PEHE_set_DCN_PM_GAN_mean, PEHE_set_DCN_PM_GAN_std))
+        print("DCN PM GAN, ATE Metric: {0}, SD: {1}"
+              .format(ATE_Metric_set_DCN_PM_GAN_mean, ATE_Metric_set_DCN_PM_GAN_std))
+        print("DCN PM GAN, True ATE: {0}, SD: {1}"
+              .format(true_ATE_set_DCN_PM_GAN_mean, true_ATE_set_DCN_PM_GAN_std))
+        print("DCN PM GAN, predicted ATE: {0}, SD: {1}"
+              .format(predicted_ATE_DCN_PM_GAN_mean,
+                      predicted_ATE_DCN_PM_GAN_std))
         print("--" * 20)
-        print("DCN - PD")
-        print("Using No PM Match PD(DCN_PD), MSE: {0}, SD: {1}"
-              .format(MSE_mean_No_PM_Match_PD, std_MSE_No_PM_Match_PD))
-        print("Using No PM Match PD(DCN_PD), true ATE: {0}, SD: {1}"
-              .format(Mean_ATE_No_PM_Match_PD_true, std_ATE_No_PM_Match_PD_true))
-        print("Using No PM Match PD(DCN_PD), predicted ATE: {0}, SD: {1}"
-              .format(Mean_ATE_No_PM_Match_PD_predicted,
-                      std_ATE_No_PM_Match_PD_predicted))
+        print("###" * 20)
+
+        print("###" * 20)
+        print("TARNET Models")
         print("--" * 20)
 
-        file1.write("\n##################################################")
-        file1.write("\n")
-        file1.write("\nUsing NN PM PD(GAN), MSE: {0}, SD: {1}"
-                    .format(MSE_mean_PM_Match_PD, std_MSE_PM_Match_PD))
-        file1.write("\nUsing NN PM PD(GAN), true ATE: {0}, SD: {1}"
-                    .format(Mean_ATE_PM_Match_PD_true,
-                            std_ATE_PM_Match_PD_true))
-        file1.write("\nUsing  NN PM PD(GAN), predicted ATE: {0}, SD: {1}"
-                    .format(Mean_ATE_PM_Match_PD_predicted,
-                            std_ATE_PM_Match_PD_predicted))
-        file1.write("\n##################################################")
+        print("Model 1: TARNET")
+        print("TARNET, PEHE: {0}, SD: {1}"
+              .format(PEHE_set_Tarnet_mean, PEHE_set_Tarnet_std))
+        print("TARNET, ATE Metric: {0}, SD: {1}"
+              .format(ATE_Metric_set_Tarnet_mean, ATE_Metric_set_Tarnet_std))
+        print("TARNET, True ATE: {0}, SD: {1}"
+              .format(true_ATE_set_Tarnet_mean, true_ATE_set_Tarnet_std))
+        print("TARNET, predicted ATE: {0}, SD: {1}"
+              .format(predicted_ATE_Tarnet_mean,
+                      predicted_ATE_Tarnet_std))
+        print("--" * 20)
 
-        file1.write("\n##################################################")
-        file1.write("\n")
-        file1.write("\nUsing NN No Dropout (PS Match), MSE: {0}, SD: {1}"
-                    .format(MSE_mean_No_PM_Match_PD, std_MSE_No_PM_Match_PD))
-        file1.write("\nUsing NN No Dropout (PS Match), true ATE: {0}, SD: {1}"
-                    .format(Mean_ATE_No_PM_Match_PD_true,
-                            std_ATE_No_PM_Match_PD_true))
-        file1.write("\nUsing NN No Dropout (PS Match), predicted ATE: {0}, SD: {1}"
-                    .format(Mean_ATE_No_PM_Match_PD_predicted,
-                            std_ATE_No_PM_Match_PD_predicted))
-        file1.write("\n##################################################")
+        print("Model 2: TARNET PM GAN")
+        print("TARNET PM GAN, PEHE: {0}, SD: {1}"
+              .format(PEHE_set_Tarnet_PM_GAN_mean, PEHE_set_Tarnet_PM_GAN_std))
+        print("TARNET PM GAN, ATE Metric: {0}, SD: {1}"
+              .format(ATE_Metric_set_Tarnet_PM_GAN_mean, ATE_Metric_set_Tarnet_PM_GAN_std))
+        print("TARNET PM GAN, True ATE: {0}, SD: {1}"
+              .format(true_ATE_set_Tarnet_PM_GAN_mean, true_ATE_set_Tarnet_PM_GAN_std))
+        print("TARNET PM GAN, predicted ATE: {0}, SD: {1}"
+              .format(predicted_ATE_Tarnet_PM_GAN_mean,
+                      predicted_ATE_Tarnet_PM_GAN_std))
+        print("--" * 20)
+        print("###" * 20)
 
-        file1.write("\n##################################################")
+        file1.write("\n###" * 20)
+        file1.write("\nDCN Models")
+        file1.write("\n--" * 20)
+        file1.write("\nModel 1: DCN_PD")
+        file1.write("\nDCN_PD, PEHE: {0}, SD: {1}"
+                    .format(PEHE_set_DCN_PD_mean, PEHE_set_DCN_PD_std))
+        file1.write("\nDCN_PD, ATE Metric: {0}, SD: {1}"
+                    .format(ATE_Metric_set_DCN_PD_mean,
+                            ATE_Metric_set_DCN_PD_std))
+        file1.write("\nDCN_PD, True ATE: {0}, SD: {1}"
+                    .format(true_ATE_set_DCN_PD_mean,
+                            true_ATE_set_DCN_PD_std))
+        file1.write("\nDCN_PD, predicted ATE: {0}, SD: {1}"
+                    .format(predicted_ATE_DCN_PD_mean,
+                            predicted_ATE_DCN_PD_std))
+        file1.write("\n--" * 20)
+        file1.write("\nModel 2: DCN PM GAN")
+        file1.write("\nDCN PM GAN, PEHE: {0}, SD: {1}"
+                    .format(PEHE_set_DCN_PM_GAN_mean, PEHE_set_DCN_PM_GAN_std))
+        file1.write("\nDCN PM GAN, ATE Metric: {0}, SD: {1}"
+                    .format(ATE_Metric_set_DCN_PM_GAN_mean,
+                            ATE_Metric_set_DCN_PM_GAN_std))
+        file1.write("\nDCN PM GAN, True ATE: {0}, SD: {1}"
+                    .format(true_ATE_set_DCN_PM_GAN_mean,
+                            true_ATE_set_DCN_PM_GAN_std))
+        file1.write("\nDCN PM GAN, predicted ATE: {0}, SD: {1}"
+                    .format(predicted_ATE_DCN_PM_GAN_mean,
+                            predicted_ATE_DCN_PM_GAN_std))
+        file1.write("\n--" * 20)
+        file1.write("\n###" * 20)
+
+        file1.write("\n###" * 20)
+        file1.write("\nTARNET Models")
+        file1.write("\n--" * 20)
+        file1.write("\nModel 1: TARNET")
+        file1.write("\nTARNET, PEHE: {0}, SD: {1}"
+                    .format(PEHE_set_Tarnet_mean, PEHE_set_Tarnet_std))
+        file1.write("\nTARNET, ATE Metric: {0}, SD: {1}"
+                    .format(ATE_Metric_set_Tarnet_mean,
+                            ATE_Metric_set_Tarnet_std))
+        file1.write("\nTARNET, True ATE: {0}, SD: {1}"
+                    .format(true_ATE_set_Tarnet_mean,
+                            true_ATE_set_Tarnet_std))
+        file1.write("\nTARNET, predicted ATE: {0}, SD: {1}"
+                    .format(predicted_ATE_Tarnet_mean,
+                            predicted_ATE_Tarnet_std))
+        file1.write("\n--" * 20)
+        file1.write("\nModel 2: TARNET PM GAN")
+        file1.write("\nTARNET PM GAN, PEHE: {0}, SD: {1}"
+                    .format(PEHE_set_Tarnet_PM_GAN_mean, PEHE_set_Tarnet_PM_GAN_std))
+        file1.write("\nTARNET PM GAN, ATE Metric: {0}, SD: {1}"
+                    .format(ATE_Metric_set_Tarnet_PM_GAN_mean,
+                            ATE_Metric_set_Tarnet_PM_GAN_std))
+        file1.write("\nTARNET PM GAN, True ATE: {0}, SD: {1}"
+                    .format(true_ATE_set_Tarnet_PM_GAN_mean,
+                            true_ATE_set_Tarnet_PM_GAN_std))
+        file1.write("\nTARNET PM GAN, predicted ATE: {0}, SD: {1}"
+                    .format(predicted_ATE_Tarnet_PM_GAN_mean,
+                            predicted_ATE_Tarnet_PM_GAN_std))
+        file1.write("\n--" * 20)
+        file1.write("\n###" * 20)
+
+
 
         Utils.write_to_csv(run_parameters["consolidated_file_path"], results_list)
 
@@ -229,8 +381,10 @@ class Experiments:
 
             run_parameters["DCN_PD"] = "./MSE/ITE/ITE_DCN_PD_iter_{0}.csv"
 
-            run_parameters["nn_DCN_PS_Match_PD_iter_file"] = "./MSE/ITE/ITE_DCN_Ps_Match_PD_iter_{0}.csv"
-            run_parameters["nn_DCN_No_PS_Match_PD_iter_file"] = "./MSE/ITE/ITE_DCN_No_PS_Match_PD_iter_{0}.csv"
+            run_parameters["DCN_PM_GAN"] = "./MSE/ITE/ITE_DCN_PM_GAN_iter_{0}.csv"
+            run_parameters["TARNET"] = "./MSE/ITE/ITE_TARNET_iter_{0}.csv"
+
+            run_parameters["TARNET_PM_GAN"] = "./MSE/ITE/ITE_TARNET_PM_GAN_iter_{0}.csv"
 
             run_parameters["summary_file_name"] = "Details_original.txt"
             run_parameters["is_synthetic"] = False
@@ -261,8 +415,9 @@ class Experiments:
                                                     ps_test_set, iter_id,
                                                     input_nodes, device)
 
-    def process_evaluated_metric(self, y1_true, y0_true, y1_hat, y0_hat,
-                                 ite_dict, ite_csv_path, iter_id):
+    @staticmethod
+    def __process_evaluated_metric(y1_true, y0_true, y1_hat, y0_hat,
+                                   ite_dict, true_ITE_list, predicted_ITE_list, ite_csv_path, iter_id):
         y1_true_np = np.array(y1_true)
         y0_true_np = np.array(y0_true)
         y1_hat_np = np.array(y1_hat)
@@ -273,5 +428,8 @@ class Experiments:
         print("PEHE: {0}".format(PEHE))
         print("ATE: {0}".format(ATE))
 
+        true_ATE = sum(true_ITE_list) / len(true_ITE_list)
+        predicted_ATE = sum(predicted_ITE_list) / len(predicted_ITE_list)
+
         Utils.write_to_csv(ite_csv_path.format(iter_id), ite_dict)
-        return  PEHE, ATE
+        return PEHE, ATE, true_ATE, predicted_ATE

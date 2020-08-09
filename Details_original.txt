@@ -1,451 +1,343 @@
 
-Today's date: 2020-07-28
-Iter: 1, MSE_NN_PM_PD(GAN): 1.9202203986951822, MSE_NN_DCN_PD: 1.7721285661490807
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 1.9202203986951822, SD: 0.0
-Using NN PM PD(GAN), true ATE: 3.8952536070733346, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 3.7796352567275364, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 1.7721285661490807, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 3.8952536070733346, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 3.746447632511457, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-07-28
-Iter: 1, MSE_NN_PM_PD(GAN): 2.383119762747242, MSE_NN_DCN_PD: 1.8533285123001872
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 2.383119762747242, SD: 0.0
-Using NN PM PD(GAN), true ATE: 4.168688582333334, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 3.5535726781686146, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 1.8533285123001872, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 3.9651534406344098, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-07-28
-Iter: 1, MSE_NN_PM_PD(GAN): 2.198300349512432, MSE_NN_DCN_PD: 1.7641832075737796
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 2.198300349512432, SD: 0.0
-Using NN PM PD(GAN), true ATE: 4.168688582333334, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 3.6533853069941205, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 1.7641832075737796, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 4.030429660479228, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-07-28
-Iter: 1, MSE_NN_PM_PD(GAN): 1.9495364248991867, MSE_NN_DCN_PD: 2.009320483756272
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 1.9495364248991867, SD: 0.0
-Using NN PM PD(GAN), true ATE: 4.168688582333334, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 3.763007440964381, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 2.009320483756272, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 3.834351567029953, SD: 0.0
-##################################################
-##################################################
-
-Today's date: 2020-07-29
-Iter: 1, MSE_NN_PM_PD(GAN): 1.8262176197117144, MSE_NN_DCN_PD: 1.806249014767374
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 1.8262176197117144, SD: 0.0
-Using NN PM PD(GAN), true ATE: 4.168688582333334, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 3.8317360480626426, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 1.806249014767374, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 4.160742077032725, SD: 0.0
-##################################################
-##################################################
-
-Today's date: 2020-07-29
-Iter: 1, MSE_NN_PM_PD(GAN): 2.0619149531762426, MSE_NN_DCN_PD: 1.979160016643238
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 2.0619149531762426, SD: 0.0
-Using NN PM PD(GAN), true ATE: 4.168688582333334, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 3.8384106667836506, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 1.979160016643238, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 4.007055532137553, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-07-29
-Iter: 1, MSE_NN_PM_PD(GAN): 2.3382066542120734, MSE_NN_DCN_PD: 1.9194703070311119
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 2.3382066542120734, SD: 0.0
-Using NN PM PD(GAN), true ATE: 4.168688582333334, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 3.6077937708298364, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 1.9194703070311119, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 3.9768941064675647, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-07-29
-Iter: 1, MSE_NN_PM_PD(GAN): 2.3074424458505787, MSE_NN_DCN_PD: 1.8539143582296258
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 2.3074424458505787, SD: 0.0
-Using NN PM PD(GAN), true ATE: 4.168688582333334, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 3.5589527742067975, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 1.8539143582296258, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 4.0022076288859045, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-07-30
-Iter: 1, MSE_NN_PM_PD(GAN): 2.1973991742370593, MSE_NN_DCN_PD: 2.0482776366266067
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 2.1973991742370593, SD: 0.0
-Using NN PM PD(GAN), true ATE: 4.168688582333334, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 3.6089015314976374, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 2.0482776366266067, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 3.900564552197854, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-07-30
-Iter: 1, MSE_NN_PM_PD(GAN): 1.9861346973351184, MSE_NN_DCN_PD: 1.8257650844641857
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 1.9861346973351184, SD: 0.0
-Using NN PM PD(GAN), true ATE: 4.168688582333334, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 3.8268017387390136, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 1.8257650844641857, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 3.8493937762578327, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-08-05
-Iter: 1, MSE_NN_PM_PD(GAN): 0, MSE_NN_DCN_PD: 2.770733053926799
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 0.0, SD: 0.0
-Using NN PM PD(GAN), true ATE: 0.0, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 0.0, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 2.770733053926799, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 4.0356508731842045, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-08-05
-Iter: 1, MSE_NN_PM_PD(GAN): 0, MSE_NN_DCN_PD: 2.608407100878581
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 0.0, SD: 0.0
-Using NN PM PD(GAN), true ATE: 0.0, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 0.0, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 2.608407100878581, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 4.102269666989645, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-08-05
-Iter: 1, MSE_NN_PM_PD(GAN): 0, MSE_NN_DCN_PD: 2.575946629993081
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 0.0, SD: 0.0
-Using NN PM PD(GAN), true ATE: 0.0, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 0.0, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 2.575946629993081, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 4.553929228782653, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-08-06
-Iter: 1, MSE_NN_PM_PD(GAN): 0, MSE_NN_DCN_PD: 2.404701269077829
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 0.0, SD: 0.0
-Using NN PM PD(GAN), true ATE: 0.0, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 0.0, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 2.404701269077829, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 3.7494463857014972, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-08-06
-Iter: 1, MSE_NN_PM_PD(GAN): 0, MSE_NN_DCN_PD: 4.156124907152466
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 0.0, SD: 0.0
-Using NN PM PD(GAN), true ATE: 0.0, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 0.0, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 4.156124907152466, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 2.7810787709554035, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-08-06
-Iter: 1, MSE_NN_PM_PD(GAN): 0, MSE_NN_DCN_PD: 2.8154020592789366
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 0.0, SD: 0.0
-Using NN PM PD(GAN), true ATE: 0.0, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 0.0, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 2.8154020592789366, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 4.523658668200175, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-08-06
-Iter: 1, MSE_NN_PM_PD(GAN): 0, MSE_NN_DCN_PD: 2.7348743582754156
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 0.0, SD: 0.0
-Using NN PM PD(GAN), true ATE: 0.0, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 0.0, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 2.7348743582754156, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 3.9482206042607624, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-08-06
-Iter: 1, MSE_NN_PM_PD(GAN): 0, MSE_NN_DCN_PD: 3.5668699129334893
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 0.0, SD: 0.0
-Using NN PM PD(GAN), true ATE: 0.0, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 0.0, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 3.5668699129334893, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 4.805162464777629, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-08-06
-Iter: 1, MSE_NN_PM_PD(GAN): 0, MSE_NN_DCN_PD: 4.44472302461168
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 0.0, SD: 0.0
-Using NN PM PD(GAN), true ATE: 0.0, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 0.0, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 4.44472302461168, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 2.718784894148509, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-08-06
-Iter: 1, MSE_NN_PM_PD(GAN): 0, MSE_NN_DCN_PD: 2.6890170124285073
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 0.0, SD: 0.0
-Using NN PM PD(GAN), true ATE: 0.0, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 0.0, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 2.6890170124285073, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 3.6212101395924887, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-08-06
-Iter: 1, MSE_NN_PM_PD(GAN): 0, MSE_NN_DCN_PD: 2.9141558082956442
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 0.0, SD: 0.0
-Using NN PM PD(GAN), true ATE: 0.0, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 0.0, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 2.9141558082956442, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 4.005508761405945, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-08-06
-Iter: 1, MSE_NN_PM_PD(GAN): 0, MSE_NN_DCN_PD: 2.566969523352476
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 0.0, SD: 0.0
-Using NN PM PD(GAN), true ATE: 0.0, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 0.0, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 2.566969523352476, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 3.868228925069173, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-08-06
-Iter: 1, MSE_NN_PM_PD(GAN): 0, MSE_NN_DCN_PD: 2.2817177832485736
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 0.0, SD: 0.0
-Using NN PM PD(GAN), true ATE: 0.0, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 0.0, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 2.2817177832485736, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 4.038219944636027, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-08-06
-Iter: 1, MSE_NN_PM_PD(GAN): 0, MSE_NN_DCN_PD: 2.7503058600101427
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 0.0, SD: 0.0
-Using NN PM PD(GAN), true ATE: 0.0, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 0.0, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 2.7503058600101427, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 4.2366424640019735, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-08-06
-Iter: 1, MSE_NN_PM_PD(GAN): 0, MSE_NN_DCN_PD: 2.967023494666188
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 0.0, SD: 0.0
-Using NN PM PD(GAN), true ATE: 0.0, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 0.0, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 2.967023494666188, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 3.47846937417984, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-08-06
-Iter: 1, MSE_NN_PM_PD(GAN): 0, MSE_NN_DCN_PD: 2.6325016538834376
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 0.0, SD: 0.0
-Using NN PM PD(GAN), true ATE: 0.0, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 0.0, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 2.6325016538834376, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 4.303521146774292, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-08-06
-Iter: 1, MSE_NN_PM_PD(GAN): 0, MSE_NN_DCN_PD: 2.153495385134961
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 0.0, SD: 0.0
-Using NN PM PD(GAN), true ATE: 0.0, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 0.0, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 2.153495385134961, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 4.18231795946757, SD: 0.0
-##################################################
-##################################################
-Today's date: 2020-08-06
-Iter: 1, MSE_NN_PM_PD(GAN): 0, MSE_NN_DCN_PD: 2.1759826863335343
-
-##################################################
-
-Using NN PM PD(GAN), MSE: 0.0, SD: 0.0
-Using NN PM PD(GAN), true ATE: 0.0, SD: 0.0
-Using  NN PM PD(GAN), predicted ATE: 0.0, SD: 0.0
-##################################################
-##################################################
-
-Using NN No Dropout (PS Match), MSE: 2.1759826863335343, SD: 0.0
-Using NN No Dropout (PS Match), true ATE: 4.168688582333334, SD: 0.0
-Using NN No Dropout (PS Match), predicted ATE: 4.129525095621744, SD: 0.0
-##################################################
-##################################################
+Today's date: 2020-08-09
+Iter: 1, PEHE_DCN_PD: 1.9154060409827458, PEHE_DCN_PM_GAN: 1.5909301347407159
+
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+DCN Models
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+Model 1: DCN_PD
+DCN_PD, PEHE: 1.9154060409827458, SD: 0.0
+DCN_PD, ATE Metric: 0.557900866421468, SD: 0.0
+DCN_PD, True ATE: 4.168688582333334, SD: 0.0
+DCN_PD, predicted ATE: 3.6107877135276794, SD: 0.0
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+Model 2: DCN PM GAN
+DCN PM GAN, PEHE: 1.5909301347407159, SD: 0.0
+DCN PM GAN, ATE Metric: 0.11308602387945488, SD: 0.0
+DCN PM GAN, True ATE: 4.168688582333334, SD: 0.0
+DCN PM GAN, predicted ATE: 4.055602569580078, SD: 0.0
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+Today's date: 2020-08-09
+Iter: 1, PEHE_DCN_PD: 1.5457890380214176, PEHE_DCN_PM_GAN: 1.591464521172879
+
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+DCN Models
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+Model 1: DCN_PD
+DCN_PD, PEHE: 1.5457890380214176, SD: 0.0
+DCN_PD, ATE Metric: 0.47857169315458004, SD: 0.0
+DCN_PD, True ATE: 4.168688582333334, SD: 0.0
+DCN_PD, predicted ATE: 3.690116895039876, SD: 0.0
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+Model 2: DCN PM GAN
+DCN PM GAN, PEHE: 1.591464521172879, SD: 0.0
+DCN PM GAN, ATE Metric: 0.04123163278143327, SD: 0.0
+DCN PM GAN, True ATE: 4.168688582333334, SD: 0.0
+DCN PM GAN, predicted ATE: 4.127456957499186, SD: 0.0
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+Today's date: 2020-08-09
+Iter: 1, PEHE_DCN_PD: 1.695127513091812, PEHE_DCN_PM_GAN: 1.1729515478004535
+
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+DCN Models
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+Model 1: DCN_PD
+DCN_PD, PEHE: 1.695127513091812, SD: 0.0
+DCN_PD, ATE Metric: 0.30082919275006326, SD: 0.0
+DCN_PD, True ATE: 4.168688582333334, SD: 0.0
+DCN_PD, predicted ATE: 3.86785938223203, SD: 0.0
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+Model 2: DCN PM GAN
+DCN PM GAN, PEHE: 1.1729515478004535, SD: 0.0
+DCN PM GAN, ATE Metric: 0.10134135897200025, SD: 0.0
+DCN PM GAN, True ATE: 4.168688582333334, SD: 0.0
+DCN PM GAN, predicted ATE: 4.067347232500712, SD: 0.0
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+--
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###
+###

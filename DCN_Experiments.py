@@ -4,31 +4,49 @@ from Utils import Utils
 
 
 class DCN_Experiments:
-    def __init__(self, data_loader_dict_train, data_loader_dict_test, input_nodes, device):
-        # data loader -> (np_treated_df_X, np_treated_ps_score, np_treated_df_Y_f, np_treated_df_Y_cf)
-
-        self.data_loader_dict_train = data_loader_dict_train
-        self.data_loader_dict_test = data_loader_dict_test
+    def __init__(self, input_nodes, device):
+        self.data_loader_dict_test = None
         self.input_nodes = input_nodes
         self.device = device
 
-    def evaluate_DCN_Model(self):
-        # Model 1: DCN - PD
-        dcn_pd_eval_dict = self.evaluate_DCN_PD()
-        # Model 2: PM GAN - No drop0ut
+    def evaluate_DCN_Model(self, tensor_treated_train_original, tensor_control_train_original,
+                           tensor_treated_balanced, tensor_control_balanced,
+                           data_loader_dict_test):
+        # data loader -> (np_treated_df_X, np_treated_ps_score, np_treated_df_Y_f, np_treated_df_Y_cf)
 
+        self.data_loader_dict_test = data_loader_dict_test
+
+        # Model 1: DCN - PD
+        print("--" * 20)
+        print("###### Model 1: DCN - PD Supervised Training started ######")
+        print("Train_mode: " + Constants.DCN_TRAIN_PD)
+        dcn_pd_eval_dict = self.evaluate_DCN_PD(tensor_treated_train_original,
+                                                tensor_control_train_original,
+                                                train_mode=Constants.DCN_TRAIN_PD)
+
+        # Model 2: PM GAN - No dropout
+        print("--" * 20)
+        print("###### Model 2: PM GAN - No dropout Supervised Training started ######")
+        print("Train_mode: " + Constants.DCN_TRAIN_NO_DROPOUT)
+        dcn_pm_gan_eval_dict = self.evaluate_DCN_PD(tensor_treated_balanced, tensor_control_balanced,
+                                                    train_mode=Constants.DCN_TRAIN_NO_DROPOUT)
         # Model 3: PM GAN - dropout - 0.2
 
         # Model 4: PM GAN - dropout - 0.5
 
         return {
-            "dcn_pd_eval_dict": dcn_pd_eval_dict
+            "dcn_pd_eval_dict": dcn_pd_eval_dict,
+            "dcn_pm_gan_eval_dict": dcn_pm_gan_eval_dict
         }
 
-    def evaluate_DCN_PD(self):
-        DCN_train_parameters = self.__get_train_parameters()
-        train_mode = Constants.DCN_TRAIN_PD
-        DCN_test_parameters = self.__get_test_parameters()
+    def evaluate_DCN_PD(self, tensor_treated_train, tensor_control_train, train_mode):
+        DCN_train_parameters = self.__get_train_parameters(tensor_treated_train, tensor_control_train)
+
+        tensor_treated_test = \
+            Utils.create_tensors_from_tuple(self.data_loader_dict_test["treated_data"])
+        tensor_control_test = \
+            Utils.create_tensors_from_tuple(self.data_loader_dict_test["control_data"])
+        DCN_test_parameters = self.__get_test_parameters(tensor_treated_test, tensor_control_test)
         return self.__supervised_train_eval(train_mode, DCN_train_parameters,
                                             DCN_test_parameters)
 
@@ -39,11 +57,21 @@ class DCN_Experiments:
         dcn_eval_dict = dcn_pd.eval(DCN_test_parameters, self.device)
         return dcn_eval_dict
 
-    def __get_train_parameters(self):
-        tensor_treated_train = \
-            Utils.create_tensors_from_tuple(self.data_loader_dict_train["treated_data"])
-        tensor_control_train = \
-            Utils.create_tensors_from_tuple(self.data_loader_dict_train["control_data"])
+    def semi_supervised_train_eval(self, treated_tensor_full_train, control_tensor_full_train,
+                                   eval_set):
+        DCN_train_parameters = self.__get_train_parameters(treated_tensor_full_train,
+                                                           control_tensor_full_train)
+        train_mode = Constants.DCN_TRAIN_PD
+        dcn_pd = DCN_Manager(self.input_nodes, self.device)
+        dcn_pd.train(DCN_train_parameters, self.device, train_mode=train_mode)
+        DCN_test_parameters = {
+            "eval_set": eval_set
+        }
+        return dcn_pd.eval_semi_supervised(DCN_test_parameters, self.device,
+                                           treated_flag=True)
+
+    @staticmethod
+    def __get_train_parameters(tensor_treated_train, tensor_control_train):
         return {
             "epochs": Constants.DCN_EPOCHS,
             "lr": Constants.DCN_LR,
@@ -54,11 +82,8 @@ class DCN_Experiments:
             "control_set_train": tensor_control_train
         }
 
-    def __get_test_parameters(self):
-        tensor_treated_test = \
-            Utils.create_tensors_from_tuple(self.data_loader_dict_test["treated_data"])
-        tensor_control_test = \
-            Utils.create_tensors_from_tuple(self.data_loader_dict_test["control_data"])
+    @staticmethod
+    def __get_test_parameters(tensor_treated_test, tensor_control_test):
         return {
             "treated_set": tensor_treated_test,
             "control_set": tensor_control_test

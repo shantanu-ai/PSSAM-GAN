@@ -26,5 +26,22 @@ class Constants:
     DCN_TRAIN_PD = "train_PD"
     DCN_TRAIN_NO_DROPOUT = "train_with_no_dropout"
 
-    # psmodel types
+    # ps model types
     PS_MODEL_NN = "Neural_Net"
+
+    # GAN Training
+    GAN_EPOCHS = 1
+    GAN_LR = 0.0002
+    GAN_BETA = 1
+    GAN_BATCH_SIZE = 64
+    GAN_GENERATOR_OUT_NODES = 25
+    GAN_DISCRIMINATOR_IN_NODES = 25
+
+    # TARNet
+    TARNET_EPOCHS = 400
+    TARNET_LR = 1e-3
+    TARNET_LAMBDA = 1e-4
+    TARNET_BATCH_SIZE = 100
+    TARNET_INPUT_NODES = 25
+    TARNET_SHARED_NODES = 200
+    TARNET_OUTPUT_NODES = 100
