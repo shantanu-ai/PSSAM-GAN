@@ -118,3 +118,13 @@ class Utils:
         tensor = Utils.convert_to_tensor_DCN(np_df_X, np_ps_score,
                                              np_df_Y_f, np_df_Y_cf)
         return tensor
+
+    @staticmethod
+    def create_tensors_from_tuple(group):
+        np_df_X = group[0]
+        np_ps_score = group[1]
+        np_df_Y_f = group[2]
+        np_df_Y_cf = group[3]
+        tensor = Utils.convert_to_tensor_DCN(np_df_X, np_ps_score,
+                                             np_df_Y_f, np_df_Y_cf)
+        return tensor

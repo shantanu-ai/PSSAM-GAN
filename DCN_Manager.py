@@ -6,23 +6,27 @@ import torch.nn as nn
 import torch.optim as optim
 
 from Constants import Constants
-from DCN_Model import DCN
+from DCN_Model import DCN_shared, DCN_Y1, DCN_Y0
 
 
-class DCN_network:
+class DCN_Manager:
+    def __init__(self, input_nodes, device):
+        self.dcn_shared = DCN_shared(input_nodes=input_nodes).to(device)
+        self.dcn_y1 = DCN_Y1().to(device)
+        self.dcn_y0 = DCN_Y0().to(device)
+
     def train(self, train_parameters, device, train_mode=Constants.DCN_TRAIN_PD):
         epochs = train_parameters["epochs"]
         treated_batch_size = train_parameters["treated_batch_size"]
         control_batch_size = train_parameters["control_batch_size"]
         lr = train_parameters["lr"]
         shuffle = train_parameters["shuffle"]
-        model_save_path = train_parameters["model_save_path"].format(epochs, lr)
         treated_set_train = train_parameters["treated_set_train"]
         control_set_train = train_parameters["control_set_train"]
 
-        input_nodes = train_parameters["input_nodes"]
-
-        print("Saved model path: {0}".format(model_save_path))
+        self.dcn_shared.set_train_mode(training_mode=train_mode)
+        self.dcn_y1.set_train_mode(training_mode=train_mode)
+        self.dcn_y0.set_train_mode(training_mode=train_mode)
 
         treated_data_loader_train = torch.utils.data.DataLoader(treated_set_train,
                                                                 batch_size=treated_batch_size,
@@ -34,72 +38,48 @@ class DCN_network:
                                                                 shuffle=shuffle,
                                                                 num_workers=1)
 
-        network = DCN(training_mode=train_mode,
-                      input_nodes=input_nodes).to(device)
-        optimizer = optim.Adam(network.parameters(), lr=lr)
+        optimizer_shared = optim.Adam(self.dcn_shared.parameters(), lr=lr)
+        optimizer_y1 = optim.Adam(self.dcn_y1.parameters(), lr=lr)
+        optimizer_y0 = optim.Adam(self.dcn_y0.parameters(), lr=lr)
         lossF = nn.MSELoss()
+
         min_loss = 100000.0
         dataset_loss = 0.0
         print(".. Training started ..")
         print(device)
         for epoch in range(epochs):
-            network.train()
+            self.dcn_shared.train()
+            self.dcn_y1.train()
+            self.dcn_y0.train()
             total_loss = 0
             train_set_size = 0
 
             if epoch % 2 == 0:
                 dataset_loss = 0
                 # train treated
-                network.hidden1_Y1.weight.requires_grad = True
-                network.hidden1_Y1.bias.requires_grad = True
-                network.hidden2_Y1.weight.requires_grad = True
-                network.hidden2_Y1.bias.requires_grad = True
-                network.out_Y1.weight.requires_grad = True
-                network.out_Y1.bias.requires_grad = True
-
-                network.hidden1_Y0.weight.requires_grad = False
-                network.hidden1_Y0.bias.requires_grad = False
-                network.hidden2_Y0.weight.requires_grad = False
-                network.hidden2_Y0.bias.requires_grad = False
-                network.out_Y0.weight.requires_grad = False
-                network.out_Y0.bias.requires_grad = False
-
                 for batch in treated_data_loader_train:
                     covariates_X, ps_score, y_f, y_cf = batch
                     covariates_X = covariates_X.to(device)
                     ps_score = ps_score.squeeze().to(device)
                     train_set_size += covariates_X.size(0)
-                    treatment_pred = network(covariates_X, ps_score)
-                    # treatment_pred[0] -> y1
-                    # treatment_pred[1] -> y0
-                    yf_predicted = treatment_pred[0]
+                    y1_hat = self.dcn_y1(self.dcn_shared(covariates_X, ps_score), ps_score)
                     if torch.cuda.is_available():
-                        loss = lossF(yf_predicted.float().cuda(),
+                        loss = lossF(y1_hat.float().cuda(),
                                      y_f.float().cuda()).to(device)
                     else:
-                        loss = lossF(yf_predicted.float(),
+                        loss = lossF(y1_hat.float(),
                                      y_f.float()).to(device)
-                    optimizer.zero_grad()
+
+                    optimizer_shared.zero_grad()
+                    optimizer_y1.zero_grad()
                     loss.backward()
-                    optimizer.step()
+                    optimizer_shared.step()
+                    optimizer_y1.step()
                     total_loss += loss.item()
                 dataset_loss = total_loss
 
             elif epoch % 2 == 1:
-                # train controlled
-                network.hidden1_Y1.weight.requires_grad = False
-                network.hidden1_Y1.bias.requires_grad = False
-                network.hidden2_Y1.weight.requires_grad = False
-                network.hidden2_Y1.bias.requires_grad = False
-                network.out_Y1.weight.requires_grad = False
-                network.out_Y1.bias.requires_grad = False
-
-                network.hidden1_Y0.weight.requires_grad = True
-                network.hidden1_Y0.bias.requires_grad = True
-                network.hidden2_Y0.weight.requires_grad = True
-                network.hidden2_Y0.bias.requires_grad = True
-                network.out_Y0.weight.requires_grad = True
-                network.out_Y0.bias.requires_grad = True
+                # train control
 
                 for batch in control_data_loader_train:
                     covariates_X, ps_score, y_f, y_cf = batch
@@ -107,33 +87,32 @@ class DCN_network:
                     ps_score = ps_score.squeeze().to(device)
 
                     train_set_size += covariates_X.size(0)
-                    treatment_pred = network(covariates_X, ps_score)
-                    # treatment_pred[0] -> y1
-                    # treatment_pred[1] -> y0
-                    yf_predicted = treatment_pred[1]
+                    y0_hat = self.dcn_y0(self.dcn_shared(covariates_X, ps_score), ps_score)
                     if torch.cuda.is_available():
-                        loss = lossF(yf_predicted.float().cuda(),
+                        loss = lossF(y0_hat.float().cuda(),
                                      y_f.float().cuda()).to(device)
                     else:
-                        loss = lossF(yf_predicted.float(),
+                        loss = lossF(y0_hat.float(),
                                      y_f.float()).to(device)
-                    optimizer.zero_grad()
+                    optimizer_shared.zero_grad()
+                    optimizer_y0.zero_grad()
                     loss.backward()
-                    optimizer.step()
+                    optimizer_shared.step()
+                    optimizer_y0.step()
+                    total_loss += loss.item()
                     total_loss += loss.item()
                 dataset_loss = dataset_loss + total_loss
 
             if epoch % 10 == 9:
                 print("epoch: {0}, Treated + Control loss: {1}".format(epoch, dataset_loss))
-        torch.save(network.state_dict(), model_save_path)
 
-    def eval(self, eval_parameters, device, input_nodes, train_mode):
+    def eval(self, eval_parameters, device):
         treated_set = eval_parameters["treated_set"]
         control_set = eval_parameters["control_set"]
-        model_path = eval_parameters["model_save_path"]
-        network = DCN(training_mode=train_mode, input_nodes=input_nodes).to(device)
-        network.load_state_dict(torch.load(model_path, map_location=device))
-        network.eval()
+
+        self.dcn_shared.eval()
+        self.dcn_y1.eval()
+        self.dcn_y0.eval()
         treated_data_loader = torch.utils.data.DataLoader(treated_set,
                                                           shuffle=False, num_workers=1)
         control_data_loader = torch.utils.data.DataLoader(control_set,
@@ -146,13 +125,20 @@ class DCN_network:
 
         ITE_dict_list = []
 
+        y1_true_list = []
+        y1_hat_list = []
+
+        y0_true_list = []
+        y0_hat_list = []
+
         for batch in treated_data_loader:
             covariates_X, ps_score, y_f, y_cf = batch
             covariates_X = covariates_X.to(device)
             ps_score = ps_score.squeeze().to(device)
-            treatment_pred = network(covariates_X, ps_score)
+            y1_hat = self.dcn_y1(self.dcn_shared(covariates_X, ps_score), ps_score)
+            y0_hat = self.dcn_y0(self.dcn_shared(covariates_X, ps_score), ps_score)
+            predicted_ITE = y1_hat - y0_hat
 
-            predicted_ITE = treatment_pred[0] - treatment_pred[1]
             true_ITE = y_f - y_cf
             if torch.cuda.is_available():
                 diff = true_ITE.float().cuda() - predicted_ITE.float().cuda()
@@ -165,6 +151,11 @@ class DCN_network:
                                                       true_ITE.item(),
                                                       predicted_ITE.item(),
                                                       diff.item()))
+            y1_true_list.append(y_f.item())
+            y0_true_list.append(y_cf.item())
+            y1_hat_list.append(y1_hat.item())
+            y0_hat_list.append(y0_hat.item())
+
             err_treated_list.append(diff.item())
             true_ITE_list.append(true_ITE.item())
             predicted_ITE_list.append(predicted_ITE.item())
@@ -173,9 +164,9 @@ class DCN_network:
             covariates_X, ps_score, y_f, y_cf = batch
             covariates_X = covariates_X.to(device)
             ps_score = ps_score.squeeze().to(device)
-            treatment_pred = network(covariates_X, ps_score)
-
-            predicted_ITE = treatment_pred[0] - treatment_pred[1]
+            y1_hat = self.dcn_y1(self.dcn_shared(covariates_X, ps_score), ps_score)
+            y0_hat = self.dcn_y0(self.dcn_shared(covariates_X, ps_score), ps_score)
+            predicted_ITE = y1_hat - y0_hat
             true_ITE = y_cf - y_f
             if torch.cuda.is_available():
                 diff = true_ITE.float().cuda() - predicted_ITE.float().cuda()
@@ -188,6 +179,12 @@ class DCN_network:
                                                       true_ITE.item(),
                                                       predicted_ITE.item(),
                                                       diff.item()))
+
+            y1_true_list.append(y_cf.item())
+            y0_true_list.append(y_f.item())
+            y1_hat_list.append(y1_hat.item())
+            y0_hat_list.append(y0_hat.item())
+
             err_control_list.append(diff.item())
             true_ITE_list.append(true_ITE.item())
             predicted_ITE_list.append(predicted_ITE.item())
@@ -199,16 +196,20 @@ class DCN_network:
             "control_err": err_control_list,
             "true_ITE": true_ITE_list,
             "predicted_ITE": predicted_ITE_list,
-            "ITE_dict_list": ITE_dict_list
+            "ITE_dict_list": ITE_dict_list,
+
+            "y1_true_list": y1_true_list,
+            "y0_true_list": y0_true_list,
+            "y1_hat_list": y1_hat_list,
+            "y0_hat_list": y0_hat_list
         }
 
-    @staticmethod
-    def eval_semi_supervised(eval_parameters, device, input_nodes, train_mode, treated_flag):
+    def eval_semi_supervised(self, eval_parameters, device, input_nodes, train_mode, treated_flag):
         eval_set = eval_parameters["eval_set"]
-        model_path = eval_parameters["model_save_path"]
-        network = DCN(training_mode=train_mode, input_nodes=input_nodes).to(device)
-        network.load_state_dict(torch.load(model_path, map_location=device))
-        network.eval()
+
+        self.dcn_shared.eval()
+        self.dcn_y1.eval()
+        self.dcn_y0.eval()
         treated_data_loader = torch.utils.data.DataLoader(eval_set,
                                                           shuffle=False, num_workers=1)
 
@@ -219,13 +220,14 @@ class DCN_network:
             covariates_X, ps_score = batch
             covariates_X = covariates_X.to(device)
             ps_score = ps_score.squeeze().to(device)
-            treatment_pred = network(covariates_X, ps_score)
+            y1_hat = self.dcn_y1(self.dcn_shared(covariates_X, ps_score), ps_score)
+            y0_hat = self.dcn_y0(self.dcn_shared(covariates_X, ps_score), ps_score)
             if treated_flag:
-                y_f_list.append(treatment_pred[0].item())
-                y_cf_list.append(treatment_pred[1].item())
+                y_f_list.append(y1_hat.item())
+                y_cf_list.append(y0_hat.item())
             else:
-                y_f_list.append(treatment_pred[1].item())
-                y_cf_list.append(treatment_pred[0].item())
+                y_f_list.append(y0_hat.item())
+                y_cf_list.append(y1_hat.item())
 
         return {
             "y_f_list": np.array(y_f_list),

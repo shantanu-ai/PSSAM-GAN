@@ -6,8 +6,8 @@ class Constants:
     PROP_SCORE_NN_MODEL_PATH = "./Propensity_Model/NN_PS_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
 
     # DCN training parameters
-    DCN_EPOCHS = 100
-    DCN_LR = 0.001
+    DCN_EPOCHS = 10
+    DCN_LR = 0.0001
     DCN_MODEL_PATH_PD_PM_MATCH_FALSE = "./DCNModel/NN_DCN_PD_PM_MATCH_FALSE_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
     DCN_MODEL_PATH_PD_PM_MATCH_TRUE = "./DCNModel/NN_DCN_PD_PM_MATCH_TRUE_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
 
@@ -25,3 +25,6 @@ class Constants:
     DCN_TRAIN_CONSTANT_DROPOUT_2 = "train_constant_dropout_2"
     DCN_TRAIN_PD = "train_PD"
     DCN_TRAIN_NO_DROPOUT = "train_with_no_dropout"
+
+    # psmodel types
+    PS_MODEL_NN = "Neural_Net"
