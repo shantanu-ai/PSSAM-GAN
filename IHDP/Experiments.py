@@ -51,7 +51,7 @@ class Experiments:
             tensor_treated_train_original = \
                 Utils.create_tensors_from_tuple(data_loader_dict_train["treated_data"])
             tensor_control_train_original = \
-                Utils.create_tensors_from_tuple(data_loader_dict_test["control_data"])
+                Utils.create_tensors_from_tuple(data_loader_dict_train["control_data"])
 
             # Execute PM GAN
             ps_t = PS_Treated_Generator(data_loader_dict_train, ps_model)

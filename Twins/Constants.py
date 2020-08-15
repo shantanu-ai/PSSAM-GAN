@@ -1,13 +1,13 @@
 class Constants:
     # ps score neural net training parameters
-    PROP_SCORE_NN_EPOCHS = 500
+    PROP_SCORE_NN_EPOCHS = 1000
     PROP_SCORE_NN_LR = 0.001
     PROP_SCORE_NN_BATCH_SIZE = 32
     PROP_SCORE_NN_MODEL_PATH = "./Propensity_Model/NN_PS_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
     PROP_SCORE_NODES = 30
 
     # DCN training parameters
-    DCN_EPOCHS = 1000
+    DCN_EPOCHS = 3000
     DCN_LR = 0.0001
     DCN_MODEL_PATH_PD_PM_MATCH_FALSE = "./DCNModel/NN_DCN_PD_PM_MATCH_FALSE_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
     DCN_MODEL_PATH_PD_PM_MATCH_TRUE = "./DCNModel/NN_DCN_PD_PM_MATCH_TRUE_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
