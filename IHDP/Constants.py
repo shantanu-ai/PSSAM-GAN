@@ -6,7 +6,7 @@ class Constants:
     PROP_SCORE_NN_MODEL_PATH = "./Propensity_Model/NN_PS_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
 
     # DCN training parameters
-    DCN_EPOCHS = 400
+    DCN_EPOCHS = 1
     DCN_LR = 0.0001
     DCN_MODEL_PATH_PD_PM_MATCH_FALSE = "./DCNModel/NN_DCN_PD_PM_MATCH_FALSE_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
     DCN_MODEL_PATH_PD_PM_MATCH_TRUE = "./DCNModel/NN_DCN_PD_PM_MATCH_TRUE_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
@@ -28,9 +28,11 @@ class Constants:
 
     # ps model types
     PS_MODEL_NN = "Neural_Net"
+    PS_MODEL_LR = "Logistic"
+    PS_MODEL_LR_Lasso = "Logistic_L1"
 
     # GAN Training Ihdp
-    GAN_EPOCHS = 10000
+    GAN_EPOCHS = 1
     GAN_LR = 0.0002
     GAN_BETA = 1
     GAN_BATCH_SIZE = 64

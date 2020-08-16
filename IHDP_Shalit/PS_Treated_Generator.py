@@ -10,10 +10,11 @@ from Utils import Utils
 
 
 class PS_Treated_Generator:
-    def __init__(self, data_loader_dict_train, ps_model):
+    def __init__(self, data_loader_dict_train, ps_model, ps_model_type):
         self.treated_tuple_full = data_loader_dict_train["treated_data"]
         self.control_tuple_full = data_loader_dict_train["control_data"]
         self.ps_model = ps_model
+        self.ps_model_type = ps_model_type
 
     def simulate_treated_semi_supervised(self, input_nodes, iter_id, device):
         treated_simulated, ps_treated_simulated, tuple_matched_control, tuple_unmatched_control \
@@ -183,7 +184,7 @@ class PS_Treated_Generator:
 
         gan = GAN_Manager(Constants.GAN_DISCRIMINATOR_IN_NODES,
                           Constants.GAN_GENERATOR_OUT_NODES,
-                          self.ps_model, device)
+                          self.ps_model, self.ps_model_type, device)
         gan.train_GAN(GAN_train_parameters, device=device)
         print("-> GAN training completed")
         treated_generated, ps_score_list_treated = gan.eval_GAN(tuple_unmatched_control[0].shape[0],

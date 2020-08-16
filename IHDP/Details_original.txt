@@ -1,781 +1,196 @@
 
-Today's date: 2020-08-11
-Iter: 1, PEHE_DCN_PD: 5.389762468185353, PEHE_DCN_PM_GAN: 6.2769977316223855,  PEHE_DCN_PM_GAN: 6.509211736889012, PEHE_DCN_PM_GAN: 5.526272964473891, PEHE_TARNET: 0,  PEHE_TARNET_PM_GAN: 0, 
+Today's date: 2020-08-16
+Iter: 1, PEHE_DCN_PD: 6.268303191474758, PEHE_DCN_PD(Dropout 0.2): 6.883281647177223, PEHE_DCN_PD(Dropout0.5): 6.587656258455597 PEHE_DCN_PM_GAN: 6.0363507909195455,  PEHE_DCN_PM_GAN(Dropout 0.2): 5.962134588297887, PEHE_DCN_PM_GAN(Dropout 0.5): 6.29834616396495PEHE_DCN_PM_GAN(Dropout 0.5): 5.819061918369614 
 
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-DCN Models
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
-Model 1: DCN_PD
-DCN_PD, PEHE: 5.389762468185353, SD: 0.0
-DCN_PD, ATE Metric: 5.389762468185352, SD: 0.0
-DCN_PD, True ATE: 4.064492587219999, SD: 0.0
-DCN_PD, predicted ATE: -1.3252698806921641, SD: 0.0
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
-Model 2: DCN PM GAN
-DCN PM GAN, PEHE: 6.2769977316223855, SD: 0.0
-DCN PM GAN, ATE Metric: 6.2769977316223855, SD: 0.0
-DCN PM GAN, True ATE: 4.064492587219999, SD: 0.0
-DCN PM GAN, predicted ATE: -2.212505145072937, SD: 0.0
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-TARNET Models
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-Today's date: 2020-08-11
-Iter: 1, PEHE_DCN_PD: 1.3861550074879987, PEHE_DCN_PM_GAN: 1.6358657160367898,  PEHE_DCN_PM_GAN: 1.2817903294364816, PEHE_DCN_PM_GAN: 1.2094663481667312, PEHE_TARNET: 0,  PEHE_TARNET_PM_GAN: 0, 
+Today's date: 2020-08-16
+Iter: 1, PEHE_DCN_PD: 6.712414944347914, PEHE_DCN_PD(Dropout 0.2): 6.262560197216447, PEHE_DCN_PD(Dropout0.5): 5.9172651965192715 PEHE_DCN_PM_GAN: 6.541966957824604,  PEHE_DCN_PM_GAN(Dropout 0.2): 6.77363408573188, PEHE_DCN_PM_GAN(Dropout 0.5): 6.787696766259448PEHE_DCN_PM_GAN(Dropout 0.5): 6.311426555404738 
 
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
+#####################
 DCN Models
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
+-------------------------------
 Model 1: DCN_PD
-DCN_PD, PEHE: 1.3861550074879987, SD: 0.0
-DCN_PD, ATE Metric: 0.11128182338249992, SD: 0.0
-DCN_PD, True ATE: 4.095517769986666, SD: 0.0
-DCN_PD, predicted ATE: 4.20679958820343, SD: 0.0
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
-Model 2: DCN PM GAN
-DCN PM GAN, PEHE: 1.6358657160367898, SD: 0.0
-DCN PM GAN, ATE Metric: 0.0698469040947387, SD: 0.0
-DCN PM GAN, True ATE: 4.095517769986666, SD: 0.0
-DCN PM GAN, predicted ATE: 4.165364670753479, SD: 0.0
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-TARNET Models
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-Today's date: 2020-08-14
-Iter: 1, PEHE_DCN_PD: 5.330527845237475, PEHE_DCN_PM_GAN: 6.488562560095212,  PEHE_DCN_PM_GAN: 6.2841670990872585, PEHE_DCN_PM_GAN: 5.169030202084513, PEHE_TARNET: 0,  PEHE_TARNET_PM_GAN: 0, 
+DCN_PD, PEHE: 6.712414944347914, SD: 0.0
+DCN_PD, ATE Metric: 6.712414944347914, SD: 0.0
+DCN_PD, True ATE: 4.094754417913332, SD: 0.0
+DCN_PD, predicted ATE: -2.617660529216131, SD: 0.0
+-------------------------------
+Model 2: DCN_PD(Dropout 0.2)
+DCN_PD(Dropout 0.2), PEHE: 6.262560197216447, SD: 0.0
+DCN_PD(Dropout 0.2), ATE Metric: 6.262560197216446, SD: 0.0
+DCN_PD(Dropout 0.2), True ATE: 4.094754417913332, SD: 0.0
+DCN_PD(Dropout 0.2), predicted ATE: -2.1678057742118835, SD: 0.0
+-------------------------------
+Model 3: DCN_PD(Dropout 0.5)
+DCN_PD(Dropout 0.5), PEHE: 5.9172651965192715, SD: 0.0
+DCN_PD(Dropout 0.5), ATE Metric: 5.9172651965192715, SD: 0.0
+DCN_PD(Dropout 0.5), True ATE: 4.094754417913332, SD: 0.0
+DCN_PD(Dropout 0.5), predicted ATE: -1.8225107822815578, SD: 0.0
+-------------------------------
+Model 4: DCN PM GAN
+DCN PM GAN, PEHE: 6.541966957824604, SD: 0.0
+DCN PM GAN, ATE Metric: 6.541966957824604, SD: 0.0
+DCN PM GAN, True ATE: 4.094754417913332, SD: 0.0
+DCN PM GAN, predicted ATE: -2.447212538719177, SD: 0.0
+-------------------------------
+Model 5: DCN PM GAN(Dropout 0.2)
+DCN PM GAN(Dropout 0.2), PEHE: 6.77363408573188, SD: 0.0
+DCN PM GAN(Dropout 0.2), ATE Metric: 6.77363408573188, SD: 0.0
+DCN PM GAN(Dropout 0.2), True ATE: 4.094754417913332, SD: 0.0
+DCN PM GAN(Dropout 0.2), predicted ATE: -2.67887966632843, SD: 0.0
+-------------------------------
+Model 6: DCN PM GAN(Dropout 0.5)
+DCN PM GAN(Dropout 0.5), PEHE: 6.787696766259448, SD: 0.0
+DCN PM GAN(Dropout 0.5), ATE Metric: 6.787696766259447, SD: 0.0
+DCN PM GAN(Dropout 0.5), True ATE: 4.094754417913332, SD: 0.0
+DCN PM GAN(Dropout 0.5), predicted ATE: -2.6929423423608143, SD: 0.0
+-------------------------------
+Model 7: DCN PM GAN(PD
+DCN PM GAN(PD), PEHE: 6.311426555404738, SD: 0.0
+DCN PM GAN(PD), ATE Metric: 6.311426555404738, SD: 0.0
+DCN PM GAN(PD), True ATE: 4.094754417913332, SD: 0.0
+DCN PM GAN(PD), predicted ATE: -2.216672146320343, SD: 0.0
+-------------------------------
+Today's date: 2020-08-16
+Iter: 1, PEHE_DCN_PD: 4.352498606177778, PEHE_DCN_PD(Dropout 0.2): 4.9058559387749545, PEHE_DCN_PD(Dropout0.5): 5.086194889081131 PEHE_DCN_PM_GAN: 4.770150512464455,  PEHE_DCN_PM_GAN(Dropout 0.2): 4.441619572175156, PEHE_DCN_PM_GAN(Dropout 0.5): 4.407098407355558PEHE_DCN_PM_GAN(Dropout 0.5): 4.637583485762389 
 
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
+#####################
 DCN Models
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
+-------------------------------
 Model 1: DCN_PD
-DCN_PD, PEHE: 5.330527845237475, SD: 0.0
-DCN_PD, ATE Metric: 5.330527845237475, SD: 0.0
-DCN_PD, True ATE: 3.976494584693335, SD: 0.0
-DCN_PD, predicted ATE: -1.3540332591533661, SD: 0.0
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
-Model 2: DCN PM GAN
-DCN PM GAN, PEHE: 6.488562560095212, SD: 0.0
-DCN PM GAN, ATE Metric: 6.488562560095211, SD: 0.0
-DCN PM GAN, True ATE: 3.976494584693335, SD: 0.0
-DCN PM GAN, predicted ATE: -2.512067977587382, SD: 0.0
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-TARNET Models
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-Today's date: 2020-08-14
-Iter: 1, PEHE_DCN_PD: 1.5429468910265327, PEHE_DCN_PM_GAN: 1.4928955897527563,  PEHE_DCN_PM_GAN: 1.2711269860376258, PEHE_DCN_PM_GAN: 1.149878652222095, PEHE_TARNET: 0,  PEHE_TARNET_PM_GAN: 0, 
+DCN_PD, PEHE: 4.352498606177778, SD: 0.0
+DCN_PD, ATE Metric: 4.337515555662613, SD: 0.0
+DCN_PD, True ATE: 3.9036213861333326, SD: 0.0
+DCN_PD, predicted ATE: -0.433894167393446, SD: 0.0
+-------------------------------
+Model 2: DCN_PD(Dropout 0.2)
+DCN_PD(Dropout 0.2), PEHE: 4.9058559387749545, SD: 0.0
+DCN_PD(Dropout 0.2), ATE Metric: 4.904407992653748, SD: 0.0
+DCN_PD(Dropout 0.2), True ATE: 3.9036213861333326, SD: 0.0
+DCN_PD(Dropout 0.2), predicted ATE: -1.0007866036891937, SD: 0.0
+-------------------------------
+Model 3: DCN_PD(Dropout 0.5)
+DCN_PD(Dropout 0.5), PEHE: 5.086194889081131, SD: 0.0
+DCN_PD(Dropout 0.5), ATE Metric: 5.056357137404581, SD: 0.0
+DCN_PD(Dropout 0.5), True ATE: 3.9036213861333326, SD: 0.0
+DCN_PD(Dropout 0.5), predicted ATE: -1.1527357495824495, SD: 0.0
+-------------------------------
+Model 4: DCN PM GAN
+DCN PM GAN, PEHE: 4.770150512464455, SD: 0.0
+DCN PM GAN, ATE Metric: 4.764575742600064, SD: 0.0
+DCN PM GAN, True ATE: 3.9036213861333326, SD: 0.0
+DCN PM GAN, predicted ATE: -0.8609543573856354, SD: 0.0
+-------------------------------
+Model 5: DCN PM GAN(Dropout 0.2)
+DCN PM GAN(Dropout 0.2), PEHE: 4.441619572175156, SD: 0.0
+DCN PM GAN(Dropout 0.2), ATE Metric: 4.424898571613133, SD: 0.0
+DCN PM GAN(Dropout 0.2), True ATE: 3.9036213861333326, SD: 0.0
+DCN PM GAN(Dropout 0.2), predicted ATE: -0.5212771836916605, SD: 0.0
+-------------------------------
+Model 6: DCN PM GAN(Dropout 0.5)
+DCN PM GAN(Dropout 0.5), PEHE: 4.407098407355558, SD: 0.0
+DCN PM GAN(Dropout 0.5), ATE Metric: 4.3722684146143, SD: 0.0
+DCN PM GAN(Dropout 0.5), True ATE: 3.9036213861333326, SD: 0.0
+DCN PM GAN(Dropout 0.5), predicted ATE: -0.4686470300952594, SD: 0.0
+-------------------------------
+Model 7: DCN PM GAN(PD
+DCN PM GAN(PD), PEHE: 4.637583485762389, SD: 0.0
+DCN PM GAN(PD), ATE Metric: 4.625978838235339, SD: 0.0
+DCN PM GAN(PD), True ATE: 3.9036213861333326, SD: 0.0
+DCN PM GAN(PD), predicted ATE: -0.7223574503759543, SD: 0.0
+-------------------------------
+Today's date: 2020-08-16
+Iter: 1, PEHE_DCN_PD: 4.0920346138523795, PEHE_DCN_PD(Dropout 0.2): 5.051723084716085, PEHE_DCN_PD(Dropout0.5): 4.2671110738838385 PEHE_DCN_PM_GAN: 4.659265794955161,  PEHE_DCN_PM_GAN(Dropout 0.2): 4.807297572694686, PEHE_DCN_PM_GAN(Dropout 0.5): 4.153840168245104PEHE_DCN_PM_GAN(Dropout 0.5): 4.092017430772644 
 
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
+#####################
 DCN Models
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
+-------------------------------
 Model 1: DCN_PD
-DCN_PD, PEHE: 1.5429468910265327, SD: 0.0
-DCN_PD, ATE Metric: 0.2528299044365929, SD: 0.0
-DCN_PD, True ATE: 3.9223711646799977, SD: 0.0
-DCN_PD, predicted ATE: 4.175201053619385, SD: 0.0
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
-Model 2: DCN PM GAN
-DCN PM GAN, PEHE: 1.4928955897527563, SD: 0.0
-DCN PM GAN, ATE Metric: 0.22784682568955006, SD: 0.0
-DCN PM GAN, True ATE: 3.9223711646799977, SD: 0.0
-DCN PM GAN, predicted ATE: 3.694524326324463, SD: 0.0
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-TARNET Models
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
---
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
-###
+DCN_PD, PEHE: 4.0920346138523795, SD: 0.0
+DCN_PD, ATE Metric: 4.07687597474638, SD: 0.0
+DCN_PD, True ATE: 4.01459472062, SD: 0.0
+DCN_PD, predicted ATE: -0.062281254629294076, SD: 0.0
+-------------------------------
+Model 2: DCN_PD(Dropout 0.2)
+DCN_PD(Dropout 0.2), PEHE: 5.051723084716085, SD: 0.0
+DCN_PD(Dropout 0.2), ATE Metric: 5.051723084716086, SD: 0.0
+DCN_PD(Dropout 0.2), True ATE: 4.01459472062, SD: 0.0
+DCN_PD(Dropout 0.2), predicted ATE: -1.0371283650398255, SD: 0.0
+-------------------------------
+Model 3: DCN_PD(Dropout 0.5)
+DCN_PD(Dropout 0.5), PEHE: 4.2671110738838385, SD: 0.0
+DCN_PD(Dropout 0.5), ATE Metric: 4.265501312780463, SD: 0.0
+DCN_PD(Dropout 0.5), True ATE: 4.01459472062, SD: 0.0
+DCN_PD(Dropout 0.5), predicted ATE: -0.250906590372324, SD: 0.0
+-------------------------------
+Model 4: DCN PM GAN
+DCN PM GAN, PEHE: 4.659265794955161, SD: 0.0
+DCN PM GAN, ATE Metric: 4.653829087434295, SD: 0.0
+DCN PM GAN, True ATE: 4.01459472062, SD: 0.0
+DCN PM GAN, predicted ATE: -0.6392343680063883, SD: 0.0
+-------------------------------
+Model 5: DCN PM GAN(Dropout 0.2)
+DCN PM GAN(Dropout 0.2), PEHE: 4.807297572694686, SD: 0.0
+DCN PM GAN(Dropout 0.2), ATE Metric: 4.800341301975731, SD: 0.0
+DCN PM GAN(Dropout 0.2), True ATE: 4.01459472062, SD: 0.0
+DCN PM GAN(Dropout 0.2), predicted ATE: -0.7857465843359629, SD: 0.0
+-------------------------------
+Model 6: DCN PM GAN(Dropout 0.5)
+DCN PM GAN(Dropout 0.5), PEHE: 4.153840168245104, SD: 0.0
+DCN PM GAN(Dropout 0.5), ATE Metric: 4.152703995250745, SD: 0.0
+DCN PM GAN(Dropout 0.5), True ATE: 4.01459472062, SD: 0.0
+DCN PM GAN(Dropout 0.5), predicted ATE: -0.13810927545030913, SD: 0.0
+-------------------------------
+Model 7: DCN PM GAN(PD
+DCN PM GAN(PD), PEHE: 4.092017430772644, SD: 0.0
+DCN PM GAN(PD), ATE Metric: 4.069535450183435, SD: 0.0
+DCN PM GAN(PD), True ATE: 4.01459472062, SD: 0.0
+DCN PM GAN(PD), predicted ATE: -0.05494072745243708, SD: 0.0
+-------------------------------
+Today's date: 2020-08-16
+Iter: 1, PEHE_DCN_PD: 4.543662691611073, PEHE_DCN_PD(Dropout 0.2): 4.654316910770308, PEHE_DCN_PD(Dropout0.5): 4.566003307269782 PEHE_DCN_PM_GAN: 4.732988018782706,  PEHE_DCN_PM_GAN(Dropout 0.2): 4.118581421549756, PEHE_DCN_PM_GAN(Dropout 0.5): 4.353213376557471PEHE_DCN_PM_GAN(Dropout 0.5): 4.876506870678833 
+
+#####################
+DCN Models
+-------------------------------
+Model 1: DCN_PD
+DCN_PD, PEHE: 4.543662691611073, SD: 0.0
+DCN_PD, ATE Metric: 4.543662691611073, SD: 0.0
+DCN_PD, True ATE: 4.391624477373334, SD: 0.0
+DCN_PD, predicted ATE: -0.1520382154919207, SD: 0.0
+-------------------------------
+Model 2: DCN_PD(Dropout 0.2)
+DCN_PD(Dropout 0.2), PEHE: 4.654316910770308, SD: 0.0
+DCN_PD(Dropout 0.2), ATE Metric: 4.654316910770309, SD: 0.0
+DCN_PD(Dropout 0.2), True ATE: 4.391624477373334, SD: 0.0
+DCN_PD(Dropout 0.2), predicted ATE: -0.2626924330492814, SD: 0.0
+-------------------------------
+Model 3: DCN_PD(Dropout 0.5)
+DCN_PD(Dropout 0.5), PEHE: 4.566003307269782, SD: 0.0
+DCN_PD(Dropout 0.5), ATE Metric: 4.566003307269783, SD: 0.0
+DCN_PD(Dropout 0.5), True ATE: 4.391624477373334, SD: 0.0
+DCN_PD(Dropout 0.5), predicted ATE: -0.17437883029381435, SD: 0.0
+-------------------------------
+Model 4: DCN PM GAN
+DCN PM GAN, PEHE: 4.732988018782706, SD: 0.0
+DCN PM GAN, ATE Metric: 4.732988018782707, SD: 0.0
+DCN PM GAN, True ATE: 4.391624477373334, SD: 0.0
+DCN PM GAN, predicted ATE: -0.34136354237794875, SD: 0.0
+-------------------------------
+Model 5: DCN PM GAN(Dropout 0.2)
+DCN PM GAN(Dropout 0.2), PEHE: 4.118581421549756, SD: 0.0
+DCN PM GAN(Dropout 0.2), ATE Metric: 4.114807041924965, SD: 0.0
+DCN PM GAN(Dropout 0.2), True ATE: 4.391624477373334, SD: 0.0
+DCN PM GAN(Dropout 0.2), predicted ATE: 0.27681743502616885, SD: 0.0
+-------------------------------
+Model 6: DCN PM GAN(Dropout 0.5)
+DCN PM GAN(Dropout 0.5), PEHE: 4.353213376557471, SD: 0.0
+DCN PM GAN(Dropout 0.5), ATE Metric: 4.342951052453887, SD: 0.0
+DCN PM GAN(Dropout 0.5), True ATE: 4.391624477373334, SD: 0.0
+DCN PM GAN(Dropout 0.5), predicted ATE: 0.04867342491944631, SD: 0.0
+-------------------------------
+Model 7: DCN PM GAN(PD
+DCN PM GAN(PD), PEHE: 4.876506870678833, SD: 0.0
+DCN PM GAN(PD), ATE Metric: 4.876506870678833, SD: 0.0
+DCN PM GAN(PD), True ATE: 4.391624477373334, SD: 0.0
+DCN PM GAN(PD), predicted ATE: -0.484882394472758, SD: 0.0
+-------------------------------

@@ -63,23 +63,38 @@ class Utils:
             return -(prob * math.log2(prob)) - ((1 - prob) * math.log2(1 - prob))
 
     @staticmethod
+    def get_shanon_entropy_tensor(prob):
+        prob_one_indx = prob == 1
+        prob[prob_one_indx] = 0.99999999999999999999999999999999999
+
+        prob_zero_indx = prob == 0
+        prob[prob_zero_indx] = 0.000000000000000000000000000000000001
+        return -(prob * torch.log2(prob)) - ((1 - prob) * torch.log2(1 - prob))
+
+    @staticmethod
     def get_dropout_probability(entropy, gama=1):
         return 1 - (gama * 0.5) - (entropy * 0.5)
 
     @staticmethod
     def get_dropout_mask(prob, x):
+        x_tensor = torch.empty(1, x.size(1))
+        out_val = np.empty([0, x.size(1)],dtype=float)
+        if prob.dim() == 1:
+            for prob_v in prob:
+                v = Bernoulli(torch.full_like(x_tensor, 1 - prob_v.item())).sample() / (1 - prob_v.item())
+                v = v.numpy()
+                out_val = np.concatenate((out_val, v), axis=0)
+                return torch.from_numpy(out_val)
+        else:
+            return Bernoulli(torch.full_like(x_tensor, 1 - prob.item())).sample() / (1 - prob.item())
+
+    @staticmethod
+    def get_dropout_mask_constant(prob, x):
         return Bernoulli(torch.full_like(x, 1 - prob)).sample() / (1 - prob)
 
     @staticmethod
     def get_dropout_probability_tensor(entropy, gama=1):
         return 1 - (gama * 0.5) - (entropy * 0.5)
-
-    @staticmethod
-    def KL_divergence(rho, rho_hat, device):
-        # sigmoid because we need the probability distributions
-        rho_hat = torch.mean(torch.sigmoid(rho_hat), 1)
-        rho = torch.tensor([rho] * len(rho_hat)).to(device)
-        return torch.sum(rho * torch.log(rho / rho_hat) + (1 - rho) * torch.log((1 - rho) / (1 - rho_hat)))
 
     @staticmethod
     def get_runs(params):

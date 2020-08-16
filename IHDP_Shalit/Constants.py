@@ -28,6 +28,9 @@ class Constants:
 
     # ps model types
     PS_MODEL_NN = "Neural_Net"
+    PS_MODEL_LR = "Logistic"
+    PS_MODEL_LR_Lasso = "Logistic_L1"
+
 
     # GAN Training Ihdp
     GAN_EPOCHS = 10000
