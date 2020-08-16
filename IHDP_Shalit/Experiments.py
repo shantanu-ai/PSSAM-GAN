@@ -54,12 +54,17 @@ class Experiments:
                                                                    ps_score_list_test,
                                                                    run_parameters["is_synthetic"])
 
+            n_treated_original = data_loader_dict_train["treated_data"][0].shape[0]
+            n_control_original = data_loader_dict_train["control_data"][0].shape[0]
+
             # Execute PM GAN
             ps_t = PS_Treated_Generator(data_loader_dict_train, ps_model, ps_model_type)
 
             balanced_dataset_dict = ps_t.simulate_treated_semi_supervised(input_nodes, iter_id, device)
             tensor_treated_balanced_dcn = balanced_dataset_dict["tensor_treated_balanced_dcn"]
             tensor_control_balanced_dcn = balanced_dataset_dict["tensor_control_balanced_dcn"]
+            n_treated_balanced_dcn = balanced_dataset_dict["n_treated_balanced_dcn"]
+            n_control_balanced_dcn = balanced_dataset_dict["n_control_balanced_dcn"]
             tensor_treated_balanced_tarnet = balanced_dataset_dict["tensor_treated_balanced_tarnet"]
             tuple_control_balanced_tarnet = balanced_dataset_dict["tuple_control_balanced_tarnet"]
 
@@ -104,8 +109,12 @@ class Experiments:
             dcn_experiments = DCN_Experiments(input_nodes, device)
             dcn_pd_models_eval_dict = dcn_experiments.evaluate_DCN_Model(tensor_treated_train_original,
                                                                          tensor_control_train_original,
+                                                                         n_treated_original,
+                                                                         n_control_original,
                                                                          tensor_treated_balanced_dcn,
                                                                          tensor_control_balanced_dcn,
+                                                                         n_treated_balanced_dcn,
+                                                                         n_control_balanced_dcn,
                                                                          data_loader_dict_test,
                                                                          model_save_paths)
             print("---" * 20)

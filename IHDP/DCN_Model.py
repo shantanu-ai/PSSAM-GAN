@@ -50,6 +50,7 @@ class DCN_shared(nn.Module):
 
         # shared layers
         shared_mask = Utils.get_dropout_mask_constant(dropout_prob, self.shared1(x))
+
         x = F.relu(shared_mask * self.shared1(x))
         x = F.relu(shared_mask * self.shared2(x))
 
@@ -61,8 +62,9 @@ class DCN_shared(nn.Module):
         dropout_prob = Utils.get_dropout_probability(entropy, gama=1)
         # shared layers
         shared_mask = Utils.get_dropout_mask(dropout_prob, self.shared1(x))
-        x = F.relu(torch.mul(shared_mask, self.shared1(x)))
-        x = F.relu(torch.mul(shared_mask, self.shared2(x.float())))
+
+        x = F.relu(shared_mask.float() * self.shared1(x))
+        x = F.relu(shared_mask.float() * self.shared2(x))
 
         return x
 
@@ -139,8 +141,8 @@ class DCN_Y1(nn.Module):
 
         # potential outcome1 Y(1)
         y1_mask = Utils.get_dropout_mask(dropout_prob, self.hidden1_Y1(x))
-        y1 = F.relu(y1_mask * self.hidden1_Y1(x))
-        y1 = F.relu(y1_mask * self.hidden2_Y1(y1.float()))
+        y1 = F.relu(y1_mask.float() * self.hidden1_Y1(x))
+        y1 = F.relu(y1_mask.float() * self.hidden2_Y1(y1))
         y1 = self.out_Y1(y1.float())
 
         return y1
@@ -221,8 +223,8 @@ class DCN_Y0(nn.Module):
 
         # potential outcome1 Y(0)
         y0_mask = Utils.get_dropout_mask(dropout_prob, self.hidden1_Y0(x))
-        y0 = F.relu(y0_mask * self.hidden1_Y0(x))
-        y0 = F.relu(y0_mask * self.hidden2_Y0(y0.float()))
+        y0 = F.relu(y0_mask.float() * self.hidden1_Y0(x))
+        y0 = F.relu(y0_mask.float() * self.hidden2_Y0(y0))
         y0 = self.out_Y0(y0.float())
 
         return y0

@@ -8,5 +8,5 @@ if __name__ == '__main__':
     print("--->> !!Using LR prop score!! <<---")
     running_mode = "original_data"
     original_exp = Experiments(running_mode, csv_path, split_size)
-    original_exp.run_all_experiments(iterations=100,
+    original_exp.run_all_experiments(iterations=1,
                                      ps_model_type=Constants.PS_MODEL_LR)
