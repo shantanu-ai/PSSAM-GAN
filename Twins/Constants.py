@@ -7,7 +7,8 @@ class Constants:
     PROP_SCORE_NODES = 30
 
     # DCN training parameters
-    DCN_EPOCHS = 3000
+    #DCN_EPOCHS = 3000
+    DCN_EPOCHS = 10000
     DCN_LR = 0.0001
     DCN_MODEL_PATH_PD_PM_MATCH_FALSE = "./DCNModel/NN_DCN_PD_PM_MATCH_FALSE_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
     DCN_MODEL_PATH_PD_PM_MATCH_TRUE = "./DCNModel/NN_DCN_PD_PM_MATCH_TRUE_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
@@ -29,9 +30,11 @@ class Constants:
 
     # ps model types
     PS_MODEL_NN = "Neural_Net"
+    PS_MODEL_LR = "Logistic"
+    PS_MODEL_LR_Lasso = "Logistic_L1"
 
     # GAN Training Twins
-    GAN_EPOCHS = 1000
+    GAN_EPOCHS = 10000
     GAN_LR = 0.0002
     GAN_BETA = 1
     GAN_BATCH_SIZE = 64

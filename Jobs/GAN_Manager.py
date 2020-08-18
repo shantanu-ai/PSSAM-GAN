@@ -10,7 +10,8 @@ from Utils import Utils
 
 
 class GAN_Manager:
-    def __init__(self, discriminator_in_nodes, generator_out_nodes, ps_model, device):
+    def __init__(self, discriminator_in_nodes, generator_out_nodes, ps_model,
+                 ps_model_type, device):
         self.discriminator = Discriminator(in_nodes=discriminator_in_nodes).to(device)
         self.discriminator.apply(self.__weights_init)
 
@@ -19,6 +20,7 @@ class GAN_Manager:
 
         self.loss = nn.BCELoss()
         self.ps_model = ps_model
+        self.ps_model_type = ps_model_type
 
     def get_generator(self):
         return self.generator
@@ -96,6 +98,17 @@ class GAN_Manager:
         return prop_loss
 
     def __get_propensity_score(self, gen_treated, device):
+        if self.ps_model_type == Constants.PS_MODEL_NN:
+            return self.__get_propensity_score_NN(gen_treated, device)
+        else:
+            return self.__get_propensity_score_LR(gen_treated)
+
+    def __get_propensity_score_LR(self, gen_treated):
+        ps_score_list_treated = self.ps_model.predict_proba(
+            gen_treated.cpu().detach().numpy())[:, -1].tolist()
+        return ps_score_list_treated
+
+    def __get_propensity_score_NN(self, gen_treated, device):
         # Assign Treated
         Y = np.ones(gen_treated.size(0))
         eval_set = Utils.convert_to_tensor(gen_treated.cpu().detach().numpy(), Y)

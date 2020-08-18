@@ -24,6 +24,8 @@ class DCN_Experiments:
         print("--" * 20)
         print("###### Model 1: DCN - PD Supervised Training started ######")
         print("Train_mode: " + Constants.DCN_TRAIN_PD)
+        print("n_treated: {0}".format(n_treated_original))
+        print("n_control: {0}".format(n_control_original))
         dcn_pd_eval_dict = self.evaluate_DCN_PD(tensor_treated_train_original,
                                                 tensor_control_train_original,
                                                 n_treated_original,
@@ -34,6 +36,8 @@ class DCN_Experiments:
         print("--" * 20)
         print("###### Model 2: DCN - Dropout 0.2 Supervised Training started ######")
         print("Train_mode: " + Constants.DCN_TRAIN_CONSTANT_DROPOUT_2)
+        print("n_treated: {0}".format(n_treated_original))
+        print("n_control: {0}".format(n_control_original))
         dcn_pd_02_eval_dict = self.evaluate_DCN_PD(tensor_treated_train_original,
                                                    tensor_control_train_original,
                                                    n_treated_original,
@@ -44,6 +48,8 @@ class DCN_Experiments:
         print("--" * 20)
         print("###### Model 3: DCN - Dropout 0.5 Supervised Training started ######")
         print("Train_mode: " + Constants.DCN_TRAIN_CONSTANT_DROPOUT_5)
+        print("n_treated: {0}".format(n_treated_original))
+        print("n_control: {0}".format(n_control_original))
         dcn_pd_05_eval_dict = self.evaluate_DCN_PD(tensor_treated_train_original,
                                                    tensor_control_train_original,
                                                    n_treated_original,
@@ -54,6 +60,8 @@ class DCN_Experiments:
         print("--" * 20)
         print("###### Model 4: DCN PM GAN - No dropout - Supervised Training started ######")
         print("Train_mode: " + Constants.DCN_TRAIN_NO_DROPOUT)
+        print("n_treated: {0}".format(n_treated_balanced_dcn))
+        print("n_control: {0}".format(n_control_balanced_dcn))
         dcn_pm_gan_eval_dict = self.evaluate_DCN_PD(tensor_treated_balanced,
                                                     tensor_control_balanced,
                                                     n_treated_balanced_dcn,
@@ -63,6 +71,8 @@ class DCN_Experiments:
         print("--" * 20)
         print("###### Model 5: DCN PM GAN - Probability 0.2 - Supervised Training started ######")
         print("Train_mode: " + Constants.DCN_TRAIN_CONSTANT_DROPOUT_2)
+        print("n_treated: {0}".format(n_treated_balanced_dcn))
+        print("n_control: {0}".format(n_control_balanced_dcn))
         dcn_pm_gan_eval_drp_02_dict = self.evaluate_DCN_PD(tensor_treated_balanced,
                                                            tensor_control_balanced,
                                                            n_treated_balanced_dcn,
@@ -73,6 +83,8 @@ class DCN_Experiments:
         print("--" * 20)
         print("###### Model 6: DCN PM GAN - Probability 0.5 - Supervised Training started ######")
         print("Train_mode: " + Constants.DCN_TRAIN_CONSTANT_DROPOUT_5)
+        print("n_treated: {0}".format(n_treated_balanced_dcn))
+        print("n_control: {0}".format(n_control_balanced_dcn))
         dcn_pm_gan_eval_drp_05_dict = self.evaluate_DCN_PD(tensor_treated_balanced,
                                                            tensor_control_balanced,
                                                            n_treated_balanced_dcn,
@@ -83,6 +95,8 @@ class DCN_Experiments:
         print("--" * 20)
         print("###### Model 7: DCN PM GAN - PD - Supervised Training started ######")
         print("Train_mode: " + Constants.DCN_TRAIN_PD)
+        print("n_treated: {0}".format(n_treated_balanced_dcn))
+        print("n_control: {0}".format(n_control_balanced_dcn))
         dcn_pm_gan_eval_pd_dict = self.evaluate_DCN_PD(tensor_treated_balanced,
                                                        tensor_control_balanced,
                                                        n_treated_balanced_dcn,

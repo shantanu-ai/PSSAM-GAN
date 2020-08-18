@@ -138,7 +138,6 @@ class DCN_Y1(nn.Module):
         # entropy = Utils.get_shanon_entropy(ps_score.item())
         entropy = Utils.get_shanon_entropy_tensor(ps_score)
         dropout_prob = Utils.get_dropout_probability(entropy, gama=1)
-
         # potential outcome1 Y(1)
         y1_mask = Utils.get_dropout_mask(dropout_prob, self.hidden1_Y1(x))
         y1 = F.relu(y1_mask.float() * self.hidden1_Y1(x))

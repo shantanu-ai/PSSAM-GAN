@@ -113,6 +113,10 @@ class DCN_Manager:
                 print("epoch: {0}, Treated + Control loss: {1}".format(epoch, dataset_loss))
 
         if not ss:
+            print(self.model_shared_path)
+            print(self.model_y1_path)
+            print(self.model_y0_path)
+
             torch.save(self.dcn_shared.state_dict(), self.model_shared_path)
             torch.save(self.dcn_y1.state_dict(), self.model_y1_path)
             torch.save(self.dcn_y0.state_dict(), self.model_y0_path)
@@ -120,6 +124,11 @@ class DCN_Manager:
     def eval(self, eval_parameters, device):
         treated_set = eval_parameters["treated_set"]
         control_set = eval_parameters["control_set"]
+
+        print(self.model_shared_path)
+        print(self.model_y1_path)
+        print(self.model_y0_path)
+
         self.dcn_shared.load_state_dict(torch.load(self.model_shared_path,
                                                    map_location=device))
         self.dcn_y1.load_state_dict(torch.load(self.model_y1_path,

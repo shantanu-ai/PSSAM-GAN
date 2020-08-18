@@ -32,6 +32,7 @@ class Experiments:
             iter_id += 1
             print("--" * 20)
             print("iter_id: {0}".format(iter_id))
+            print("IHDP Random")
             print("--" * 20)
             input_nodes = run_parameters["input_nodes"]
 

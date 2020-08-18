@@ -7,5 +7,6 @@ if __name__ == '__main__':
     print("Using original data")
     running_mode = "original_data"
     original_exp = Experiments(running_mode)
-    original_exp.run_all_experiments(train_path, test_path, iterations=1,
-                                     ps_model_type=Constants.PS_MODEL_NN)
+    original_exp.run_all_experiments(train_path, test_path,
+                                     iterations=10,
+                                     ps_model_type=Constants.PS_MODEL_LR_Lasso)

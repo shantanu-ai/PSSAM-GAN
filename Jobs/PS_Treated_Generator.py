@@ -10,10 +10,13 @@ from Utils import Utils
 
 
 class PS_Treated_Generator:
-    def __init__(self, data_loader_dict_train, ps_model):
+    def __init__(self, data_loader_dict_train, ps_model, ps_model_type):
         self.treated_tuple_full = data_loader_dict_train["treated_data"]
         self.control_tuple_full = data_loader_dict_train["control_data"]
+        self.n_treated_original = data_loader_dict_train["treated_data"][0].shape[0]
+        self.n_control_original = data_loader_dict_train["control_data"][0].shape[0]
         self.ps_model = ps_model
+        self.ps_model_type = ps_model_type
 
     def simulate_treated_semi_supervised(self, input_nodes, iter_id, device):
         treated_simulated, ps_treated_simulated, tuple_matched_control, tuple_unmatched_control \
@@ -21,7 +24,8 @@ class PS_Treated_Generator:
         treated_simulated = treated_simulated.detach().cpu()
         ps_score_list_treated_np = np.array(ps_treated_simulated)
 
-        tensor_treated_balanced_dcn, tensor_control_balanced_dcn = \
+        tensor_treated_balanced_dcn, tensor_control_balanced_dcn, n_treated_balanced_dcn, \
+        n_control_balanced_dcn = \
             self.__get_balanced_dataset_using_DCN(treated_simulated, ps_score_list_treated_np,
                                                   tuple_matched_control, tuple_unmatched_control,
                                                   input_nodes, device)
@@ -33,6 +37,9 @@ class PS_Treated_Generator:
         return {
             "tensor_treated_balanced_dcn": tensor_treated_balanced_dcn,
             "tensor_control_balanced_dcn": tensor_control_balanced_dcn,
+
+            "n_treated_balanced_dcn": n_treated_balanced_dcn,
+            "n_control_balanced_dcn": n_control_balanced_dcn,
             # "tensor_treated_balanced_tarnet": tensor_treated_balanced_tarnet,
             # "tuple_control_balanced_tarnet": tuple_control_balanced_tarnet
         }
@@ -86,7 +93,8 @@ class PS_Treated_Generator:
                                   np_control_y_1)
         return tensor_treated_balanced, tuple_control_balanced
 
-    def __get_balanced_dataset_using_DCN(self, treated_simulated, ps_score_list_treated_np,
+    def __get_balanced_dataset_using_DCN(self, treated_simulated,
+                                         ps_score_list_treated_np,
                                          tuple_matched_control, tuple_unmatched_control,
                                          input_nodes, device):
         eval_set = Utils.convert_to_tensor_DCN_PS(treated_simulated,
@@ -99,6 +107,8 @@ class PS_Treated_Generator:
         print("----->>> Semi supervised training started for DCN <<<-----")
         simulated_treated_Y = dcn.semi_supervised_train_eval(treated_tensor_full_train,
                                                              control_tensor_full_train,
+                                                             self.n_treated_original,
+                                                             self.n_control_original,
                                                              eval_set)
         print("---> Semi supervised training completed...")
         np_treated_gen_f = Utils.convert_to_col_vector(simulated_treated_Y["y_f_list"])
@@ -117,7 +127,10 @@ class PS_Treated_Generator:
         tensor_control_balanced = Utils.convert_to_tensor_DCN(np_control_x, np_control_ps,
                                                               np_control_f)
 
-        return tensor_treated_balanced, tensor_control_balanced
+        n_treated_balanced = np_treated_x.shape[0]
+        n_control_balanced = np_control_x.shape[0]
+
+        return tensor_treated_balanced, tensor_control_balanced, n_treated_balanced, n_control_balanced
 
     @staticmethod
     def __get_balanced_control(tuple_matched_control, tuple_unmatched_control):
@@ -178,7 +191,7 @@ class PS_Treated_Generator:
 
         gan = GAN_Manager(Constants.GAN_DISCRIMINATOR_IN_NODES,
                           Constants.GAN_GENERATOR_OUT_NODES,
-                          self.ps_model, device)
+                          self.ps_model, self.ps_model_type, device)
         gan.train_GAN(GAN_train_parameters, device=device)
         print("-> GAN training completed")
         treated_generated, ps_score_list_treated = gan.eval_GAN(tuple_unmatched_control[0].shape[0],

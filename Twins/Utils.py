@@ -69,11 +69,33 @@ class Utils:
             return -(prob * math.log2(prob)) - ((1 - prob) * math.log2(1 - prob))
 
     @staticmethod
+    def get_shanon_entropy_tensor(prob):
+        prob_one_indx = prob == 1
+        prob[prob_one_indx] = 0.9999
+
+        prob_zero_indx = prob == 0
+        prob[prob_zero_indx] = 0.0001
+        return -(prob * torch.log2(prob)) - ((1 - prob) * torch.log2(1 - prob))
+
+    @staticmethod
     def get_dropout_probability(entropy, gama=1):
         return 1 - (gama * 0.5) - (entropy * 0.5)
 
     @staticmethod
     def get_dropout_mask(prob, x):
+        x_tensor = torch.empty(1, x.size(1), device=Utils.get_device())
+        out_val = np.empty([0, x.size(1)], dtype=float)
+        if prob.dim() == 1:
+            for prob_v in prob:
+                v = Bernoulli(torch.full_like(x_tensor, 1 - prob_v.item())).sample() / (1 - prob_v.item())
+                v = v.cpu().numpy()
+                out_val = np.concatenate((out_val, v), axis=0)
+                return torch.from_numpy(out_val).to(Utils.get_device())
+        else:
+            return Bernoulli(torch.full_like(x_tensor, 1 - prob.item())).sample() / (1 - prob.item())
+
+    @staticmethod
+    def get_dropout_mask_constant(prob, x):
         return Bernoulli(torch.full_like(x, 1 - prob)).sample() / (1 - prob)
 
     @staticmethod
