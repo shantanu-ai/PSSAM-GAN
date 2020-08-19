@@ -90,7 +90,7 @@ class Experiments:
             print("---" * 20)
             print("--> 1. Model 1: DCN - PD Supervised Training Evaluation: ")
             dcn_pd_eval = dcn_pd_models_eval_dict["dcn_pd_eval_dict"]
-            dcn_pd_PEHE, dcn_pd_ATE_metric, dcn_pd_true_ATE, dcn_pd_predicted_ATE = \
+            dcn_pd_PEHE, dcn_pd_PEHE_new, dcn_pd_ATE_metric, dcn_pd_true_ATE, dcn_pd_predicted_ATE = \
                 self.__process_evaluated_metric(
                     dcn_pd_eval["y1_true_list"],
                     dcn_pd_eval["y0_true_list"],
@@ -104,7 +104,7 @@ class Experiments:
 
             print("--> 2. Model 2: DCN - PD(Dropout 0.2) Supervised Training Evaluation: ")
             dcn_pd_02_eval_dict = dcn_pd_models_eval_dict["dcn_pd_02_eval_dict"]
-            dcn_pd_02_PEHE, dcn_pd_02_ATE_metric, dcn_pd_02_true_ATE, dcn_pd_02_predicted_ATE = \
+            dcn_pd_02_PEHE, dcn_pd_02_PEHE_new, dcn_pd_02_ATE_metric, dcn_pd_02_true_ATE, dcn_pd_02_predicted_ATE = \
                 self.__process_evaluated_metric(
                     dcn_pd_02_eval_dict["y1_true_list"],
                     dcn_pd_02_eval_dict["y0_true_list"],
@@ -118,7 +118,7 @@ class Experiments:
 
             print("--> 3. Model 3: DCN - PD(Dropout 0.5) Supervised Training Evaluation: ")
             dcn_pd_05_eval_dict = dcn_pd_models_eval_dict["dcn_pd_05_eval_dict"]
-            dcn_pd_05_PEHE, dcn_pd_05_ATE_metric, dcn_pd_05_true_ATE, dcn_pd_05_predicted_ATE = \
+            dcn_pd_05_PEHE, dcn_pd_05_PEHE_new, dcn_pd_05_ATE_metric, dcn_pd_05_true_ATE, dcn_pd_05_predicted_ATE = \
                 self.__process_evaluated_metric(
                     dcn_pd_05_eval_dict["y1_true_list"],
                     dcn_pd_05_eval_dict["y0_true_list"],
@@ -132,7 +132,7 @@ class Experiments:
 
             print("--> 4. Model 2: PM GAN - No dropout Supervised Training Evaluation: ")
             dcn_pm_gan_eval = dcn_pd_models_eval_dict["dcn_pm_gan_eval_dict"]
-            dcn_pm_gan_PEHE, dcn_pm_gan_ATE_metric, dcn_pm_gan_true_ATE, dcn_pm_gan_predicted_ATE = \
+            dcn_pm_gan_PEHE, dcn_pm_gan_PEHE_new, dcn_pm_gan_ATE_metric, dcn_pm_gan_true_ATE, dcn_pm_gan_predicted_ATE = \
                 self.__process_evaluated_metric(
                     dcn_pm_gan_eval["y1_true_list"],
                     dcn_pm_gan_eval["y0_true_list"],
@@ -146,7 +146,8 @@ class Experiments:
 
             print("--> 5. Model 3: PM GAN - dropout 0.2 Supervised Training Evaluation: ")
             dcn_pm_gan_eval_02 = dcn_pd_models_eval_dict["dcn_pm_gan_eval_drp_02_dict"]
-            dcn_pm_gan_02_PEHE, dcn_pm_gan_02_ATE_metric, dcn_pm_gan_02_true_ATE, dcn_pm_gan_02_predicted_ATE = \
+            dcn_pm_gan_02_PEHE, dcn_pm_gan_02_PEHE_new, dcn_pm_gan_02_ATE_metric, dcn_pm_gan_02_true_ATE, \
+            dcn_pm_gan_02_predicted_ATE = \
                 self.__process_evaluated_metric(
                     dcn_pm_gan_eval_02["y1_true_list"],
                     dcn_pm_gan_eval_02["y0_true_list"],
@@ -160,7 +161,8 @@ class Experiments:
 
             print("--> 6. Model 4: PM GAN - dropout 0.5 Supervised Training Evaluation: ")
             dcn_pm_gan_eval_05 = dcn_pd_models_eval_dict["dcn_pm_gan_eval_drp_05_dict"]
-            dcn_pm_gan_05_PEHE, dcn_pm_gan_05_ATE_metric, dcn_pm_gan_05_true_ATE, dcn_pm_gan_05_predicted_ATE = \
+            dcn_pm_gan_05_PEHE, dcn_pm_gan_05_PEHE_new, dcn_pm_gan_05_ATE_metric, dcn_pm_gan_05_true_ATE, \
+            dcn_pm_gan_05_predicted_ATE = \
                 self.__process_evaluated_metric(
                     dcn_pm_gan_eval_05["y1_true_list"],
                     dcn_pm_gan_eval_05["y0_true_list"],
@@ -174,7 +176,8 @@ class Experiments:
 
             print("--> 7. Model 7: PM GAN - PD Supervised Training Evaluation: ")
             dcn_pm_gan_eval_pd = dcn_pd_models_eval_dict["dcn_pm_gan_eval_pd_dict"]
-            dcn_pm_gan_pd_PEHE, dcn_pm_gan_pd_ATE_metric, dcn_pm_gan_pd_true_ATE, dcn_pm_gan_pd_predicted_ATE = \
+            dcn_pm_gan_pd_PEHE, dcn_pm_gan_pd_PEHE_new, dcn_pm_gan_pd_ATE_metric, dcn_pm_gan_pd_true_ATE, \
+            dcn_pm_gan_pd_predicted_ATE = \
                 self.__process_evaluated_metric(
                     dcn_pm_gan_eval_pd["y1_true_list"],
                     dcn_pm_gan_eval_pd["y0_true_list"],
@@ -196,36 +199,43 @@ class Experiments:
             result_dict["iter_id"] = iter_id
 
             result_dict["PEHE_DCN_PD"] = dcn_pd_PEHE
+            result_dict["PEHE_DCN_PD_new"] = dcn_pd_PEHE_new
             result_dict["ATE_Metric_DCN_PD"] = dcn_pd_ATE_metric
             result_dict["true_ATE_DCN_PD"] = dcn_pd_true_ATE
             result_dict["predicted_DCN_PD"] = dcn_pd_predicted_ATE
 
             result_dict["PEHE_DCN_PD_02"] = dcn_pd_02_PEHE
+            result_dict["PEHE_DCN_PD_02_new"] = dcn_pd_02_PEHE_new
             result_dict["ATE_Metric_DCN_PD_02"] = dcn_pd_02_ATE_metric
             result_dict["true_ATE_DCN_PD_02"] = dcn_pd_02_true_ATE
             result_dict["predicted_DCN_PD_02"] = dcn_pd_02_predicted_ATE
 
             result_dict["PEHE_DCN_PD_05"] = dcn_pd_05_PEHE
+            result_dict["PEHE_DCN_PD_05_new"] = dcn_pd_05_PEHE_new
             result_dict["ATE_Metric_DCN_PD_05"] = dcn_pd_05_ATE_metric
             result_dict["true_ATE_DCN_PD_05"] = dcn_pd_05_true_ATE
             result_dict["predicted_DCN_PD_05"] = dcn_pd_05_predicted_ATE
 
             result_dict["PEHE_DCN_PM_GAN"] = dcn_pm_gan_PEHE
+            result_dict["PEHE_DCN_PM_GAN_new"] = dcn_pm_gan_PEHE_new
             result_dict["ATE_Metric_DCN_PM_GAN"] = dcn_pm_gan_ATE_metric
             result_dict["true_ATE_DCN_PM_GAN"] = dcn_pm_gan_true_ATE
             result_dict["predicted_DCN_PM_GAN"] = dcn_pm_gan_predicted_ATE
 
             result_dict["PEHE_DCN_PM_GAN_02"] = dcn_pm_gan_02_PEHE
+            result_dict["PEHE_DCN_PM_GAN_02_new"] = dcn_pm_gan_02_PEHE_new
             result_dict["ATE_Metric_DCN_PM_GAN_02"] = dcn_pm_gan_02_ATE_metric
             result_dict["true_ATE_DCN_PM_GAN_02"] = dcn_pm_gan_02_true_ATE
             result_dict["predicted_DCN_PM_GAN_02"] = dcn_pm_gan_02_predicted_ATE
 
             result_dict["PEHE_DCN_PM_GAN_05"] = dcn_pm_gan_05_PEHE
+            result_dict["PEHE_DCN_PM_GAN_05_new"] = dcn_pm_gan_05_PEHE_new
             result_dict["ATE_Metric_DCN_PM_GAN_05"] = dcn_pm_gan_05_ATE_metric
             result_dict["true_ATE_DCN_PM_GAN_05"] = dcn_pm_gan_05_true_ATE
             result_dict["predicted_DCN_PM_GAN_05"] = dcn_pm_gan_05_predicted_ATE
 
             result_dict["PEHE_DCN_PM_GAN_PD"] = dcn_pm_gan_pd_PEHE
+            result_dict["PEHE_DCN_PM_GAN_PD_new"] = dcn_pm_gan_pd_PEHE_new
             result_dict["ATE_Metric_DCN_PM_GAN_PD"] = dcn_pm_gan_pd_ATE_metric
             result_dict["true_ATE_DCN_PM_GAN_PD"] = dcn_pm_gan_pd_true_ATE
             result_dict["predicted_DCN_PM_GAN_PD"] = dcn_pm_gan_pd_predicted_ATE
@@ -246,36 +256,43 @@ class Experiments:
             results_list.append(result_dict)
 
         PEHE_set_DCN_PD = []
+        PEHE_set_DCN_PD_new = []
         ATE_Metric_set_DCN_PD = []
         true_ATE_set_DCN_PD = []
         predicted_ATE_DCN_PD = []
 
         PEHE_set_DCN_PD_02 = []
+        PEHE_set_DCN_PD_02_new = []
         ATE_Metric_set_DCN_PD_02 = []
         true_ATE_set_DCN_PD_02 = []
         predicted_ATE_DCN_PD_02 = []
 
         PEHE_set_DCN_PD_05 = []
+        PEHE_set_DCN_PD_05_new = []
         ATE_Metric_set_DCN_PD_05 = []
         true_ATE_set_DCN_PD_05 = []
         predicted_ATE_DCN_PD_05 = []
 
         PEHE_set_DCN_PM_GAN = []
+        PEHE_set_DCN_PM_GAN_new = []
         ATE_Metric_set_DCN_PM_GAN = []
         true_ATE_set_DCN_PM_GAN = []
         predicted_ATE_DCN_PM_GAN = []
 
         PEHE_set_DCN_PM_GAN_02 = []
+        PEHE_set_DCN_PM_GAN_02_new = []
         ATE_Metric_set_DCN_PM_GAN_02 = []
         true_ATE_set_DCN_PM_GAN_02 = []
         predicted_ATE_DCN_PM_GAN_02 = []
 
         PEHE_set_DCN_PM_GAN_05 = []
+        PEHE_set_DCN_PM_GAN_05_new = []
         ATE_Metric_set_DCN_PM_GAN_05 = []
         true_ATE_set_DCN_PM_GAN_05 = []
         predicted_ATE_DCN_PM_GAN_05 = []
 
         PEHE_set_DCN_PM_GAN_PD = []
+        PEHE_set_DCN_PM_GAN_PD_new = []
         ATE_Metric_set_DCN_PM_GAN_PD = []
         true_ATE_set_DCN_PM_GAN_PD = []
         predicted_ATE_DCN_PM_GAN_PD = []
@@ -292,42 +309,51 @@ class Experiments:
 
         for result in results_list:
             PEHE_set_DCN_PD.append(result["PEHE_DCN_PD"])
+            PEHE_set_DCN_PD_new.append(result["PEHE_DCN_PD_new"])
             ATE_Metric_set_DCN_PD.append(result["ATE_Metric_DCN_PD"])
             true_ATE_set_DCN_PD.append(result["true_ATE_DCN_PD"])
             predicted_ATE_DCN_PD.append(result["predicted_DCN_PD"])
 
             PEHE_set_DCN_PD_02.append(result["PEHE_DCN_PD_02"])
+            PEHE_set_DCN_PD_02_new.append(result["PEHE_DCN_PD_02_new"])
             ATE_Metric_set_DCN_PD_02.append(result["ATE_Metric_DCN_PD_02"])
             true_ATE_set_DCN_PD_02.append(result["true_ATE_DCN_PD_02"])
             predicted_ATE_DCN_PD_02.append(result["predicted_DCN_PD_02"])
 
             PEHE_set_DCN_PD_05.append(result["PEHE_DCN_PD_05"])
+            PEHE_set_DCN_PD_05_new.append(result["PEHE_DCN_PD_05_new"])
             ATE_Metric_set_DCN_PD_05.append(result["ATE_Metric_DCN_PD_05"])
             true_ATE_set_DCN_PD_05.append(result["true_ATE_DCN_PD_05"])
             predicted_ATE_DCN_PD_05.append(result["predicted_DCN_PD_05"])
 
             PEHE_set_DCN_PM_GAN.append(result["PEHE_DCN_PM_GAN"])
+            PEHE_set_DCN_PM_GAN.append(result["PEHE_DCN_PM_GAN_new"])
             ATE_Metric_set_DCN_PM_GAN.append(result["ATE_Metric_DCN_PM_GAN"])
             true_ATE_set_DCN_PM_GAN.append(result["true_ATE_DCN_PM_GAN"])
             predicted_ATE_DCN_PM_GAN.append(result["predicted_DCN_PM_GAN"])
 
             PEHE_set_DCN_PM_GAN_02.append(result["PEHE_DCN_PM_GAN_02"])
+            PEHE_set_DCN_PM_GAN_02.append(result["PEHE_DCN_PM_GAN_02_new"])
             ATE_Metric_set_DCN_PM_GAN_02.append(result["ATE_Metric_DCN_PM_GAN_02"])
             true_ATE_set_DCN_PM_GAN_02.append(result["true_ATE_DCN_PM_GAN_02"])
             predicted_ATE_DCN_PM_GAN_02.append(result["predicted_DCN_PM_GAN_02"])
 
             PEHE_set_DCN_PM_GAN_05.append(result["PEHE_DCN_PM_GAN_05"])
+            PEHE_set_DCN_PM_GAN_05_new.append(result["PEHE_DCN_PM_GAN_05_new"])
             ATE_Metric_set_DCN_PM_GAN_05.append(result["ATE_Metric_DCN_PM_GAN_05"])
             true_ATE_set_DCN_PM_GAN_05.append(result["true_ATE_DCN_PM_GAN_05"])
             predicted_ATE_DCN_PM_GAN_05.append(result["predicted_DCN_PM_GAN_05"])
 
             PEHE_set_DCN_PM_GAN_PD.append(result["PEHE_DCN_PM_GAN_PD"])
+            PEHE_set_DCN_PM_GAN_PD_new.append(result["PEHE_DCN_PM_GAN_PD_new"])
             ATE_Metric_set_DCN_PM_GAN_PD.append(result["ATE_Metric_DCN_PM_GAN_PD"])
             true_ATE_set_DCN_PM_GAN_PD.append(result["true_ATE_DCN_PM_GAN_PD"])
             predicted_ATE_DCN_PM_GAN_PD.append(result["predicted_DCN_PM_GAN_PD"])
 
         PEHE_set_DCN_PD_mean = np.mean(np.array(PEHE_set_DCN_PD))
         PEHE_set_DCN_PD_std = np.std(PEHE_set_DCN_PD)
+        PEHE_set_DCN_PD_mean_new = np.mean(np.array(PEHE_set_DCN_PD_new))
+        PEHE_set_DCN_PD_std_new = np.std(PEHE_set_DCN_PD_new)
         ATE_Metric_set_DCN_PD_mean = np.mean(np.array(ATE_Metric_set_DCN_PD))
         ATE_Metric_set_DCN_PD_std = np.std(ATE_Metric_set_DCN_PD)
         true_ATE_set_DCN_PD_mean = np.mean(np.array(true_ATE_set_DCN_PD))
@@ -337,6 +363,8 @@ class Experiments:
 
         PEHE_set_DCN_PD_02_mean = np.mean(np.array(PEHE_set_DCN_PD_02))
         PEHE_set_DCN_PD_02_std = np.std(PEHE_set_DCN_PD_02)
+        PEHE_set_DCN_PD_02_mean_new = np.mean(np.array(PEHE_set_DCN_PD_02_new))
+        PEHE_set_DCN_PD_02_std_new = np.std(np.array(PEHE_set_DCN_PD_02_new))
         ATE_Metric_set_DCN_PD_02_mean = np.mean(np.array(ATE_Metric_set_DCN_PD_02))
         ATE_Metric_set_DCN_PD_02_std = np.std(ATE_Metric_set_DCN_PD_02)
         true_ATE_set_DCN_PD_02_mean = np.mean(np.array(true_ATE_set_DCN_PD_02))
@@ -346,6 +374,8 @@ class Experiments:
 
         PEHE_set_DCN_PD_05_mean = np.mean(np.array(PEHE_set_DCN_PD_05))
         PEHE_set_DCN_PD_05_std = np.std(PEHE_set_DCN_PD_05)
+        PEHE_set_DCN_PD_05_mean_new = np.mean(np.array(PEHE_set_DCN_PD_05_new))
+        PEHE_set_DCN_PD_05_std_new = np.std(np.array(PEHE_set_DCN_PD_05_new))
         ATE_Metric_set_DCN_PD_05_mean = np.mean(np.array(ATE_Metric_set_DCN_PD_05))
         ATE_Metric_set_DCN_PD_05_std = np.std(ATE_Metric_set_DCN_PD_05)
         true_ATE_set_DCN_PD_05_mean = np.mean(np.array(true_ATE_set_DCN_PD_05))
@@ -355,6 +385,8 @@ class Experiments:
 
         PEHE_set_DCN_PM_GAN_mean = np.mean(np.array(PEHE_set_DCN_PM_GAN))
         PEHE_set_DCN_PM_GAN_std = np.std(PEHE_set_DCN_PM_GAN)
+        PEHE_set_DCN_PM_GAN_mean_new = np.mean(np.array(PEHE_set_DCN_PM_GAN_new))
+        PEHE_set_DCN_PM_GAN_std_new = np.std(np.array(PEHE_set_DCN_PM_GAN_new))
         ATE_Metric_set_DCN_PM_GAN_mean = np.mean(np.array(ATE_Metric_set_DCN_PM_GAN))
         ATE_Metric_set_DCN_PM_GAN_std = np.std(ATE_Metric_set_DCN_PM_GAN)
         true_ATE_set_DCN_PM_GAN_mean = np.mean(np.array(true_ATE_set_DCN_PM_GAN))
@@ -364,6 +396,8 @@ class Experiments:
 
         PEHE_set_DCN_PM_GAN_02_mean = np.mean(np.array(PEHE_set_DCN_PM_GAN_02))
         PEHE_set_DCN_PM_GAN_02_std = np.std(PEHE_set_DCN_PM_GAN_02)
+        PEHE_set_DCN_PM_GAN_02_mean_new = np.mean(np.array(PEHE_set_DCN_PM_GAN_02_new))
+        PEHE_set_DCN_PM_GAN_02_std_new = np.std(np.array(PEHE_set_DCN_PM_GAN_02_new))
         ATE_Metric_set_DCN_PM_GAN_02_mean = np.mean(np.array(ATE_Metric_set_DCN_PM_GAN_02))
         ATE_Metric_set_DCN_PM_GAN_02_std = np.std(ATE_Metric_set_DCN_PM_GAN_02)
         true_ATE_set_DCN_PM_GAN_02_mean = np.mean(np.array(true_ATE_set_DCN_PM_GAN_02))
@@ -373,6 +407,8 @@ class Experiments:
 
         PEHE_set_DCN_PM_GAN_05_mean = np.mean(np.array(PEHE_set_DCN_PM_GAN_05))
         PEHE_set_DCN_PM_GAN_05_std = np.std(PEHE_set_DCN_PM_GAN_05)
+        PEHE_set_DCN_PM_GAN_05_mean_new = np.mean(np.array(PEHE_set_DCN_PM_GAN_05_new))
+        PEHE_set_DCN_PM_GAN_05_std_new = np.std(np.array(PEHE_set_DCN_PM_GAN_05_new))
         ATE_Metric_set_DCN_PM_GAN_05_mean = np.mean(np.array(ATE_Metric_set_DCN_PM_GAN_05))
         ATE_Metric_set_DCN_PM_GAN_05_std = np.std(ATE_Metric_set_DCN_PM_GAN_05)
         true_ATE_set_DCN_PM_GAN_05_mean = np.mean(np.array(true_ATE_set_DCN_PM_GAN_05))
@@ -382,6 +418,8 @@ class Experiments:
 
         PEHE_set_DCN_PM_GAN_PD_mean = np.mean(np.array(PEHE_set_DCN_PM_GAN_PD))
         PEHE_set_DCN_PM_GAN_PD_std = np.std(PEHE_set_DCN_PM_GAN_PD)
+        PEHE_set_DCN_PM_GAN_PD_mean_new = np.mean(np.array(PEHE_set_DCN_PM_GAN_PD_new))
+        PEHE_set_DCN_PM_GAN_PD_std_new = np.std(np.array(PEHE_set_DCN_PM_GAN_PD_new))
         ATE_Metric_set_DCN_PM_GAN_PD_mean = np.mean(np.array(ATE_Metric_set_DCN_PM_GAN_PD))
         ATE_Metric_set_DCN_PM_GAN_PD_std = np.std(ATE_Metric_set_DCN_PM_GAN_PD)
         true_ATE_set_DCN_PM_GAN_PD_mean = np.mean(np.array(true_ATE_set_DCN_PM_GAN_PD))
@@ -396,6 +434,8 @@ class Experiments:
         print("Model 1: DCN_PD")
         print("DCN_PD, PEHE: {0}, SD: {1}"
               .format(PEHE_set_DCN_PD_mean, PEHE_set_DCN_PD_std))
+        print("DCN_PD, PEHE(TarNet): {0}, SD: {1}"
+              .format(PEHE_set_DCN_PD_mean_new, PEHE_set_DCN_PD_std_new))
         print("DCN_PD, ATE Metric: {0}, SD: {1}"
               .format(ATE_Metric_set_DCN_PD_mean, ATE_Metric_set_DCN_PD_std))
         print("DCN_PD, True ATE: {0}, SD: {1}"
@@ -408,6 +448,8 @@ class Experiments:
         print("Model 2: DCN_PD(Dropout 0.2)")
         print("DCN_PD(Dropout 0.2), PEHE: {0}, SD: {1}"
               .format(PEHE_set_DCN_PD_02_mean, PEHE_set_DCN_PD_02_std))
+        print("DCN_PD(Dropout 0.2), PEHE(TarNet): {0}, SD: {1}"
+              .format(PEHE_set_DCN_PD_02_mean_new, PEHE_set_DCN_PD_02_std_new))
         print("DCN_PD(Dropout 0.2), ATE Metric: {0}, SD: {1}"
               .format(ATE_Metric_set_DCN_PD_02_mean, ATE_Metric_set_DCN_PD_02_std))
         print("DCN_PD(Dropout 0.2), True ATE: {0}, SD: {1}"
@@ -418,13 +460,15 @@ class Experiments:
         print("--" * 20)
 
         print("Model 3: DCN_PD(Dropout 0.5)")
-        print("(Dropout 0.5), PEHE: {0}, SD: {1}"
+        print("DCN_PD(Dropout 0.5), PEHE: {0}, SD: {1}"
               .format(PEHE_set_DCN_PD_05_mean, PEHE_set_DCN_PD_05_std))
-        print("(Dropout 0.5), ATE Metric: {0}, SD: {1}"
+        print("DCN_PD(Dropout 0.5), PEHE(TarNet): {0}, SD: {1}"
+              .format(PEHE_set_DCN_PD_05_mean_new, PEHE_set_DCN_PD_05_std_new))
+        print("DCN_PD(Dropout 0.5), ATE Metric: {0}, SD: {1}"
               .format(ATE_Metric_set_DCN_PD_05_mean, ATE_Metric_set_DCN_PD_05_std))
-        print("(Dropout 0.5), True ATE: {0}, SD: {1}"
+        print("DCN_PD(Dropout 0.5), True ATE: {0}, SD: {1}"
               .format(true_ATE_set_DCN_PD_05_mean, true_ATE_set_DCN_PD_05_std))
-        print("(Dropout 0.5), predicted ATE: {0}, SD: {1}"
+        print("DCN_PD(Dropout 0.5), predicted ATE: {0}, SD: {1}"
               .format(predicted_ATE_DCN_PD_05_mean,
                       predicted_ATE_DCN_PD_05_std))
         print("--" * 20)
@@ -432,6 +476,8 @@ class Experiments:
         print("Model 4: DCN PM GAN")
         print("DCN PM GAN, PEHE: {0}, SD: {1}"
               .format(PEHE_set_DCN_PM_GAN_mean, PEHE_set_DCN_PM_GAN_std))
+        print("DCN PM GAN, PEHE(TarNet): {0}, SD: {1}"
+              .format(PEHE_set_DCN_PM_GAN_mean_new, PEHE_set_DCN_PM_GAN_std_new))
         print("DCN PM GAN, ATE Metric: {0}, SD: {1}"
               .format(ATE_Metric_set_DCN_PM_GAN_mean, ATE_Metric_set_DCN_PM_GAN_std))
         print("DCN PM GAN, True ATE: {0}, SD: {1}"
@@ -444,6 +490,8 @@ class Experiments:
         print("Model 5: DCN PM GAN Dropout 0.2")
         print("DCN PM GAN Dropout 0.2, PEHE: {0}, SD: {1}"
               .format(PEHE_set_DCN_PM_GAN_02_mean, PEHE_set_DCN_PM_GAN_02_std))
+        print("DCN PM GAN Dropout 0.2, PEHE(TarNet): {0}, SD: {1}"
+              .format(PEHE_set_DCN_PM_GAN_02_mean_new, PEHE_set_DCN_PM_GAN_02_std_new))
         print("DCN PM GAN Dropout 0.2, ATE Metric: {0}, SD: {1}"
               .format(ATE_Metric_set_DCN_PM_GAN_02_mean, ATE_Metric_set_DCN_PM_GAN_02_std))
         print("DCN PM GAN Dropout 0.2, True ATE: {0}, SD: {1}"
@@ -456,6 +504,8 @@ class Experiments:
         print("Model 6: DCN PM GAN Dropout 0.5")
         print("DCN PM GAN Dropout 0.5, PEHE: {0}, SD: {1}"
               .format(PEHE_set_DCN_PM_GAN_05_mean, PEHE_set_DCN_PM_GAN_05_std))
+        print("DCN PM GAN Dropout 0.5, PEHE(TarNet): {0}, SD: {1}"
+              .format(PEHE_set_DCN_PM_GAN_05_mean_new, PEHE_set_DCN_PM_GAN_05_std_new))
         print("DCN PM GAN Dropout 0.5, ATE Metric: {0}, SD: {1}"
               .format(ATE_Metric_set_DCN_PM_GAN_05_mean, ATE_Metric_set_DCN_PM_GAN_05_std))
         print("DCN PM GAN Dropout 0.5, True ATE: {0}, SD: {1}"
@@ -468,6 +518,8 @@ class Experiments:
         print("Model 7: DCN PM GAN PD ")
         print("DCN PM GAN PD, PEHE: {0}, SD: {1}"
               .format(PEHE_set_DCN_PM_GAN_PD_mean, PEHE_set_DCN_PM_GAN_PD_std))
+        print("DCN PM GAN PD, PEHE(TarNet): {0}, SD: {1}"
+              .format(PEHE_set_DCN_PM_GAN_PD_mean_new, PEHE_set_DCN_PM_GAN_PD_std_new))
         print("DCN PM GAN PD, ATE Metric: {0}, SD: {1}"
               .format(ATE_Metric_set_DCN_PM_GAN_PD_mean, ATE_Metric_set_DCN_PM_GAN_PD_std))
         print("DCN PM GAN PD, True ATE: {0}, SD: {1}"
@@ -487,6 +539,8 @@ class Experiments:
         file1.write("\nModel 1: DCN_PD")
         file1.write("\nDCN_PD, PEHE: {0}, SD: {1}"
                     .format(PEHE_set_DCN_PD_mean, PEHE_set_DCN_PD_std))
+        file1.write("\nDCN_PD, PEHE(TarNet): {0}, SD: {1}"
+                    .format(PEHE_set_DCN_PD_mean_new, PEHE_set_DCN_PD_std_new))
         file1.write("\nDCN_PD, ATE Metric: {0}, SD: {1}"
                     .format(ATE_Metric_set_DCN_PD_mean,
                             ATE_Metric_set_DCN_PD_std))
@@ -502,6 +556,9 @@ class Experiments:
         file1.write("\nDCN_PD(Dropout 0.2), PEHE: {0}, SD: {1}"
                     .format(PEHE_set_DCN_PD_02_mean,
                             PEHE_set_DCN_PD_02_std))
+        file1.write("\nDCN_PD(Dropout 0.2), PEHE(TarNet): {0}, SD: {1}"
+                    .format(PEHE_set_DCN_PD_02_mean_new,
+                            PEHE_set_DCN_PD_02_std_new))
         file1.write("\nDCN_PD(Dropout 0.2), ATE Metric: {0}, SD: {1}"
                     .format(ATE_Metric_set_DCN_PD_02_mean,
                             ATE_Metric_set_DCN_PD_02_std))
@@ -517,6 +574,9 @@ class Experiments:
         file1.write("\nDCN_PD(Dropout 0.5), PEHE: {0}, SD: {1}"
                     .format(PEHE_set_DCN_PD_05_mean,
                             PEHE_set_DCN_PD_05_std))
+        file1.write("\nDCN_PD(Dropout 0.5), PEHE(TarNet): {0}, SD: {1}"
+                    .format(PEHE_set_DCN_PD_05_mean_new,
+                            PEHE_set_DCN_PD_05_std_new))
         file1.write("\nDCN_PD(Dropout 0.5), ATE Metric: {0}, SD: {1}"
                     .format(ATE_Metric_set_DCN_PD_05_mean,
                             ATE_Metric_set_DCN_PD_05_std))
@@ -531,6 +591,8 @@ class Experiments:
         file1.write("\nModel 4: DCN PM GAN")
         file1.write("\nDCN PM GAN, PEHE: {0}, SD: {1}"
                     .format(PEHE_set_DCN_PM_GAN_mean, PEHE_set_DCN_PM_GAN_std))
+        file1.write("\nDCN PM GAN, PEHE(TarNet): {0}, SD: {1}"
+                    .format(PEHE_set_DCN_PM_GAN_mean_new, PEHE_set_DCN_PM_GAN_std_new))
         file1.write("\nDCN PM GAN, ATE Metric: {0}, SD: {1}"
                     .format(ATE_Metric_set_DCN_PM_GAN_mean,
                             ATE_Metric_set_DCN_PM_GAN_std))
@@ -546,6 +608,9 @@ class Experiments:
         file1.write("\nDCN PM GAN(Dropout 0.2), PEHE: {0}, SD: {1}"
                     .format(PEHE_set_DCN_PM_GAN_02_mean,
                             PEHE_set_DCN_PM_GAN_02_std))
+        file1.write("\nDCN PM GAN(Dropout 0.2), PEHE(TarNet): {0}, SD: {1}"
+                    .format(PEHE_set_DCN_PM_GAN_02_mean_new,
+                            PEHE_set_DCN_PM_GAN_02_std_new))
         file1.write("\nDCN PM GAN(Dropout 0.2), ATE Metric: {0}, SD: {1}"
                     .format(ATE_Metric_set_DCN_PM_GAN_02_mean,
                             ATE_Metric_set_DCN_PM_GAN_02_std))
@@ -561,6 +626,9 @@ class Experiments:
         file1.write("\nDCN PM GAN(Dropout 0.5), PEHE: {0}, SD: {1}"
                     .format(PEHE_set_DCN_PM_GAN_05_mean,
                             PEHE_set_DCN_PM_GAN_05_std))
+        file1.write("\nDCN PM GAN(Dropout 0.5), PEHE(TarNet): {0}, SD: {1}"
+                    .format(PEHE_set_DCN_PM_GAN_05_mean_new,
+                            PEHE_set_DCN_PM_GAN_05_std_new))
         file1.write("\nDCN PM GAN(Dropout 0.5), ATE Metric: {0}, SD: {1}"
                     .format(ATE_Metric_set_DCN_PM_GAN_05_mean,
                             ATE_Metric_set_DCN_PM_GAN_05_std))
@@ -576,6 +644,9 @@ class Experiments:
         file1.write("\nDCN PM GAN(PD), PEHE: {0}, SD: {1}"
                     .format(PEHE_set_DCN_PM_GAN_PD_mean,
                             PEHE_set_DCN_PM_GAN_PD_std))
+        file1.write("\nDCN PM GAN(PD), PEHE(TarNet): {0}, SD: {1}"
+                    .format(PEHE_set_DCN_PM_GAN_PD_mean_new,
+                            PEHE_set_DCN_PM_GAN_PD_std_new))
         file1.write("\nDCN PM GAN(PD), ATE Metric: {0}, SD: {1}"
                     .format(ATE_Metric_set_DCN_PM_GAN_PD_mean,
                             ATE_Metric_set_DCN_PM_GAN_PD_std))
@@ -659,15 +730,17 @@ class Experiments:
         y0_hat_np = np.array(y0_hat)
 
         PEHE = Metrics.PEHE(y1_true_np, y0_true_np, y1_hat_np, y0_hat_np)
+        PEHE_new = Metrics.PEHE_new(y1_true_np, y0_true_np, y1_hat_np, y0_hat_np)
         ATE = Metrics.ATE(y1_true_np, y0_true_np, y1_hat_np, y0_hat_np)
-        print("PEHE: {0}".format(PEHE))
+        print("PEHE(Ganite): {0}".format(PEHE))
+        print("PEHE(TarNet): {0}".format(PEHE_new))
         print("ATE: {0}".format(ATE))
 
         true_ATE = sum(true_ITE_list) / len(true_ITE_list)
         predicted_ATE = sum(predicted_ITE_list) / len(predicted_ITE_list)
 
         Utils.write_to_csv(ite_csv_path.format(iter_id), ite_dict)
-        return PEHE, ATE, true_ATE, predicted_ATE
+        return PEHE, PEHE_new, ATE, true_ATE, predicted_ATE
 
     def get_consolidated_file_name(self, ps_model_type):
         if ps_model_type == Constants.PS_MODEL_NN:
