@@ -6,6 +6,7 @@ import torch.nn as nn
 import torch.optim as optim
 
 from DCN_Model import DCN_shared, DCN_Y1, DCN_Y0
+from Utils import EarlyStopping_DCN
 
 
 class DCN_Manager:
@@ -14,14 +15,17 @@ class DCN_Manager:
         self.dcn_y1 = DCN_Y1().to(device)
         self.dcn_y0 = DCN_Y0().to(device)
 
-    def train(self, train_parameters, device, train_mode):
+    def train(self, train_parameters, val_parameters, device, train_mode):
         epochs = train_parameters["epochs"]
         treated_batch_size = train_parameters["treated_batch_size"]
         control_batch_size = train_parameters["control_batch_size"]
+
         lr = train_parameters["lr"]
         shuffle = train_parameters["shuffle"]
         treated_set_train = train_parameters["treated_set_train"]
         control_set_train = train_parameters["control_set_train"]
+        treated_set_val = val_parameters["treated_set"]
+        control_set_val = val_parameters["control_set"]
 
         self.dcn_shared.set_train_mode(training_mode=train_mode)
         self.dcn_y1.set_train_mode(training_mode=train_mode)
@@ -35,23 +39,44 @@ class DCN_Manager:
                                                                 batch_size=control_batch_size,
                                                                 shuffle=shuffle)
 
+        treated_data_loader_val = torch.utils.data.DataLoader(treated_set_val,
+                                                              batch_size=treated_batch_size,
+                                                              shuffle=shuffle)
+
+        control_data_loader_val = torch.utils.data.DataLoader(control_set_val,
+                                                              batch_size=control_batch_size,
+                                                              shuffle=shuffle)
+
         optimizer_shared = optim.Adam(self.dcn_shared.parameters(), lr=lr)
         optimizer_y1 = optim.Adam(self.dcn_y1.parameters(), lr=lr)
         optimizer_y0 = optim.Adam(self.dcn_y0.parameters(), lr=lr)
         lossF = nn.MSELoss()
 
         min_loss = 100000.0
-        dataset_loss = 0.0
+        dataset_loss_train = 0.0
+        dataset_loss_val = 0.0
+        train_loss = 0
+        val_loss = 0
+        train_losses = []
+        valid_losses = []
+        avg_train_losses = []
+        avg_valid_losses = []
+        early_stopping = EarlyStopping_DCN(patience=80, verbose=True,
+                                           model_shared_path="DCN_shared_checkpoint.pt",
+                                           model_y1_path="DCN_y1_checkpoint.pt",
+                                           model_y0_path="DCN_y0_checkpoint.pt")
+
+        total_loss_train = 0
+        total_loss_val = 0
         for epoch in range(epochs):
             epoch += 1
             self.dcn_shared.train()
             self.dcn_y1.train()
             self.dcn_y0.train()
-            total_loss = 0
             train_set_size = 0
 
             if epoch % 2 == 0:
-                dataset_loss = 0
+                dataset_loss_train = 0
                 # train treated
                 for batch in treated_data_loader_train:
                     covariates_X, ps_score, y_f, y_cf = batch
@@ -71,8 +96,11 @@ class DCN_Manager:
                     loss.backward()
                     optimizer_shared.step()
                     optimizer_y1.step()
-                    total_loss += loss.item()
-                dataset_loss = total_loss
+                    total_loss_train += loss.item()
+
+                train_losses.append(total_loss_train)
+                dataset_loss_train += total_loss_train
+                total_loss_train = 0
 
             elif epoch % 2 == 1:
                 # train control
@@ -95,12 +123,78 @@ class DCN_Manager:
                     loss.backward()
                     optimizer_shared.step()
                     optimizer_y0.step()
-                    total_loss += loss.item()
-                    total_loss += loss.item()
-                dataset_loss = dataset_loss + total_loss
+                    total_loss_train += loss.item()
+                dataset_loss_train += total_loss_train
+
+            ######################
+            # validate the model #
+            ######################
+            # prep model for evaluation
+            self.dcn_shared.eval()
+            self.dcn_y1.eval()
+            self.dcn_y0.eval()
+            if epoch % 2 == 0:
+                dataset_loss_val += 0
+                # val treated
+                for batch in treated_data_loader_val:
+                    covariates_X, ps_score, y_f, y_cf = batch
+                    covariates_X = covariates_X.to(device)
+                    ps_score = ps_score.squeeze().to(device)
+                    y1_hat = self.dcn_y1(self.dcn_shared(covariates_X, ps_score), ps_score)
+                    if torch.cuda.is_available():
+                        loss = lossF(y1_hat.float().cuda(),
+                                     y_f.float().cuda()).to(device)
+                    else:
+                        loss = lossF(y1_hat.float(),
+                                     y_f.float()).to(device)
+                    total_loss_val += loss.item()
+                valid_losses.append(total_loss_val)
+                dataset_loss_val += total_loss_val
+                total_loss_val = 0
+
+            elif epoch % 2 == 1:
+                # val control
+                for batch in control_data_loader_val:
+                    covariates_X, ps_score, y_f, y_cf = batch
+                    covariates_X = covariates_X.to(device)
+                    ps_score = ps_score.squeeze().to(device)
+
+                    train_set_size += covariates_X.size(0)
+                    y0_hat = self.dcn_y0(self.dcn_shared(covariates_X, ps_score), ps_score)
+                    if torch.cuda.is_available():
+                        loss = lossF(y0_hat.float().cuda(),
+                                     y_f.float().cuda()).to(device)
+                    else:
+                        loss = lossF(y0_hat.float(),
+                                     y_f.float()).to(device)
+                    total_loss_val += loss.item()
+                    dataset_loss_val += total_loss_val
+
+            if epoch % 2 == 0:
+                train_loss = np.average(np.array(train_losses))
+                valid_loss = np.average(np.array(valid_losses))
+                avg_train_losses.append(train_loss)
+                avg_valid_losses.append(valid_loss)
+
+                n_epoch = len(str(epochs))
+
+                train_losses = []
+                valid_losses = []
+                early_stopping(valid_loss, self.dcn_shared, self.dcn_y1, self.dcn_y0)
+
+                if early_stopping.early_stop:
+                    print("Early stopping")
+                    break
 
             if epoch % 100 == 0:
-                print("epoch: {0}, Treated + Control loss: {1}".format(epoch, dataset_loss))
+                print("---->>>[[epoch: {0}/400]], Treated + Control loss, train: {1}, val: {2}".format(epoch,
+                                                                                                       train_loss,
+                                                                                                       valid_loss))
+                # print("epoch: {0}, Treated + Control loss: {1}".format(epoch, dataset_loss_train))
+
+        self.dcn_shared.load_state_dict(torch.load("DCN_shared_checkpoint.pt"))
+        self.dcn_y1.load_state_dict(torch.load("DCN_y1_checkpoint.pt"))
+        self.dcn_y0.load_state_dict(torch.load("DCN_y0_checkpoint.pt"))
 
     def eval(self, eval_parameters, device):
         treated_set = eval_parameters["treated_set"]
