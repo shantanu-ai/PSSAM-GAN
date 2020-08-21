@@ -8,6 +8,7 @@ from DCN_Experiments import DCN_Experiments
 from Metrics import Metrics
 from PS_Manager import PS_Manager
 from PS_Treated_Generator import PS_Treated_Generator
+from TARNet_Experiments import TARNet_Experiments
 from Utils import Utils
 from dataloader import DataLoader
 
@@ -34,21 +35,29 @@ class Experiments:
             print("iter_id: {0}".format(iter_id))
             print("--" * 20)
             input_nodes = run_parameters["input_nodes"]
-            self.np_covariates_X_train, self.np_covariates_X_test, self.np_covariates_T_train, \
-            self.np_covariates_T_test \
+            self.np_covariates_X_train, self.np_covariates_X_test, self.np_covariates_X_val, \
+            self.np_covariates_T_train, \
+            self.np_covariates_T_test, self.np_covariates_T_val \
                 = self.__load_data(train_path, test_path, iter_id)
 
             # get propensity score for classifier training and testing
-            ps_score_list_train, ps_score_list_test, ps_model = self.__get_ps_model(ps_model_type,
-                                                                                    iter_id,
-                                                                                    run_parameters["input_nodes"],
-                                                                                    device)
+            ps_score_list_train, ps_score_list_val, ps_score_list_test, ps_model = \
+                self.__get_ps_model(ps_model_type,
+                                    iter_id,
+                                    run_parameters[
+                                        "input_nodes"],
+                                    device)
             run_parameters["consolidated_file_path"] = self.get_consolidated_file_name(ps_model_type)
 
             data_loader_dict_train = self.dL.prepare_tensor_for_DCN(self.np_covariates_X_train,
                                                                     self.np_covariates_T_train,
                                                                     ps_score_list_train,
                                                                     run_parameters["is_synthetic"])
+            data_loader_dict_val = self.dL.prepare_tensor_for_DCN(self.np_covariates_X_val,
+                                                                  self.np_covariates_T_val,
+                                                                  ps_score_list_val,
+                                                                  run_parameters["is_synthetic"])
+
             data_loader_dict_test = self.dL.prepare_tensor_for_DCN(self.np_covariates_X_test,
                                                                    self.np_covariates_T_test,
                                                                    ps_score_list_test,
@@ -58,15 +67,19 @@ class Experiments:
             n_control_original = data_loader_dict_train["control_data"][0].shape[0]
 
             # Execute PM GAN
-            ps_t = PS_Treated_Generator(data_loader_dict_train, ps_model, ps_model_type)
+            ps_t = PS_Treated_Generator(data_loader_dict_train, data_loader_dict_val,
+                                        ps_model, ps_model_type)
 
             balanced_dataset_dict = ps_t.simulate_treated_semi_supervised(input_nodes, iter_id, device)
+
             tensor_treated_balanced_dcn = balanced_dataset_dict["tensor_treated_balanced_dcn"]
             tensor_control_balanced_dcn = balanced_dataset_dict["tensor_control_balanced_dcn"]
             n_treated_balanced_dcn = balanced_dataset_dict["n_treated_balanced_dcn"]
             n_control_balanced_dcn = balanced_dataset_dict["n_control_balanced_dcn"]
+
             tensor_treated_balanced_tarnet = balanced_dataset_dict["tensor_treated_balanced_tarnet"]
-            tuple_control_balanced_tarnet = balanced_dataset_dict["tuple_control_balanced_tarnet"]
+            n_total_balanced_tarnet = balanced_dataset_dict["n_total_balanced_tarnet"]
+            n_treated_balanced_tarnet = balanced_dataset_dict["n_treated_balanced_tarnet"]
 
             print("---" * 20)
             print("-----------> !! Supervised Training(DCN Models ) !!<-----------")
@@ -223,47 +236,49 @@ class Experiments:
             # run TARNet Models
             tarnet_PEHE = 0
             tarnet_pm_gan_PEHE = 0
-            # print("-----------> !! Supervised Training(TARNet Models) !!<-----------")
-            # tarnet_experiments = TARNet_Experiments(input_nodes, device)
-            # tarnet_experiments_models_eval_dict = tarnet_experiments.evaluate_TARNet_Model(
-            #     data_loader_dict_test["treated_data"],
-            #     data_loader_dict_test["control_data"],
-            #     tensor_treated_balanced_tarnet,
-            #     tuple_control_balanced_tarnet,
-            #     data_loader_dict_test)
-            #
-            # tarnet_eval = tarnet_experiments_models_eval_dict["tarnet_eval_dict"]
-            # print("---" * 20)
-            # print("---> !! Supervised Evaluation(TARNet Models) !! <---")
-            # print("---" * 20)
-            # print("--> 1. Model 1: TARNet Supervised Training Evaluation: ")
-            # tarnet_PEHE, tarnet_ATE_metric, tarnet_true_ATE, tarnet_predicted_ATE = \
-            #     self.__process_evaluated_metric(
-            #         tarnet_eval["y1_true_list"],
-            #         tarnet_eval["y0_true_list"],
-            #         tarnet_eval["y1_hat_list"],
-            #         tarnet_eval["y0_hat_list"],
-            #         tarnet_eval["ITE_dict_list"],
-            #         tarnet_eval["true_ITE"],
-            #         tarnet_eval["predicted_ITE"],
-            #         run_parameters["TARNET"],
-            #         iter_id)
-            #
-            # tarnet_pm_gan_eval = tarnet_experiments_models_eval_dict["tarnet_pm_gan_eval_dict"]
-            # print("--> 2. Model 2: TARNet PM GAN Supervised Training Evaluation: ")
-            # tarnet_pm_gan_PEHE, tarnet_pm_gan_ATE_metric, tarnet_pm_gan_true_ATE, tarnet_pm_gan_predicted_ATE = \
-            #     self.__process_evaluated_metric(
-            #         tarnet_pm_gan_eval["y1_true_list"],
-            #         tarnet_pm_gan_eval["y0_true_list"],
-            #         tarnet_pm_gan_eval["y1_hat_list"],
-            #         tarnet_pm_gan_eval["y0_hat_list"],
-            #         tarnet_pm_gan_eval["ITE_dict_list"],
-            #         tarnet_pm_gan_eval["true_ITE"],
-            #         tarnet_pm_gan_eval["predicted_ITE"],
-            #         run_parameters["TARNET_PM_GAN"],
-            #         iter_id)
-            #
-            # print("---" * 20)
+            print("-----------> !! Supervised Training(TARNet Models) !!<-----------")
+            tarnet_experiments = TARNet_Experiments(input_nodes, device)
+            tarnet_experiments_models_eval_dict = tarnet_experiments.evaluate_TARNet_Model(
+                data_loader_dict_train["treated_data"],
+                data_loader_dict_train["control_data"],
+                tensor_treated_balanced_tarnet,
+                data_loader_dict_val,
+                data_loader_dict_test,
+                n_total_balanced_tarnet,
+                n_treated_balanced_tarnet)
+
+            tarnet_eval = tarnet_experiments_models_eval_dict["tarnet_eval_dict"]
+            print("---" * 20)
+            print("---> !! Supervised Evaluation(TARNet Models) !! <---")
+            print("---" * 20)
+            print("--> 1. Model 1: TARNet Supervised Training Evaluation: ")
+            tarnet_PEHE, tarnet_ATE_metric, tarnet_true_ATE, tarnet_predicted_ATE = \
+                self.__process_evaluated_metric(
+                    tarnet_eval["y1_true_list"],
+                    tarnet_eval["y0_true_list"],
+                    tarnet_eval["y1_hat_list"],
+                    tarnet_eval["y0_hat_list"],
+                    tarnet_eval["ITE_dict_list"],
+                    tarnet_eval["true_ITE"],
+                    tarnet_eval["predicted_ITE"],
+                    run_parameters["TARNET"],
+                    iter_id)
+
+            tarnet_pm_gan_eval = tarnet_experiments_models_eval_dict["tarnet_pm_gan_eval_dict"]
+            print("--> 2. Model 2: TARNet PM GAN Supervised Training Evaluation: ")
+            tarnet_pm_gan_PEHE, tarnet_pm_gan_ATE_metric, tarnet_pm_gan_true_ATE, tarnet_pm_gan_predicted_ATE = \
+                self.__process_evaluated_metric(
+                    tarnet_pm_gan_eval["y1_true_list"],
+                    tarnet_pm_gan_eval["y0_true_list"],
+                    tarnet_pm_gan_eval["y1_hat_list"],
+                    tarnet_pm_gan_eval["y0_hat_list"],
+                    tarnet_pm_gan_eval["ITE_dict_list"],
+                    tarnet_pm_gan_eval["true_ITE"],
+                    tarnet_pm_gan_eval["predicted_ITE"],
+                    run_parameters["TARNET_PM_GAN"],
+                    iter_id)
+
+            print("---" * 20)
 
             result_dict = OrderedDict()
             result_dict["iter_id"] = iter_id
@@ -302,15 +317,15 @@ class Experiments:
             result_dict["true_ATE_DCN_PM_GAN_PD"] = dcn_pm_gan_pd_true_ATE
             result_dict["predicted_DCN_PM_GAN_PD"] = dcn_pm_gan_pd_predicted_ATE
 
-            # result_dict["tarnet_PEHE"] = tarnet_PEHE
-            # result_dict["tarnet_ATE_metric"] = tarnet_ATE_metric
-            # result_dict["tarnet_true_ATE"] = tarnet_true_ATE
-            # result_dict["tarnet_predicted_ATE"] = tarnet_predicted_ATE
-            #
-            # result_dict["tarnet_pm_gan_PEHE"] = tarnet_pm_gan_PEHE
-            # result_dict["tarnet_pm_gan_ATE_metric"] = tarnet_pm_gan_ATE_metric
-            # result_dict["tarnet_pm_gan_true_ATE"] = tarnet_pm_gan_true_ATE
-            # result_dict["tarnet_pm_gan_predicted_ATE"] = tarnet_pm_gan_predicted_ATE
+            result_dict["tarnet_PEHE"] = tarnet_PEHE
+            result_dict["tarnet_ATE_metric"] = tarnet_ATE_metric
+            result_dict["tarnet_true_ATE"] = tarnet_true_ATE
+            result_dict["tarnet_predicted_ATE"] = tarnet_predicted_ATE
+
+            result_dict["tarnet_pm_gan_PEHE"] = tarnet_pm_gan_PEHE
+            result_dict["tarnet_pm_gan_ATE_metric"] = tarnet_pm_gan_ATE_metric
+            result_dict["tarnet_pm_gan_true_ATE"] = tarnet_pm_gan_true_ATE
+            result_dict["tarnet_pm_gan_predicted_ATE"] = tarnet_pm_gan_predicted_ATE
 
             file1.write("\nToday's date: {0}\n".format(date.today()))
             file1.write("Iter: {0}, PEHE_DCN_PD: {1}, PEHE_DCN_PD(Dropout 0.2): {2}, "
@@ -362,15 +377,15 @@ class Experiments:
         true_ATE_set_DCN_PM_GAN_PD = []
         predicted_ATE_DCN_PM_GAN_PD = []
 
-        # PEHE_set_Tarnet = []
-        # ATE_Metric_set_Tarnet = []
-        # true_ATE_set_Tarnet = []
-        # predicted_ATE_Tarnet = []
-        #
-        # PEHE_set_Tarnet_PM_GAN = []
-        # ATE_Metric_set_Tarnet_PM_GAN = []
-        # true_ATE_set_Tarnet_PM_GAN = []
-        # predicted_ATE_Tarnet_PM_GAN = []
+        PEHE_set_Tarnet = []
+        ATE_Metric_set_Tarnet = []
+        true_ATE_set_Tarnet = []
+        predicted_ATE_Tarnet = []
+
+        PEHE_set_Tarnet_PM_GAN = []
+        ATE_Metric_set_Tarnet_PM_GAN = []
+        true_ATE_set_Tarnet_PM_GAN = []
+        predicted_ATE_Tarnet_PM_GAN = []
 
         for result in results_list:
             PEHE_set_DCN_PD.append(result["PEHE_DCN_PD"])
@@ -408,15 +423,15 @@ class Experiments:
             true_ATE_set_DCN_PM_GAN_PD.append(result["true_ATE_DCN_PM_GAN_PD"])
             predicted_ATE_DCN_PM_GAN_PD.append(result["predicted_DCN_PM_GAN_PD"])
 
-            # PEHE_set_Tarnet.append(result["tarnet_PEHE"])
-            # ATE_Metric_set_Tarnet.append(result["tarnet_ATE_metric"])
-            # true_ATE_set_Tarnet.append(result["tarnet_true_ATE"])
-            # predicted_ATE_Tarnet.append(result["tarnet_predicted_ATE"])
-            #
-            # PEHE_set_Tarnet_PM_GAN.append(result["tarnet_pm_gan_PEHE"])
-            # ATE_Metric_set_Tarnet_PM_GAN.append(result["tarnet_pm_gan_ATE_metric"])
-            # true_ATE_set_Tarnet_PM_GAN.append(result["tarnet_pm_gan_true_ATE"])
-            # predicted_ATE_Tarnet_PM_GAN.append(result["tarnet_pm_gan_predicted_ATE"])
+            PEHE_set_Tarnet.append(result["tarnet_PEHE"])
+            ATE_Metric_set_Tarnet.append(result["tarnet_ATE_metric"])
+            true_ATE_set_Tarnet.append(result["tarnet_true_ATE"])
+            predicted_ATE_Tarnet.append(result["tarnet_predicted_ATE"])
+
+            PEHE_set_Tarnet_PM_GAN.append(result["tarnet_pm_gan_PEHE"])
+            ATE_Metric_set_Tarnet_PM_GAN.append(result["tarnet_pm_gan_ATE_metric"])
+            true_ATE_set_Tarnet_PM_GAN.append(result["tarnet_pm_gan_true_ATE"])
+            predicted_ATE_Tarnet_PM_GAN.append(result["tarnet_pm_gan_predicted_ATE"])
 
         PEHE_set_DCN_PD_mean = np.mean(np.array(PEHE_set_DCN_PD))
         PEHE_set_DCN_PD_std = np.std(PEHE_set_DCN_PD)
@@ -481,23 +496,23 @@ class Experiments:
         predicted_ATE_DCN_PM_GAN_PD_mean = np.mean(np.array(predicted_ATE_DCN_PM_GAN_PD))
         predicted_ATE_DCN_PM_GAN_PD_std = np.std(predicted_ATE_DCN_PM_GAN_PD)
 
-        # PEHE_set_Tarnet_mean = np.mean(np.array(PEHE_set_Tarnet))
-        # PEHE_set_Tarnet_std = np.std(PEHE_set_Tarnet)
-        # ATE_Metric_set_Tarnet_mean = np.mean(np.array(ATE_Metric_set_Tarnet))
-        # ATE_Metric_set_Tarnet_std = np.std(ATE_Metric_set_Tarnet)
-        # true_ATE_set_Tarnet_mean = np.mean(np.array(true_ATE_set_Tarnet))
-        # true_ATE_set_Tarnet_std = np.std(true_ATE_set_Tarnet)
-        # predicted_ATE_Tarnet_mean = np.mean(np.array(predicted_ATE_Tarnet))
-        # predicted_ATE_Tarnet_std = np.std(predicted_ATE_Tarnet)
-        #
-        # PEHE_set_Tarnet_PM_GAN_mean = np.mean(np.array(PEHE_set_Tarnet_PM_GAN))
-        # PEHE_set_Tarnet_PM_GAN_std = np.std(PEHE_set_Tarnet_PM_GAN)
-        # ATE_Metric_set_Tarnet_PM_GAN_mean = np.mean(np.array(ATE_Metric_set_Tarnet_PM_GAN))
-        # ATE_Metric_set_Tarnet_PM_GAN_std = np.std(ATE_Metric_set_Tarnet_PM_GAN)
-        # true_ATE_set_Tarnet_PM_GAN_mean = np.mean(np.array(true_ATE_set_Tarnet_PM_GAN))
-        # true_ATE_set_Tarnet_PM_GAN_std = np.std(true_ATE_set_Tarnet_PM_GAN)
-        # predicted_ATE_Tarnet_PM_GAN_mean = np.mean(np.array(predicted_ATE_Tarnet_PM_GAN))
-        # predicted_ATE_Tarnet_PM_GAN_std = np.std(predicted_ATE_Tarnet_PM_GAN)
+        PEHE_set_Tarnet_mean = np.mean(np.array(PEHE_set_Tarnet))
+        PEHE_set_Tarnet_std = np.std(PEHE_set_Tarnet)
+        ATE_Metric_set_Tarnet_mean = np.mean(np.array(ATE_Metric_set_Tarnet))
+        ATE_Metric_set_Tarnet_std = np.std(ATE_Metric_set_Tarnet)
+        true_ATE_set_Tarnet_mean = np.mean(np.array(true_ATE_set_Tarnet))
+        true_ATE_set_Tarnet_std = np.std(true_ATE_set_Tarnet)
+        predicted_ATE_Tarnet_mean = np.mean(np.array(predicted_ATE_Tarnet))
+        predicted_ATE_Tarnet_std = np.std(predicted_ATE_Tarnet)
+
+        PEHE_set_Tarnet_PM_GAN_mean = np.mean(np.array(PEHE_set_Tarnet_PM_GAN))
+        PEHE_set_Tarnet_PM_GAN_std = np.std(PEHE_set_Tarnet_PM_GAN)
+        ATE_Metric_set_Tarnet_PM_GAN_mean = np.mean(np.array(ATE_Metric_set_Tarnet_PM_GAN))
+        ATE_Metric_set_Tarnet_PM_GAN_std = np.std(ATE_Metric_set_Tarnet_PM_GAN)
+        true_ATE_set_Tarnet_PM_GAN_mean = np.mean(np.array(true_ATE_set_Tarnet_PM_GAN))
+        true_ATE_set_Tarnet_PM_GAN_std = np.std(true_ATE_set_Tarnet_PM_GAN)
+        predicted_ATE_Tarnet_PM_GAN_mean = np.mean(np.array(predicted_ATE_Tarnet_PM_GAN))
+        predicted_ATE_Tarnet_PM_GAN_std = np.std(predicted_ATE_Tarnet_PM_GAN)
 
         print("###" * 20)
         print("----------------- !!DCN Models(Results) !! ------------------------")
@@ -587,31 +602,31 @@ class Experiments:
                       predicted_ATE_DCN_PM_GAN_PD_std))
         print("--" * 20)
         print("###" * 20)
-        # print("----------------- !!TARNet Models(Results) !! ------------------------")
-        # print("--" * 20)
-        #
-        # print("Model 1: TARNET")
-        # print("TARNET, PEHE: {0}, SD: {1}"
-        #       .format(PEHE_set_Tarnet_mean, PEHE_set_Tarnet_std))
-        # print("TARNET, ATE Metric: {0}, SD: {1}"
-        #       .format(ATE_Metric_set_Tarnet_mean, ATE_Metric_set_Tarnet_std))
-        # print("TARNET, True ATE: {0}, SD: {1}"
-        #       .format(true_ATE_set_Tarnet_mean, true_ATE_set_Tarnet_std))
-        # print("TARNET, predicted ATE: {0}, SD: {1}"
-        #       .format(predicted_ATE_Tarnet_mean,
-        #               predicted_ATE_Tarnet_std))
-        # print("--" * 20)
-        #
-        # print("Model 2: TARNET PM GAN")
-        # print("TARNET PM GAN, PEHE: {0}, SD: {1}"
-        #       .format(PEHE_set_Tarnet_PM_GAN_mean, PEHE_set_Tarnet_PM_GAN_std))
-        # print("TARNET PM GAN, ATE Metric: {0}, SD: {1}"
-        #       .format(ATE_Metric_set_Tarnet_PM_GAN_mean, ATE_Metric_set_Tarnet_PM_GAN_std))
-        # print("TARNET PM GAN, True ATE: {0}, SD: {1}"
-        #       .format(true_ATE_set_Tarnet_PM_GAN_mean, true_ATE_set_Tarnet_PM_GAN_std))
-        # print("TARNET PM GAN, predicted ATE: {0}, SD: {1}"
-        #       .format(predicted_ATE_Tarnet_PM_GAN_mean,
-        #               predicted_ATE_Tarnet_PM_GAN_std))
+        print("----------------- !!TARNet Models(Results) !! ------------------------")
+        print("--" * 20)
+
+        print("Model 1: TARNET")
+        print("TARNET, PEHE: {0}, SD: {1}"
+              .format(PEHE_set_Tarnet_mean, PEHE_set_Tarnet_std))
+        print("TARNET, ATE Metric: {0}, SD: {1}"
+              .format(ATE_Metric_set_Tarnet_mean, ATE_Metric_set_Tarnet_std))
+        print("TARNET, True ATE: {0}, SD: {1}"
+              .format(true_ATE_set_Tarnet_mean, true_ATE_set_Tarnet_std))
+        print("TARNET, predicted ATE: {0}, SD: {1}"
+              .format(predicted_ATE_Tarnet_mean,
+                      predicted_ATE_Tarnet_std))
+        print("--" * 20)
+
+        print("Model 2: TARNET PM GAN")
+        print("TARNET PM GAN, PEHE: {0}, SD: {1}"
+              .format(PEHE_set_Tarnet_PM_GAN_mean, PEHE_set_Tarnet_PM_GAN_std))
+        print("TARNET PM GAN, ATE Metric: {0}, SD: {1}"
+              .format(ATE_Metric_set_Tarnet_PM_GAN_mean, ATE_Metric_set_Tarnet_PM_GAN_std))
+        print("TARNET PM GAN, True ATE: {0}, SD: {1}"
+              .format(true_ATE_set_Tarnet_PM_GAN_mean, true_ATE_set_Tarnet_PM_GAN_std))
+        print("TARNET PM GAN, predicted ATE: {0}, SD: {1}"
+              .format(predicted_ATE_Tarnet_PM_GAN_mean,
+                      predicted_ATE_Tarnet_PM_GAN_std))
         print("--" * 20)
         print("###" * 20)
 
@@ -725,31 +740,31 @@ class Experiments:
                     .format(predicted_ATE_DCN_PM_GAN_PD_mean,
                             predicted_ATE_DCN_PM_GAN_PD_std))
         file1.write("\n-------------------------------")
-        # file1.write("\nModel 1: TARNET")
-        # file1.write("\nTARNET, PEHE: {0}, SD: {1}"
-        #             .format(PEHE_set_Tarnet_mean, PEHE_set_Tarnet_std))
-        # file1.write("\nTARNET, ATE Metric: {0}, SD: {1}"
-        #             .format(ATE_Metric_set_Tarnet_mean,
-        #                     ATE_Metric_set_Tarnet_std))
-        # file1.write("\nTARNET, True ATE: {0}, SD: {1}"
-        #             .format(true_ATE_set_Tarnet_mean,
-        #                     true_ATE_set_Tarnet_std))
-        # file1.write("\nTARNET, predicted ATE: {0}, SD: {1}"
-        #             .format(predicted_ATE_Tarnet_mean,
-        #                     predicted_ATE_Tarnet_std))
-        # file1.write("\n--" * 20)
-        # file1.write("\nModel 2: TARNET PM GAN")
-        # file1.write("\nTARNET PM GAN, PEHE: {0}, SD: {1}"
-        #             .format(PEHE_set_Tarnet_PM_GAN_mean, PEHE_set_Tarnet_PM_GAN_std))
-        # file1.write("\nTARNET PM GAN, ATE Metric: {0}, SD: {1}"
-        #             .format(ATE_Metric_set_Tarnet_PM_GAN_mean,
-        #                     ATE_Metric_set_Tarnet_PM_GAN_std))
-        # file1.write("\nTARNET PM GAN, True ATE: {0}, SD: {1}"
-        #             .format(true_ATE_set_Tarnet_PM_GAN_mean,
-        #                     true_ATE_set_Tarnet_PM_GAN_std))
-        # file1.write("\nTARNET PM GAN, predicted ATE: {0}, SD: {1}"
-        #             .format(predicted_ATE_Tarnet_PM_GAN_mean,
-        #                     predicted_ATE_Tarnet_PM_GAN_std))
+        file1.write("\nModel 1: TARNET")
+        file1.write("\nTARNET, PEHE: {0}, SD: {1}"
+                    .format(PEHE_set_Tarnet_mean, PEHE_set_Tarnet_std))
+        file1.write("\nTARNET, ATE Metric: {0}, SD: {1}"
+                    .format(ATE_Metric_set_Tarnet_mean,
+                            ATE_Metric_set_Tarnet_std))
+        file1.write("\nTARNET, True ATE: {0}, SD: {1}"
+                    .format(true_ATE_set_Tarnet_mean,
+                            true_ATE_set_Tarnet_std))
+        file1.write("\nTARNET, predicted ATE: {0}, SD: {1}"
+                    .format(predicted_ATE_Tarnet_mean,
+                            predicted_ATE_Tarnet_std))
+        file1.write("\n--" * 20)
+        file1.write("\nModel 2: TARNET PM GAN")
+        file1.write("\nTARNET PM GAN, PEHE: {0}, SD: {1}"
+                    .format(PEHE_set_Tarnet_PM_GAN_mean, PEHE_set_Tarnet_PM_GAN_std))
+        file1.write("\nTARNET PM GAN, ATE Metric: {0}, SD: {1}"
+                    .format(ATE_Metric_set_Tarnet_PM_GAN_mean,
+                            ATE_Metric_set_Tarnet_PM_GAN_std))
+        file1.write("\nTARNET PM GAN, True ATE: {0}, SD: {1}"
+                    .format(true_ATE_set_Tarnet_PM_GAN_mean,
+                            true_ATE_set_Tarnet_PM_GAN_std))
+        file1.write("\nTARNET PM GAN, predicted ATE: {0}, SD: {1}"
+                    .format(predicted_ATE_Tarnet_PM_GAN_mean,
+                            predicted_ATE_Tarnet_PM_GAN_std))
         file1.write("\n--" * 20)
         file1.write("\n###" * 20)
 
@@ -830,21 +845,27 @@ class Experiments:
     def __get_ps_model(self, ps_model_type, iter_id,
                        input_nodes, device):
         ps_train_set = self.dL.convert_to_tensor(self.np_covariates_X_train, self.np_covariates_T_train)
+
+        ps_val_set = self.dL.convert_to_tensor(self.np_covariates_X_val,
+                                               self.np_covariates_T_val)
         ps_test_set = self.dL.convert_to_tensor(self.np_covariates_X_test,
                                                 self.np_covariates_T_test)
         ps_manager = PS_Manager()
         if ps_model_type == Constants.PS_MODEL_NN:
             return ps_manager.get_propensity_scores(ps_train_set,
+                                                    ps_val_set,
                                                     ps_test_set, iter_id,
                                                     input_nodes, device)
         elif ps_model_type == Constants.PS_MODEL_LR:
             return ps_manager.get_propensity_scores_using_LR(self.np_covariates_X_train,
                                                              self.np_covariates_T_train,
+                                                             self.np_covariates_X_val,
                                                              self.np_covariates_X_test,
                                                              regularized=False)
         elif ps_model_type == Constants.PS_MODEL_LR_Lasso:
             return ps_manager.get_propensity_scores_using_LR(self.np_covariates_X_train,
                                                              self.np_covariates_T_train,
+                                                             self.np_covariates_X_val,
                                                              self.np_covariates_X_test,
                                                              regularized=True)
 
