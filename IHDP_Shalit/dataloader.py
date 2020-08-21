@@ -20,12 +20,16 @@ class DataLoader:
     def load_train_test_ihdp_shalit(train_path, test_path, iter_id):
         train_arr = np.load(train_path)
         test_arr = np.load(test_path)
+
         np_train_X = train_arr['x'][:, :, iter_id]
         np_train_T = Utils.convert_to_col_vector(train_arr['t'][:, iter_id])
         np_train_yf = Utils.convert_to_col_vector(train_arr['yf'][:, iter_id])
         np_train_ycf = Utils.convert_to_col_vector(train_arr['ycf'][:, iter_id])
 
         train_X = np.concatenate((np_train_X, np_train_yf, np_train_ycf), axis=1)
+
+        train_X, val_X, train_T, val_T = \
+            Utils.test_train_split(train_X, np_train_T, split_size=0.63)
 
         np_test_X = test_arr['x'][:, :, iter_id]
         np_test_T = Utils.convert_to_col_vector(test_arr['t'][:, iter_id])
@@ -36,14 +40,17 @@ class DataLoader:
 
         print("Numpy Train Statistics:")
         print(train_X.shape)
-        print(np_train_T.shape)
+        print(train_T.shape)
+
+        print("Numpy Val Statistics:")
+        print(val_X.shape)
+        print(val_T.shape)
 
         print(" Numpy Test Statistics:")
         print(test_X.shape)
         print(np_test_T.shape)
 
-        # X -> x1.. x17, e, yf -> (19, 1)
-        return train_X, test_X, np_train_T, np_test_T
+        return train_X, test_X, val_X, train_T, np_test_T, val_T
 
     def preprocess_data_from_csv(self, csv_path, split_size):
         # print(".. Data Loading ..")
@@ -84,6 +91,8 @@ class DataLoader:
 
     @staticmethod
     def convert_to_tensor(ps_np_covariates_X, ps_np_treatment_Y):
+        print(ps_np_covariates_X.shape)
+        print(ps_np_treatment_Y.shape)
         return Utils.convert_to_tensor(ps_np_covariates_X, ps_np_treatment_Y)
 
     def prepare_tensor_for_DCN(self, ps_np_covariates_X, ps_np_treatment_Y, ps_list,

@@ -6,7 +6,7 @@ from Propensity_socre_network import Propensity_socre_network
 
 class PS_Manager:
     @staticmethod
-    def get_propensity_scores(ps_train_set, ps_test_set, iter_id, input_nodes, device):
+    def get_propensity_scores(ps_train_set, ps_val_set, ps_test_set, iter_id, input_nodes, device):
         print("############### Propensity Score neural net Training ###############")
 
         train_parameters_NN = {
@@ -32,10 +32,16 @@ class PS_Manager:
         }
         ps_score_list_test = ps_net_NN.eval(ps_eval_parameters_NN, device)
 
-        return ps_score_list_train, ps_score_list_test, ps_net_NN
+        ps_val_parameters_NN = {
+            "eval_set": ps_val_set
+        }
+        ps_score_list_val = ps_net_NN.eval(ps_val_parameters_NN, device)
+
+        return ps_score_list_train, ps_score_list_val, ps_score_list_test, ps_net_NN
 
     @staticmethod
     def get_propensity_scores_using_LR(np_covariates_X_train, np_covariates_Y_train,
+                                       np_covariates_X_val,
                                        np_covariates_X_test,
                                        regularized=False):
         print("############### Propensity Score Logistic Regression Training ###############")
@@ -50,9 +56,11 @@ class PS_Manager:
 
         ps_model.fit(np_covariates_X_train, np_covariates_Y_train.ravel())
         ps_score_list_train = ps_model.predict_proba(np_covariates_X_train)[:, -1].tolist()
+        ps_score_list_val = ps_model.predict_proba(np_covariates_X_val)[:, -1].tolist()
+
         ps_score_list_test = ps_model.predict_proba(np_covariates_X_test)[:, -1].tolist()
 
-        return ps_score_list_train, ps_score_list_test, ps_model
+        return ps_score_list_train, ps_score_list_val, ps_score_list_test, ps_model
 
     @staticmethod
     def get_propensity_scores_using_LR_GAN(np_covariates_X_test, np_covariates_Y_test, log_reg):

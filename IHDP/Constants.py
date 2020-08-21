@@ -42,7 +42,7 @@ class Constants:
     GAN_DISCRIMINATOR_IN_NODES = 25
 
     # TARNet
-    TARNET_EPOCHS = 1
+    TARNET_EPOCHS = 3000
     TARNET_SS_EPOCHS = 1
     TARNET_LR = 1e-3
     TARNET_LAMBDA = 1e-4

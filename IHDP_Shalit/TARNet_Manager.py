@@ -7,6 +7,7 @@ import torch.optim as optim
 
 from PSM_Manager import PSM_Manager
 from TARNet_Model import TARNetH_Y1, TARNetH_Y0, TARNetPhi
+from Utils import EarlyStopping_DCN
 
 
 class TARNet_Manager:
@@ -28,16 +29,24 @@ class TARNet_Manager:
     def get_tarnet_h_y0_model(self):
         return self.tarnet_h_y0
 
-    def train_semi_supervised(self, train_parameters, n_total, n_treated, device):
+    def train_semi_supervised(self, train_parameters, val_parameters, n_total, n_treated, device):
         epochs = train_parameters["epochs"]
         batch_size = train_parameters["batch_size"]
         lr = train_parameters["lr"]
         weight_decay = train_parameters["lambda"]
         shuffle = train_parameters["shuffle"]
         tensor_dataset = train_parameters["tensor_dataset"]
+        treated_set_val = val_parameters["treated_set"]
+        control_set_val = val_parameters["control_set"]
+
         u = n_treated / n_total
         weight_t = 1 / (2 * u)
         weight_c = 1 / (2 * (1 - u))
+
+        treated_data_loader_val = torch.utils.data.DataLoader(treated_set_val,
+                                                              shuffle=False)
+        control_data_loader_val = torch.utils.data.DataLoader(control_set_val,
+                                                              shuffle=False)
 
         treated_data_loader_train = torch.utils.data.DataLoader(tensor_dataset,
                                                                 batch_size=batch_size,
@@ -47,10 +56,21 @@ class TARNet_Manager:
         optimizer_V1 = optim.Adam(self.tarnet_h_y1.parameters(), lr=lr, weight_decay=weight_decay)
         optimizer_V2 = optim.Adam(self.tarnet_h_y0.parameters(), lr=lr, weight_decay=weight_decay)
         lossF = nn.MSELoss()
+        train_losses = []
+        valid_losses = []
+
+        early_stopping = EarlyStopping_DCN(patience=150, verbose=True,
+                                           model_shared_path="Tarnet_shared_checkpoint.pt",
+                                           model_y1_path="Tarnet_y1_checkpoint.pt",
+                                           model_y0_path="Tarnet_y0_checkpoint.pt")
+
         for epoch in range(epochs):
             epoch += 1
-            total_loss_T = 0
-            total_loss_C = 0
+            total_loss_T_train = 0
+            total_loss_C_train = 0
+            total_loss_T_val = 0
+            total_loss_C_val = 0
+
             for batch in treated_data_loader_train:
                 covariates_X, ps_score, T, y_f, y_cf = batch
                 covariates_X = covariates_X.to(device)
@@ -78,7 +98,7 @@ class TARNet_Manager:
                         loss_T = weight_t * lossF(y1_hat.float(),
                                                   y_f_treated.float()).to(device)
                     loss_T.backward()
-                    total_loss_T += loss_T.item()
+                    total_loss_T_train += loss_T.item()
 
                 if control_size > 0:
                     y0_hat = self.tarnet_h_y0(self.tarnet_phi(covariates_X_control))
@@ -89,7 +109,10 @@ class TARNet_Manager:
                         loss_C = weight_c * lossF(y0_hat.float(),
                                                   y_f_control.float()).to(device)
                     loss_C.backward()
-                    total_loss_C += loss_C.item()
+                    total_loss_C_train += loss_C.item()
+
+                train_loss = total_loss_T_train + total_loss_C_train
+                train_losses.append(train_loss)
 
                 optimizer_W.step()
 
@@ -98,8 +121,65 @@ class TARNet_Manager:
                 if control_size > 0:
                     optimizer_V2.step()
 
+            ######################
+            # validate the model #
+            ######################
+            # prep model for evaluation
+            self.tarnet_phi.eval()
+            self.tarnet_h_y1.eval()
+            self.tarnet_h_y0.eval()
+
+            # val treated
+            for batch in treated_data_loader_val:
+                covariates_X, ps_score, y_f, y_cf = batch
+                covariates_X = covariates_X.to(device)
+                ps_score = ps_score.squeeze().to(device)
+                y1_hat = self.tarnet_h_y1(self.tarnet_phi(covariates_X))
+                if torch.cuda.is_available():
+                    loss = lossF(y1_hat.float().cuda(),
+                                 y_f.float().cuda()).to(device)
+                else:
+                    loss = lossF(y1_hat.float(),
+                                 y_f.float()).to(device)
+                total_loss_T_val += loss.item()
+
+            # val control
+            for batch in control_data_loader_val:
+                covariates_X, ps_score, y_f, y_cf = batch
+                covariates_X = covariates_X.to(device)
+                ps_score = ps_score.squeeze().to(device)
+
+                y0_hat = self.tarnet_h_y0(self.tarnet_phi(covariates_X))
+                if torch.cuda.is_available():
+                    loss = lossF(y0_hat.float().cuda(),
+                                 y_f.float().cuda()).to(device)
+                else:
+                    loss = lossF(y0_hat.float(),
+                                 y_f.float()).to(device)
+                total_loss_C_val += loss.item()
+
+            val_loss = total_loss_T_val + total_loss_C_val
+            valid_losses.append(val_loss)
+
+            train_loss = np.average(np.array(train_losses))
+            valid_loss = np.average(np.array(valid_losses))
+
+            train_losses = []
+            valid_losses = []
+            early_stopping(valid_loss, self.tarnet_phi, self.tarnet_h_y1, self.tarnet_h_y0)
+
+            if early_stopping.early_stop:
+                print("Early stopping")
+                break
+
             if epoch % 100 == 0:
-                print("epoch: {0}, Treated + Control loss: {1}".format(epoch, total_loss_T + total_loss_C))
+                print("---->>>[[epoch: {0}/3000]], Treated + Control loss, train: {1}, val: {2}"
+                      .format(epoch,
+                              train_loss,
+                              valid_loss))
+        # self.tarnet_phi.load_state_dict(torch.load("Tarnet_shared_checkpoint.pt"))
+        # self.tarnet_h_y1.load_state_dict(torch.load("Tarnet_y1_checkpoint.pt"))
+        # self.tarnet_h_y0.load_state_dict(torch.load("Tarnet_y0_checkpoint.pt"))
 
     def eval_semi_supervised(self, eval_parameters, device, treated_flag):
         eval_set = eval_parameters["tensor_dataset"]

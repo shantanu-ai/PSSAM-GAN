@@ -6,6 +6,7 @@ from Utils import Utils
 class DCN_Experiments:
     def __init__(self, input_nodes, device):
         self.data_loader_dict_test = None
+        self.data_loader_dict_val = None
         self.input_nodes = input_nodes
         self.device = device
 
@@ -15,10 +16,12 @@ class DCN_Experiments:
                            tensor_treated_balanced, tensor_control_balanced,
                            n_treated_balanced_dcn,
                            n_control_balanced_dcn,
+                           data_loader_dict_val,
                            data_loader_dict_test):
         # data loader -> (np_treated_df_X, np_treated_ps_score, np_treated_df_Y_f, np_treated_df_Y_cf)
 
         self.data_loader_dict_test = data_loader_dict_test
+        self.data_loader_dict_val = data_loader_dict_val
 
         # Model 1: DCN - PD
         print("--" * 20)
@@ -128,17 +131,24 @@ class DCN_Experiments:
             Utils.create_tensors_from_tuple(self.data_loader_dict_test["control_data"])
         DCN_test_parameters = self.__get_test_parameters(tensor_treated_test, tensor_control_test)
 
-        return self.__supervised_train_eval(train_mode, DCN_train_parameters,
+        tensor_treated_val = \
+            Utils.create_tensors_from_tuple(self.data_loader_dict_val["treated_data"])
+        tensor_control_val = \
+            Utils.create_tensors_from_tuple(self.data_loader_dict_val["control_data"])
+        DCN_val_parameters = self.__get_test_parameters(tensor_treated_val, tensor_control_val)
+
+        return self.__supervised_train_eval(train_mode, DCN_train_parameters, DCN_val_parameters,
                                             DCN_test_parameters)
 
-    def __supervised_train_eval(self, train_mode, DCN_train_parameters,
+    def __supervised_train_eval(self, train_mode, DCN_train_parameters, DCN_val_parameters,
                                 DCN_test_parameters):
         dcn_pd = DCN_Manager(self.input_nodes, self.device)
-        dcn_pd.train(DCN_train_parameters, self.device, train_mode=train_mode)
+        dcn_pd.train(DCN_train_parameters, DCN_val_parameters, self.device, train_mode=train_mode)
         dcn_eval_dict = dcn_pd.eval(DCN_test_parameters, self.device)
         return dcn_eval_dict
 
     def semi_supervised_train_eval(self, treated_tensor_full_train, control_tensor_full_train,
+                                   data_loader_dict_val,
                                    n_treated,
                                    n_control,
                                    eval_set):
@@ -146,9 +156,15 @@ class DCN_Experiments:
                                                            control_tensor_full_train,
                                                            n_treated,
                                                            n_control)
+        tensor_treated_val = \
+            Utils.create_tensors_from_tuple(data_loader_dict_val["treated_data"])
+        tensor_control_val = \
+            Utils.create_tensors_from_tuple(data_loader_dict_val["control_data"])
+        DCN_val_parameters = self.__get_test_parameters(tensor_treated_val, tensor_control_val)
+
         train_mode = Constants.DCN_TRAIN_PD
         dcn_pd = DCN_Manager(self.input_nodes, self.device)
-        dcn_pd.train(DCN_train_parameters, self.device, train_mode=train_mode)
+        dcn_pd.train(DCN_train_parameters, DCN_val_parameters, self.device, train_mode=train_mode)
         DCN_test_parameters = {
             "eval_set": eval_set
         }

@@ -27,14 +27,22 @@ class DataLoader:
         np_covariates_X_train, np_covariates_X_test, np_covariates_Y_train, np_covariates_Y_test = \
             Utils.test_train_split(np_covariates_X, np_treatment_Y, split_size)
 
+        np_covariates_X_train, np_covariates_X_val, np_covariates_Y_train, np_covariates_Y_val = \
+            Utils.test_train_split(np_covariates_X_train, np_covariates_Y_train, split_size=0.90)
+
         print("np_covariates_X_train: {0}".format(np_covariates_X_train.shape))
         print("np_covariates_Y_train: {0}".format(np_covariates_Y_train.shape))
         print("---" * 20)
+        print("np_covariates_X_val: {0}".format(np_covariates_X_val.shape))
+        print("np_covariates_Y_val: {0}".format(np_covariates_Y_val.shape))
+        print("---" * 20)
+
         print("np_covariates_X_test: {0}".format(np_covariates_X_test.shape))
         print("np_covariates_Y_test: {0}".format(np_covariates_Y_test.shape))
         print("---" * 20)
 
-        return np_covariates_X_train, np_covariates_X_test, np_covariates_Y_train, np_covariates_Y_test
+        return np_covariates_X_train, np_covariates_X_test, np_covariates_X_val, \
+               np_covariates_Y_train, np_covariates_Y_test, np_covariates_Y_val
 
     def preprocess_data_from_csv_augmented(self, csv_path, split_size):
         # print(".. Data Loading synthetic..")

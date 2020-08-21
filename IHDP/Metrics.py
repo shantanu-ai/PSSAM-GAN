@@ -7,6 +7,7 @@ class Metrics:
         PEHE_val = np.mean(np.abs((y1_true_np - y0_true_np) - (y1_hat_np - y0_hat_np)))
         return PEHE_val
 
+    @staticmethod
     def PEHE_new(y1_true_np, y0_true_np, y1_hat_np, y0_hat_np):
         PEHE_val = np.sqrt(np.mean(np.square((y1_true_np - y0_true_np) - (y1_hat_np - y0_hat_np))))
         return PEHE_val
