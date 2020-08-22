@@ -28,7 +28,7 @@ class DataLoader:
             Utils.test_train_split(np_covariates_X, np_treatment_Y, split_size)
 
         np_covariates_X_train, np_covariates_X_val, np_covariates_Y_train, np_covariates_Y_val = \
-            Utils.test_train_split(np_covariates_X_train, np_covariates_Y_train, split_size=0.63)
+            Utils.test_train_split(np_covariates_X_train, np_covariates_Y_train, split_size=0.90)
 
         print("np_covariates_X_train: {0}".format(np_covariates_X_train.shape))
         print("np_covariates_Y_train: {0}".format(np_covariates_Y_train.shape))

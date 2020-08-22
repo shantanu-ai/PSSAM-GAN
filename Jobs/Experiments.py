@@ -256,8 +256,8 @@ class Experiments:
             print("-----------> !! Supervised Training(TARNet Models) !!<-----------")
             tarnet_experiments = TARNet_Experiments(input_nodes, device)
             tarnet_experiments_models_eval_dict = tarnet_experiments.evaluate_TARNet_Model(
-                data_loader_dict_test["treated_data"],
-                data_loader_dict_test["control_data"],
+                data_loader_dict_train["treated_data"],
+                data_loader_dict_train["control_data"],
                 tensor_balanced_tarnet,
                 data_loader_dict_val,
                 data_loader_dict_test,

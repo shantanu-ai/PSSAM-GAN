@@ -58,7 +58,6 @@ class DCN_Manager:
         optimizer_y0 = optim.Adam(self.dcn_y0.parameters(), lr=lr)
 
         lossF = nn.CrossEntropyLoss()
-
         min_loss = 100000.0
         dataset_loss = 0.0
         dataset_loss_train = 0.0
