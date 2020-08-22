@@ -22,6 +22,8 @@ class DataLoader:
         np_train_yf = Utils.convert_to_col_vector(train_arr['yf'][:, iter_id])
 
         train_X = np.concatenate((np_train_X, np_train_e, np_train_yf), axis=1)
+        train_X, val_X, train_T, val_T = \
+            Utils.test_train_split(train_X, np_train_T, split_size=0.56)
 
         np_test_X = test_arr['x'][:, :, iter_id]
         np_test_T = Utils.convert_to_col_vector(test_arr['t'][:, iter_id])
@@ -32,14 +34,18 @@ class DataLoader:
 
         print("Numpy Train Statistics:")
         print(train_X.shape)
-        print(np_train_T.shape)
+        print(train_T.shape)
+
+        print("Numpy Val Statistics:")
+        print(val_X.shape)
+        print(val_T.shape)
 
         print(" Numpy Test Statistics:")
         print(test_X.shape)
         print(np_test_T.shape)
 
         # X -> x1.. x17, e, yf -> (19, 1)
-        return train_X, test_X, np_train_T, np_test_T
+        return train_X, test_X, val_X, train_T, np_test_T, val_T
 
     def preprocess_data_from_csv_augmented(self, csv_path, split_size):
         # print(".. Data Loading synthetic..")

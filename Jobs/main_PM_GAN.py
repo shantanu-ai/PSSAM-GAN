@@ -9,4 +9,4 @@ if __name__ == '__main__':
     original_exp = Experiments(running_mode)
     original_exp.run_all_experiments(train_path, test_path,
                                      iterations=10,
-                                     ps_model_type=Constants.PS_MODEL_LR_Lasso)
+                                     ps_model_type=Constants.PS_MODEL_NN)
