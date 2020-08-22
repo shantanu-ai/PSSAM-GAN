@@ -52,16 +52,16 @@ class DCN_Manager:
         optimizer_y0 = optim.Adam(self.dcn_y0.parameters(), lr=lr)
         lossF = nn.MSELoss()
 
-        min_loss = 100000.0
         dataset_loss_train = 0.0
         dataset_loss_val = 0.0
         train_loss = 0
-        val_loss = 0
+
         train_losses = []
         valid_losses = []
         avg_train_losses = []
         avg_valid_losses = []
-        early_stopping = EarlyStopping_DCN(patience=80, verbose=True,
+
+        early_stopping = EarlyStopping_DCN(patience=200, verbose=True,
                                            model_shared_path="DCN_shared_checkpoint.pt",
                                            model_y1_path="DCN_y1_checkpoint.pt",
                                            model_y0_path="DCN_y0_checkpoint.pt")

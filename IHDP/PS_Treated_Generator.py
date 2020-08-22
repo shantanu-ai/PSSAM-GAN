@@ -34,7 +34,7 @@ class PS_Treated_Generator:
                                                   treated_tensor_full_train, control_tensor_full_train,
                                                   tuple_matched_control, tuple_unmatched_control,
                                                   input_nodes, device)
-        tensor_treated_balanced_tarnet, n_total, n_treated = \
+        tensor_balanced_tarnet, n_total, n_treated = \
             self.__get_balanced_dataset_using_TARNet(tuple_matched_control, tuple_unmatched_control,
                                                      treated_simulated,
                                                      ps_score_list_treated_np, input_nodes, device)
@@ -45,7 +45,7 @@ class PS_Treated_Generator:
             "n_treated_balanced_dcn": n_treated_balanced_dcn,
             "n_control_balanced_dcn": n_control_balanced_dcn,
 
-            "tensor_treated_balanced_tarnet": tensor_treated_balanced_tarnet,
+            "tensor_balanced_tarnet": tensor_balanced_tarnet,
             "n_total_balanced_tarnet": n_total,
             "n_treated_balanced_tarnet": n_treated
         }
@@ -109,7 +109,7 @@ class PS_Treated_Generator:
         n_control = np_control_x.shape[0]
         n_total = n_treated + n_control
 
-        tensor_treated_balanced = Utils.create_tensors_to_train_DCN_semi_supervised(
+        tensor_balanced = Utils.create_tensors_to_train_DCN_semi_supervised(
             (np_train_supervised_X, np_train_supervised_ps, np_train_supervised_T,
              np_train_supervised_f,
              np_train_supervised_cf))
@@ -118,7 +118,7 @@ class PS_Treated_Generator:
         #     = self.__get_balanced_control(tuple_matched_control,
         #                                   tuple_unmatched_control)
         # tuple_control_balanced = (np_control_x, np_control_ps, np_control_f, np_control_cf)
-        return tensor_treated_balanced, n_total, n_treated
+        return tensor_balanced, n_total, n_treated
 
     def __get_balanced_dataset_using_DCN(self, treated_simulated, ps_score_list_treated_np,
                                          treated_tensor_full_train, control_tensor_full_train,

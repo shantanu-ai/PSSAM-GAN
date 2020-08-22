@@ -78,7 +78,7 @@ class Experiments:
             n_treated_balanced_dcn = balanced_dataset_dict["n_treated_balanced_dcn"]
             n_control_balanced_dcn = balanced_dataset_dict["n_control_balanced_dcn"]
 
-            tensor_treated_balanced_tarnet = balanced_dataset_dict["tensor_treated_balanced_tarnet"]
+            tensor_balanced_tarnet = balanced_dataset_dict["tensor_balanced_tarnet"]
             n_total_balanced_tarnet = balanced_dataset_dict["n_total_balanced_tarnet"]
             n_treated_balanced_tarnet = balanced_dataset_dict["n_treated_balanced_tarnet"]
 
@@ -211,7 +211,7 @@ class Experiments:
             tarnet_experiments_models_eval_dict = tarnet_experiments.evaluate_TARNet_Model(
                 data_loader_dict_train["treated_data"],
                 data_loader_dict_train["control_data"],
-                tensor_treated_balanced_tarnet,
+                tensor_balanced_tarnet,
                 data_loader_dict_val,
                 data_loader_dict_test,
                 n_total_balanced_tarnet,

@@ -46,7 +46,7 @@ class TARNetH_Y1(nn.Module):
         nn.init.xavier_uniform_(self.hidden2_Y1.weight)
         nn.init.zeros_(self.hidden2_Y1.bias)
 
-        self.out_Y1 = nn.Linear(in_features=outcome_nodes, out_features=1)
+        self.out_Y1 = nn.Linear(in_features=outcome_nodes, out_features=2)
         nn.init.xavier_uniform_(self.out_Y1.weight)
         nn.init.zeros_(self.out_Y1.bias)
 
@@ -77,7 +77,7 @@ class TARNetH_Y0(nn.Module):
         nn.init.xavier_uniform_(self.hidden2_Y0.weight)
         nn.init.zeros_(self.hidden2_Y0.bias)
 
-        self.out_Y0 = nn.Linear(in_features=outcome_nodes, out_features=1)
+        self.out_Y0 = nn.Linear(in_features=outcome_nodes, out_features=2)
         nn.init.xavier_uniform_(self.out_Y0.weight)
         nn.init.zeros_(self.out_Y0.bias)
 

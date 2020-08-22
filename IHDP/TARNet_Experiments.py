@@ -37,7 +37,7 @@ class TARNet_Experiments:
 
     def evaluate_TARNet_Model(self, tuple_treated_train_original,
                               tuple_control_train_original,
-                              tensor_treated_balanced,
+                              evaluate_TARNet_PM_GAN,
                               data_loader_dict_val,
                               data_loader_dict_test,
                               n_total_balanced_tarnet,
@@ -60,7 +60,7 @@ class TARNet_Experiments:
         print("###### Model 2: TARNET PM GAN Supervised Training started ######")
         print("Treated: "+str(n_treated_balanced_tarnet))
         print("Control: "+str(n_total_balanced_tarnet - n_treated_balanced_tarnet))
-        tarnet_pm_gan_eval_dict = self.evaluate_TARNet_PM_GAN(tensor_treated_balanced,
+        tarnet_pm_gan_eval_dict = self.evaluate_TARNet_PM_GAN(evaluate_TARNet_PM_GAN,
                                                               n_total_balanced_tarnet,
                                                               n_treated_balanced_tarnet)
         return {
@@ -114,10 +114,10 @@ class TARNet_Experiments:
 
         return tarnet_eval_dict
 
-    def evaluate_TARNet_PM_GAN(self, tensor_treated_train,
+    def evaluate_TARNet_PM_GAN(self, tensor_balanced,
                                n_total_balanced_tarnet,
                                n_treated_balanced_tarnet):
-        _train_parameters = self.__get_train_parameters_PM_GAN(tensor_treated_train)
+        _train_parameters = self.__get_train_parameters_PM_GAN(tensor_balanced)
 
         tensor_treated_test = \
             Utils.create_tensors_from_tuple(self.data_loader_dict_test["treated_data"])

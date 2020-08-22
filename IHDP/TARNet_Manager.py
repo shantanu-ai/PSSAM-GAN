@@ -60,7 +60,7 @@ class TARNet_Manager:
         train_losses = []
         valid_losses = []
 
-        early_stopping = EarlyStopping_DCN(patience=1000, verbose=True,
+        early_stopping = EarlyStopping_DCN(patience=200, verbose=True,
                                            model_shared_path="Tarnet_shared_checkpoint.pt",
                                            model_y1_path="Tarnet_y1_checkpoint.pt",
                                            model_y0_path="Tarnet_y0_checkpoint.pt")

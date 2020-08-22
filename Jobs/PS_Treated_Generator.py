@@ -10,11 +10,12 @@ from Utils import Utils
 
 
 class PS_Treated_Generator:
-    def __init__(self, data_loader_dict_train, ps_model, ps_model_type):
+    def __init__(self, data_loader_dict_train, data_loader_dict_val, ps_model, ps_model_type):
         self.treated_tuple_full = data_loader_dict_train["treated_data"]
         self.control_tuple_full = data_loader_dict_train["control_data"]
         self.n_treated_original = data_loader_dict_train["treated_data"][0].shape[0]
         self.n_control_original = data_loader_dict_train["control_data"][0].shape[0]
+        self.data_loader_dict_val = data_loader_dict_val
         self.ps_model = ps_model
         self.ps_model_type = ps_model_type
 
@@ -29,10 +30,11 @@ class PS_Treated_Generator:
             self.__get_balanced_dataset_using_DCN(treated_simulated, ps_score_list_treated_np,
                                                   tuple_matched_control, tuple_unmatched_control,
                                                   input_nodes, device)
-        # tensor_treated_balanced_tarnet, tuple_control_balanced_tarnet = \
-        #     self.__get_balanced_dataset_using_TARNet(tuple_matched_control, tuple_unmatched_control,
-        #                                              treated_simulated,
-        #                                              ps_score_list_treated_np, input_nodes, device)
+
+        tensor_balanced_tarnet, n_total, n_treated = \
+            self.__get_balanced_dataset_using_TARNet(tuple_matched_control, tuple_unmatched_control,
+                                                     treated_simulated,
+                                                     ps_score_list_treated_np, input_nodes, device)
 
         return {
             "tensor_treated_balanced_dcn": tensor_treated_balanced_dcn,
@@ -40,15 +42,17 @@ class PS_Treated_Generator:
 
             "n_treated_balanced_dcn": n_treated_balanced_dcn,
             "n_control_balanced_dcn": n_control_balanced_dcn,
-            # "tensor_treated_balanced_tarnet": tensor_treated_balanced_tarnet,
-            # "tuple_control_balanced_tarnet": tuple_control_balanced_tarnet
+
+            "tensor_balanced_tarnet": tensor_balanced_tarnet,
+            "n_total_balanced_tarnet": n_total,
+            "n_treated_balanced_tarnet": n_treated
         }
 
     def __get_balanced_dataset_using_TARNet(self, tuple_matched_control, tuple_unmatched_control,
                                             treated_simulated,
                                             ps_score_list_treated_np, input_nodes, device):
-        np_treated_x, np_treated_ps, np_treated_f, np_treated_cf = self.treated_tuple_full
-        np_control_x, np_control_ps, np_control_f, np_control_cf = self.control_tuple_full
+        np_treated_x, np_treated_ps, np_treated_f, np_treated_e = self.treated_tuple_full
+        np_control_x, np_control_ps, np_control_f, np_control_e = self.control_tuple_full
 
         t_1 = np.ones(np_treated_x.shape[0])
         t_0 = np.zeros(np_control_x.shape[0])
@@ -61,37 +65,52 @@ class PS_Treated_Generator:
         np_train_ss_ps = np.concatenate((np_treated_ps, np_control_ps), axis=0)
         np_train_ss_T = np.concatenate((t_1, t_0), axis=0)
         np_train_ss_f = np.concatenate((np_treated_f, np_control_f), axis=0)
-        np_train_ss_cf = np.concatenate((np_treated_cf, np_control_cf), axis=0)
 
-        train_set = Utils.create_tensors_to_train_DCN_semi_supervised(
-            (np_train_ss_X, np_train_ss_ps, np_train_ss_T, np_train_ss_f,
-             np_train_ss_cf))
+        train_set = Utils.create_tensors_to_train_TARNET((np_train_ss_X,
+                                                          np_train_ss_ps,
+                                                          np_train_ss_T,
+                                                          np_train_ss_f))
+
         eval_set = Utils.convert_to_tensor_DCN_PS(treated_simulated,
                                                   ps_score_list_treated_np)
         print("--" * 20)
         print("----->>> Semi supervised training started for TARNet <<<-----")
 
         tarnet = TARNet_Experiments(input_nodes, device)
-        simulated_treated_Y = tarnet.semi_supervised_train_eval(train_set, eval_set, n_total, n_treated)
+        simulated_treated_Y = tarnet.semi_supervised_train_eval(train_set,
+                                                                self.data_loader_dict_val,
+                                                                eval_set, n_total,
+                                                                n_treated)
 
         print("----->>> Semi supervised training completed <<<-----")
 
         np_treated_gen_f = Utils.convert_to_col_vector(simulated_treated_Y["y_f_list"])
-        np_treated_gen_cf = Utils.convert_to_col_vector(simulated_treated_Y["y_cf_list"])
-        np_treated_x, np_treated_ps, np_treated_f, np_treated_cf, np_treated_y_0 = \
+        np_treated_x, np_treated_ps, np_treated_f = \
             self.__get_balanced_treated(treated_simulated,
                                         ps_score_list_treated_np,
-                                        np_treated_gen_f,
-                                        np_treated_gen_cf)
-        tensor_treated_balanced = Utils.convert_to_tensor_DCN(np_treated_x, np_treated_ps,
-                                                              np_treated_f, np_treated_cf)
+                                        np_treated_gen_f)
+        t_1 = np.ones(np_treated_x.shape[0])
+        t_0 = np.zeros(np_control_x.shape[0])
+        np_train_supervised_X = np.concatenate((np_treated_x, np_control_x), axis=0)
+        np_train_supervised_ps = np.concatenate((np_treated_ps, np_control_ps), axis=0)
+        np_train_supervised_T = np.concatenate((t_1, t_0), axis=0)
+        np_train_supervised_f = np.concatenate((np_treated_f, np_control_f), axis=0)
 
-        np_control_x, np_control_ps, np_control_f, np_control_y_0, np_control_y_1 \
-            = self.__get_balanced_control(tuple_matched_control,
-                                          tuple_unmatched_control)
-        tuple_control_balanced = (np_control_x, np_control_ps, np_control_f, np_control_y_0,
-                                  np_control_y_1)
-        return tensor_treated_balanced, tuple_control_balanced
+        print("TARnet Supervised Model dataset statistics:")
+        print(np_treated_x.shape)
+        print(np_control_x.shape)
+        print(np_train_supervised_X.shape)
+
+        n_treated = np_treated_x.shape[0]
+        n_control = np_control_x.shape[0]
+        n_total = n_treated + n_control
+
+        tensor_balanced = Utils.create_tensors_to_train_TARNET((np_train_supervised_X,
+                                                                np_train_supervised_ps,
+                                                                np_train_supervised_T,
+                                                                np_train_supervised_f))
+
+        return tensor_balanced, n_total, n_treated
 
     def __get_balanced_dataset_using_DCN(self, treated_simulated,
                                          ps_score_list_treated_np,
@@ -107,6 +126,7 @@ class PS_Treated_Generator:
         print("----->>> Semi supervised training started for DCN <<<-----")
         simulated_treated_Y = dcn.semi_supervised_train_eval(treated_tensor_full_train,
                                                              control_tensor_full_train,
+                                                             self.data_loader_dict_val,
                                                              self.n_treated_original,
                                                              self.n_control_original,
                                                              eval_set)

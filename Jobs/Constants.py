@@ -1,6 +1,6 @@
 class Constants:
     # ps score neural net training parameters
-    PROP_SCORE_NN_EPOCHS = 150
+    PROP_SCORE_NN_EPOCHS = 50
     PROP_SCORE_NN_LR = 0.001
     PROP_SCORE_NN_BATCH_SIZE = 32
     PROP_SCORE_NN_MODEL_PATH = "./Propensity_Model/NN_PS_model_iter_id_{0}_epoch_{1}_lr_{2}.pth"
@@ -43,11 +43,11 @@ class Constants:
     GAN_DISCRIMINATOR_IN_NODES = 17
 
     # TARNet
-    TARNET_EPOCHS = 1
+    TARNET_EPOCHS = 3000
     TARNET_SS_EPOCHS = 1
     TARNET_LR = 1e-3
     TARNET_LAMBDA = 1e-4
     TARNET_BATCH_SIZE = 100
-    TARNET_INPUT_NODES = 25
+    TARNET_INPUT_NODES = 17
     TARNET_SHARED_NODES = 200
     TARNET_OUTPUT_NODES = 100
