@@ -56,6 +56,7 @@ class TARNet_Manager:
         optimizer_W = optim.Adam(self.tarnet_phi.parameters(), lr=lr)
         optimizer_V1 = optim.Adam(self.tarnet_h_y1.parameters(), lr=lr, weight_decay=weight_decay)
         optimizer_V2 = optim.Adam(self.tarnet_h_y0.parameters(), lr=lr, weight_decay=weight_decay)
+
         lossF = nn.MSELoss()
         train_losses = []
         valid_losses = []
