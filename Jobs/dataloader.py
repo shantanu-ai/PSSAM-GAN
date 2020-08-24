@@ -23,7 +23,7 @@ class DataLoader:
 
         train_X = np.concatenate((np_train_X, np_train_e, np_train_yf), axis=1)
         train_X, val_X, train_T, val_T = \
-            Utils.test_train_split(train_X, np_train_T, split_size=0.9)
+            Utils.test_train_split(train_X, np_train_T, split_size=0.90)
 
         np_test_X = test_arr['x'][:, :, iter_id]
         np_test_T = Utils.convert_to_col_vector(test_arr['t'][:, iter_id])

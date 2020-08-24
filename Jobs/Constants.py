@@ -33,7 +33,7 @@ class Constants:
     PS_MODEL_LR_Lasso = "Logistic_L1"
 
     # GAN Training
-    GAN_EPOCHS = 10000
+    GAN_EPOCHS = 1000
     GAN_LR = 0.0002
     GAN_BETA = 1
     GAN_BATCH_SIZE = 64
@@ -50,4 +50,4 @@ class Constants:
     TARNET_BATCH_SIZE = 100
     TARNET_INPUT_NODES = 17
     TARNET_SHARED_NODES = 200
-    TARNET_OUTPUT_NODES = 100
+    TARNET_OUTPUT_NODES = 200

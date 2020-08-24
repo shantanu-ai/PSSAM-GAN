@@ -28,7 +28,7 @@ class TARNetPhi(nn.Module):
 
 
 class TARNetH_Y1(nn.Module):
-    def __init__(self, input_nodes=200, outcome_nodes=100):
+    def __init__(self, input_nodes=200, outcome_nodes=200):
         super(TARNetH_Y1, self).__init__()
 
         # potential outcome1 Y(1)
@@ -53,7 +53,7 @@ class TARNetH_Y1(nn.Module):
 
 
 class TARNetH_Y0(nn.Module):
-    def __init__(self, input_nodes=200, outcome_nodes=100):
+    def __init__(self, input_nodes=200, outcome_nodes=200):
         super(TARNetH_Y0, self).__init__()
 
         # potential outcome1 Y(0)
