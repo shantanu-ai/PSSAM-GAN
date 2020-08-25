@@ -627,17 +627,17 @@ class Experiments:
         file1.write("\nTARNET Models")
         file1.write("\n------")
         file1.write("\nModel 1: TARNET")
-        file1.write("\nTARNET, PEHE: {0}, SD: {1}"
+        file1.write("\nTARNET, Bias att: {0}, SD: {1}"
                     .format(bias_att_tarnet_mean, bias_att_tarnet_std))
-        file1.write("\nTARNET, ATE Metric: {0}, SD: {1}"
+        file1.write("\nTARNET, Policy Risk: {0}, SD: {1}"
                     .format(policy_risk_tarnet_mean,
                             policy_risk_tarnet_std))
 
         file1.write("\n------")
         file1.write("\nModel 2: TARNET PM GAN")
-        file1.write("\nTARNET PM GAN, PEHE: {0}, SD: {1}"
+        file1.write("\nTARNET PM GAN, Bias att: {0}, SD: {1}"
                     .format(bias_att_tarnet_PM_GAN_mean, bias_att_tarnet_PM_GAN_std))
-        file1.write("\nTARNET PM GAN, ATE Metric: {0}, SD: {1}"
+        file1.write("\nTARNET PM GAN, Policy Risk: {0}, SD: {1}"
                     .format(policy_risk_tarnet_PM_GAN_mean,
                             policy_risk_tarnet_PM_GAN_std))
 
