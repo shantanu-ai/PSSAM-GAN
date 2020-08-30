@@ -33,7 +33,7 @@ class Constants:
     PS_MODEL_LR_Lasso = "Logistic_L1"
 
     # GAN Training
-    GAN_EPOCHS = 1000
+    GAN_EPOCHS = 10000
     GAN_LR = 0.0002
     GAN_BETA = 1
     GAN_BATCH_SIZE = 64
