@@ -1,4 +1,6 @@
 class Constants:
+    ITERATIONS = 1
+
     # ps score neural net training parameters
     PROP_SCORE_NN_EPOCHS = 50
     PROP_SCORE_NN_LR = 0.001
@@ -43,7 +45,7 @@ class Constants:
 
     # TARNet
     TARNET_EPOCHS = 3000
-    TARNET_SS_EPOCHS = 1
+    TARNET_SS_EPOCHS = 3000
     TARNET_LR = 1e-3
     TARNET_LAMBDA = 1e-4
     TARNET_BATCH_SIZE = 100

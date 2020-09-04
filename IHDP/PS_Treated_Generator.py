@@ -224,32 +224,33 @@ class PS_Treated_Generator:
                           self.ps_model, self.ps_model_type, device)
         gan.train_GAN(GAN_train_parameters, device=device)
         print("-> GAN training completed")
-        treated_generated, ps_score_list_treated = gan.eval_GAN(tuple_unmatched_control[0].shape[0],
+        treated_generated, ps_score_list_sim_treated = gan.eval_GAN(tuple_unmatched_control[0].shape[0],
                                                                 device)
 
         ps_matched_control_list = tuple_matched_control[1].tolist()
         ps_un_matched_control_list = tuple_unmatched_control[1].tolist()
         ps_treated_list = self.treated_tuple_full[1].tolist()
+        ps_control_list = self.control_tuple_full[1].tolist()
 
         # matched control and treated
         self.draw(ps_treated_list, ps_matched_control_list,
-                  label_treated="Matched treated", label_control="Matched Control",
+                  label_treated="Matched treated", label_control="Matched control",
                   fig_name="./Plots/Fig_Iter_id_{0}_Matched treated vs Matched Control"
                   .format(iter_id))
 
-        # unmatched control and treated
-        self.draw(ps_treated_list, ps_un_matched_control_list,
-                  label_treated="Matched treated", label_control="Unmatched Control",
+        # full control and treated
+        self.draw(ps_treated_list, ps_control_list,
+                  label_treated="Matched treated", label_control="Unmatched control",
                   fig_name="./Plots/Fig_Iter_id_{0}_Matched treated vs Unmatched Control"
                   .format(iter_id))
 
         # treated by GAN vs unmatched control
-        self.draw(ps_score_list_treated, ps_un_matched_control_list,
-                  label_treated="Simulated treated", label_control="Unmatched Control",
+        self.draw(ps_score_list_sim_treated, ps_un_matched_control_list,
+                  label_treated="Synthetic treated", label_control="Unmatched control",
                   fig_name="./Plots/Fig_Iter_id_{0}_Simulated treated vs Unmatched Control"
                   .format(iter_id))
 
-        return treated_generated, ps_score_list_treated, tuple_matched_control, tuple_unmatched_control
+        return treated_generated, ps_score_list_sim_treated, tuple_matched_control, tuple_unmatched_control
 
     @staticmethod
     def draw(treated_ps_list, control_ps_list, label_treated, label_control, fig_name):

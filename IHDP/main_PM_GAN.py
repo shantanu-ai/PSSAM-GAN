@@ -7,17 +7,5 @@ if __name__ == '__main__':
     print("--->> !!Using NN prop score!! <<---")
     running_mode = "original_data"
     original_exp = Experiments(running_mode, csv_path, split_size)
-    original_exp.run_all_experiments(iterations=1,
+    original_exp.run_all_experiments(iterations=Constants.ITERATIONS,
                                      ps_model_type=Constants.PS_MODEL_NN)
-
-    # print("--->> !!Using LR prop score!! <<---")
-    # running_mode = "original_data"
-    # original_exp = Experiments(running_mode, csv_path, split_size)
-    # original_exp.run_all_experiments(iterations=1,
-    #                                  ps_model_type=Constants.PS_MODEL_LR)
-    #
-    # print("--->> !!Using LR Lasso prop score!! <<---")
-    # running_mode = "original_data"
-    # original_exp = Experiments(running_mode, csv_path, split_size)
-    # original_exp.run_all_experiments(iterations=1,
-    #                                  ps_model_type=Constants.PS_MODEL_LR_Lasso)
