@@ -152,24 +152,7 @@ class Experiments:
                     iter_id)
             print("---" * 20)
 
-            print("--> 2. Model 2: DCN - PD(Dropout 0.2) Supervised Training Evaluation: ")
-            dcn_pd_02_eval_dict = dcn_pd_models_eval_dict["dcn_pd_02_eval_dict"]
-            dcn_pd_02_ate_pred, dcn_pd_02_att_pred, dcn_pd_02_bias_att, dcn_pd_02_atc_pred, \
-            dcn_pd_02_policy_value, \
-            dcn_pd_02_policy_risk, dcn_pd_02_err_fact = \
-                self.__process_evaluated_metric(
-                    dcn_pd_02_eval_dict["yf_list"],
-                    dcn_pd_02_eval_dict["e_list"],
-                    dcn_pd_02_eval_dict["T_list"],
-                    dcn_pd_02_eval_dict["y1_hat_list"],
-                    dcn_pd_02_eval_dict["y0_hat_list"],
-                    dcn_pd_02_eval_dict["ITE_dict_list"],
-                    dcn_pd_02_eval_dict["predicted_ITE"],
-                    run_parameters["DCN_PD_02"],
-                    iter_id)
-            print("---" * 20)
-
-            print("--> 3. Model 3: DCN - PD(Dropout 0.5) Supervised Training Evaluation: ")
+            print("--> 2. Model 2: DCN - PD(Dropout 0.5) Supervised Training Evaluation: ")
             dcn_pd_05_eval_dict = dcn_pd_models_eval_dict["dcn_pd_05_eval_dict"]
             dcn_pd_05_ate_pred, dcn_pd_05_att_pred, dcn_pd_05_bias_att, dcn_pd_05_atc_pred, \
             dcn_pd_05_policy_value, \
@@ -186,7 +169,7 @@ class Experiments:
                     iter_id)
             print("---" * 20)
 
-            print("--> 4. Model 4: PM GAN - No dropout Supervised Training Evaluation: ")
+            print("--> 3. Model 3: PM GAN - No dropout Supervised Training Evaluation: ")
             dcn_pm_gan_eval = dcn_pd_models_eval_dict["dcn_pm_gan_eval_dict"]
             dcn_pm_gan_ate_pred, dcn_pm_gan_att_pred, dcn_pm_gan_bias_att, dcn_pm_gan_atc_pred, \
             dcn_pm_gan_policy_value, dcn_pm_gan_policy_risk, dcn_pm_gan_err_fact = \
@@ -202,23 +185,7 @@ class Experiments:
                     iter_id)
             print("---" * 20)
 
-            print("--> 5. Model 5: PM GAN - dropout 0.2 Supervised Training Evaluation: ")
-            dcn_pm_gan_eval_02 = dcn_pd_models_eval_dict["dcn_pm_gan_eval_drp_02_dict"]
-            dcn_pm_gan_02_ate_pred, dcn_pm_gan_02_att_pred, dcn_pm_gan_02_bias_att, dcn_pm_gan_02_atc_pred, \
-            dcn_pm_gan_02_policy_value, dcn_pm_gan_02_policy_risk, dcn_pm_gan_02_err_fact = \
-                self.__process_evaluated_metric(
-                    dcn_pm_gan_eval_02["yf_list"],
-                    dcn_pm_gan_eval_02["e_list"],
-                    dcn_pm_gan_eval_02["T_list"],
-                    dcn_pm_gan_eval_02["y1_hat_list"],
-                    dcn_pm_gan_eval_02["y0_hat_list"],
-                    dcn_pm_gan_eval_02["ITE_dict_list"],
-                    dcn_pm_gan_eval_02["predicted_ITE"],
-                    run_parameters["DCN_PM_GAN_02"],
-                    iter_id)
-            print("---" * 20)
-
-            print("--> 6. Model 6: PM GAN - dropout 0.5 Supervised Training Evaluation: ")
+            print("--> 4. Model 4: PM GAN - dropout 0.5 Supervised Training Evaluation: ")
             dcn_pm_gan_eval_05 = dcn_pd_models_eval_dict["dcn_pm_gan_eval_drp_05_dict"]
             dcn_pm_gan_05_ate_pred, dcn_pm_gan_05_att_pred, dcn_pm_gan_05_bias_att, dcn_pm_gan_05_atc_pred, \
             dcn_pm_gan_05_policy_value, dcn_pm_gan_05_policy_risk, dcn_pm_gan_05_err_fact = \
@@ -234,7 +201,7 @@ class Experiments:
                     iter_id)
             print("---" * 20)
 
-            print("--> 7. Model 7: PM GAN - PD Supervised Training Evaluation: ")
+            print("--> 5. Model 5: PM GAN - PD Supervised Training Evaluation: ")
             dcn_pm_gan_eval_pd = dcn_pd_models_eval_dict["dcn_pm_gan_eval_pd_dict"]
             dcn_pm_gan_pd_ate_pred, dcn_pm_gan_pd_att_pred, dcn_pm_gan_pd_bias_att, dcn_pm_gan_pd_atc_pred, \
             dcn_pm_gan_pd_policy_value, dcn_pm_gan_pd_policy_risk, dcn_pm_gan_pd_err_fact = \
@@ -309,14 +276,6 @@ class Experiments:
             result_dict["dcn_pd_policy_risk"] = dcn_pd_policy_risk
             result_dict["dcn_pd_err_fact"] = dcn_pd_err_fact
 
-            result_dict["dcn_pd_02_ate_pred"] = dcn_pd_02_ate_pred
-            result_dict["dcn_pd_02_att_pred"] = dcn_pd_02_att_pred
-            result_dict["dcn_pd_02_bias_att"] = dcn_pd_02_bias_att
-            result_dict["dcn_pd_02_atc_pred"] = dcn_pd_02_atc_pred
-            result_dict["dcn_pd_02_policy_value"] = dcn_pd_02_policy_value
-            result_dict["dcn_pd_02_policy_risk"] = dcn_pd_02_policy_risk
-            result_dict["dcn_pd_02_err_fact"] = dcn_pd_02_err_fact
-
             result_dict["dcn_pd_05_ate_pred"] = dcn_pd_05_ate_pred
             result_dict["dcn_pd_05_att_pred"] = dcn_pd_05_att_pred
             result_dict["dcn_pd_05_bias_att"] = dcn_pd_05_bias_att
@@ -332,14 +291,6 @@ class Experiments:
             result_dict["dcn_pm_gan_policy_value"] = dcn_pm_gan_policy_value
             result_dict["dcn_pm_gan_policy_risk"] = dcn_pm_gan_policy_risk
             result_dict["dcn_pm_gan_err_fact"] = dcn_pm_gan_err_fact
-
-            result_dict["dcn_pm_gan_02_ate_pred"] = dcn_pm_gan_02_ate_pred
-            result_dict["dcn_pm_gan_02_att_pred"] = dcn_pm_gan_02_att_pred
-            result_dict["dcn_pm_gan_02_bias_att"] = dcn_pm_gan_02_bias_att
-            result_dict["dcn_pm_gan_02_atc_pred"] = dcn_pm_gan_02_atc_pred
-            result_dict["dcn_pm_gan_02_policy_value"] = dcn_pm_gan_02_policy_value
-            result_dict["dcn_pm_gan_02_policy_risk"] = dcn_pm_gan_02_policy_risk
-            result_dict["dcn_pm_gan_02_err_fact"] = dcn_pm_gan_02_err_fact
 
             result_dict["dcn_pm_gan_05_att_pred"] = dcn_pm_gan_05_ate_pred
             result_dict["dcn_pm_gan_05_att_pred"] = dcn_pm_gan_05_att_pred
@@ -374,37 +325,31 @@ class Experiments:
             result_dict["tarnet_pm_gan_err_fact"] = tarnet_pm_gan_err_fact
 
             file1.write("\nToday's date: {0}\n".format(date.today()))
-            file1.write("Iter: {0}, bias_att_DCN_PD: {1}, bias_att_DCN_PD(0.2): {2},  bias_att_DCN_PD(0.5): {3},  "
-                        "bias_att_DCN_PM_GAN: {4},  "
-                        "bias_att_DCN_PM_GAN_02: {5}, bias_att_DCN_PM_GAN_05: {6}, bias_att_DCN_PM_GAN(PD): {7}, "
-                        "policy_risk_DCN_PD: {8},  policy_risk_DCN_PD(0.2): {9} , "
-                        "policy_risk_DCN_PD(0.5): {10}, policy_risk_DCN_PM_GAN: {11},  "
-                        "policy_risk_DCN_PM_GAN_02: {12}, policy_risk_PM_GAN_05: {13}, policy_risk_PM_GAN(PD): {14}, "
+            file1.write("Iter: {0}, bias_att_DCN_PD: {1},  bias_att_DCN_PD(0.5): {2},  "
+                        "bias_att_DCN_PM_GAN: {3},  "
+                        "bias_att_DCN_PM_GAN_05: {4}, bias_att_DCN_PM_GAN(PD): {5}, "
+                        "policy_risk_DCN_PD: {6}, "
+                        "policy_risk_DCN_PD(0.5): {7}, policy_risk_DCN_PM_GAN: {8},  "
+                        "policy_risk_PM_GAN_05: {9}, policy_risk_PM_GAN(PD): {10}, "
 
-                        .format(iter_id, dcn_pd_bias_att, dcn_pd_02_bias_att,
+                        .format(iter_id, dcn_pd_bias_att,
                                 dcn_pd_05_bias_att,
                                 dcn_pm_gan_bias_att,
-                                dcn_pm_gan_02_bias_att, dcn_pm_gan_05_bias_att, dcn_pm_gan_pd_bias_att,
-                                dcn_pd_policy_risk, dcn_pd_02_policy_risk, dcn_pd_05_policy_risk,
+                                dcn_pm_gan_05_bias_att, dcn_pm_gan_pd_bias_att,
+                                dcn_pd_policy_risk, dcn_pd_05_policy_risk,
                                 dcn_pm_gan_policy_risk,
-                                dcn_pm_gan_02_policy_risk, dcn_pm_gan_05_policy_risk,
+                                dcn_pm_gan_05_policy_risk,
                                 dcn_pm_gan_pd_policy_risk))
             results_list.append(result_dict)
 
         bias_att_set_DCN_PD = []
         policy_risk_set_DCN_PD = []
 
-        bias_att_set_DCN_PD_02 = []
-        policy_risk_set_DCN_PD_02 = []
-
         bias_att_set_DCN_PD_05 = []
         policy_risk_set_DCN_PD_05 = []
 
         bias_att_DCN_PM_GAN = []
         policy_risk_set_DCN_PM_GAN = []
-
-        bias_att_DCN_PM_GAN_02 = []
-        policy_risk_set_DCN_PM_GAN_02 = []
 
         bias_att_DCN_PM_GAN_05 = []
         policy_risk_set_DCN_PM_GAN_05 = []
@@ -422,17 +367,11 @@ class Experiments:
             bias_att_set_DCN_PD.append(result["dcn_pd_bias_att"])
             policy_risk_set_DCN_PD.append(result["dcn_pd_policy_risk"])
 
-            bias_att_set_DCN_PD_02.append(result["dcn_pd_02_bias_att"])
-            policy_risk_set_DCN_PD_02.append(result["dcn_pd_02_policy_risk"])
-
             bias_att_set_DCN_PD_05.append(result["dcn_pd_05_bias_att"])
             policy_risk_set_DCN_PD_05.append(result["dcn_pd_05_policy_risk"])
 
             bias_att_DCN_PM_GAN.append(result["dcn_pm_gan_bias_att"])
             policy_risk_set_DCN_PM_GAN.append(result["dcn_pm_gan_policy_risk"])
-
-            bias_att_DCN_PM_GAN_02.append(result["dcn_pm_gan_02_bias_att"])
-            policy_risk_set_DCN_PM_GAN_02.append(result["dcn_pm_gan_02_policy_risk"])
 
             bias_att_DCN_PM_GAN_05.append(result["dcn_pm_gan_05_bias_att"])
             policy_risk_set_DCN_PM_GAN_05.append(result["dcn_pm_gan_05_policy_risk"])
@@ -451,11 +390,6 @@ class Experiments:
         policy_risk_set_DCN_PD_mean = np.mean(np.array(policy_risk_set_DCN_PD))
         policy_risk_set_DCN_PD_std = np.std(policy_risk_set_DCN_PD)
 
-        bias_att_DCN_PD_mean_02 = np.mean(np.array(bias_att_set_DCN_PD_02))
-        bias_att_DCN_PD_std_02 = np.std(bias_att_set_DCN_PD_02)
-        policy_risk_set_DCN_PD_mean_02 = np.mean(np.array(policy_risk_set_DCN_PD_02))
-        policy_risk_set_DCN_PD_std_02 = np.std(policy_risk_set_DCN_PD_02)
-
         bias_att_DCN_PD_mean_05 = np.mean(np.array(bias_att_set_DCN_PD_05))
         bias_att_DCN_PD_std_05 = np.std(bias_att_set_DCN_PD_05)
         policy_risk_set_DCN_PD_mean_05 = np.mean(np.array(policy_risk_set_DCN_PD_05))
@@ -465,11 +399,6 @@ class Experiments:
         bias_att_DCN_PM_GAN_std = np.std(bias_att_DCN_PM_GAN)
         policy_risk_set_DCN_PM_GAN_mean = np.mean(np.array(policy_risk_set_DCN_PM_GAN))
         policy_risk_set_DCN_PM_GAN_std = np.std(policy_risk_set_DCN_PM_GAN)
-
-        bias_att_DCN_PM_GAN_02_mean = np.mean(np.array(bias_att_DCN_PM_GAN_02))
-        bias_att_DCN_PM_GAN_02_std = np.std(bias_att_DCN_PM_GAN_02)
-        policy_risk_DCN_PM_GAN_02_mean = np.mean(np.array(policy_risk_set_DCN_PM_GAN_02))
-        policy_risk_DCN_PM_GAN_02_std = np.std(policy_risk_set_DCN_PM_GAN_02)
 
         bias_att_DCN_PM_GAN_05_mean = np.mean(np.array(bias_att_DCN_PM_GAN_05))
         bias_att_DCN_PM_GAN_05_std = np.std(bias_att_DCN_PM_GAN_05)
@@ -502,42 +431,28 @@ class Experiments:
               .format(policy_risk_set_DCN_PD_mean, policy_risk_set_DCN_PD_std))
         print("--" * 20)
 
-        print("Model 2: DCN_PD(0.2)")
-        print("DCN_PD(0.2), Bias: {0}, SD: {1}"
-              .format(bias_att_DCN_PD_mean_02, bias_att_DCN_PD_std_02))
-        print("DCN_PD(0.2), Policy Risk: {0}, SD: {1}"
-              .format(policy_risk_set_DCN_PD_mean_02, policy_risk_set_DCN_PD_std_02))
-        print("--" * 20)
-
-        print("Model 3: DCN_PD(0.5)")
+        print("Model 2: DCN_PD(0.5)")
         print("DCN_PD(0.5), Bias: {0}, SD: {1}"
               .format(bias_att_DCN_PD_mean_05, bias_att_DCN_PD_std_05))
         print("DCN_PD(0.5), Policy Risk: {0}, SD: {1}"
               .format(policy_risk_set_DCN_PD_mean_05, policy_risk_set_DCN_PD_std_05))
         print("--" * 20)
 
-        print("Model 4: DCN PM GAN")
+        print("Model 3: DCN PM GAN")
         print("DCN PM GAN, Bias: {0}, SD: {1}"
               .format(bias_att_DCN_PM_GAN_mean, bias_att_DCN_PM_GAN_std))
         print("DCN PM GAN, Policy Risk: {0}, SD: {1}"
               .format(policy_risk_set_DCN_PM_GAN_mean, policy_risk_set_DCN_PM_GAN_std))
         print("--" * 20)
 
-        print("Model 5: DCN PM GAN Dropout 0.2")
-        print("DCN PM GAN Dropout 0.2, Bias: {0}, SD: {1}"
-              .format(bias_att_DCN_PM_GAN_02_mean, bias_att_DCN_PM_GAN_02_std))
-        print("DCN PM GAN Dropout 0.2, Policy Risk: {0}, SD: {1}"
-              .format(policy_risk_DCN_PM_GAN_02_mean, policy_risk_DCN_PM_GAN_02_std))
-        print("--" * 20)
-
-        print("Model 6: DCN PM GAN Dropout 0.5")
+        print("Model 4: DCN PM GAN Dropout 0.5")
         print("DCN PM GAN Dropout 0.5, Bias: {0}, SD: {1}"
               .format(bias_att_DCN_PM_GAN_05_mean, bias_att_DCN_PM_GAN_05_std))
         print("DCN PM GAN Dropout 0.5, Policy Risk: {0}, SD: {1}"
               .format(policy_risk_DCN_PM_GAN_05_mean, policy_risk_DCN_PM_GAN_05_std))
         print("--" * 20)
 
-        print("Model 7: DCN PM GAN(PD)")
+        print("Model 5: DCN PM GAN(PD)")
         print("DCN PM GAN(PD), Bias: {0}, SD: {1}"
               .format(bias_att_DCN_PM_GAN_mean_PD, bias_att_DCN_PM_GAN_std_PD))
         print("DCN PM GAN(PD), Policy Risk: {0}, SD: {1}"
@@ -575,15 +490,7 @@ class Experiments:
                             policy_risk_set_DCN_PD_std))
 
         file1.write("\n------")
-        file1.write("\nModel 2: DCN_PD(0.2)")
-        file1.write("\nDCN_PD(0.2, Bias att: {0}, SD: {1}"
-                    .format(bias_att_DCN_PD_mean_02, bias_att_DCN_PD_std_02))
-        file1.write("\nDCN_PD(0.2, Policy Risk: {0}, SD: {1}"
-                    .format(policy_risk_set_DCN_PD_mean_02,
-                            policy_risk_set_DCN_PD_std_02))
-
-        file1.write("\n------")
-        file1.write("\nModel 3: DCN_PD(0.5)")
+        file1.write("\nModel 2: DCN_PD(0.5)")
         file1.write("\nDCN_PD(0.5), Bias att: {0}, SD: {1}"
                     .format(bias_att_DCN_PD_mean_05, bias_att_DCN_PD_std_05))
         file1.write("\nDCN_PD(0.5), Policy Risk: {0}, SD: {1}"
@@ -591,7 +498,7 @@ class Experiments:
                             policy_risk_set_DCN_PD_std_05))
 
         file1.write("\n------")
-        file1.write("\nModel 4: DCN PM GAN")
+        file1.write("\nModel 3: DCN PM GAN")
         file1.write("\nDCN PM GAN, Bias att: {0}, SD: {1}"
                     .format(bias_att_DCN_PM_GAN_mean, bias_att_DCN_PM_GAN_std))
         file1.write("\nDCN PM GAN, Policy Risk: {0}, SD: {1}"
@@ -599,15 +506,7 @@ class Experiments:
                             policy_risk_set_DCN_PM_GAN_std))
         file1.write("\n------")
 
-        file1.write("\nModel 5: DCN PM GAN Dropout 0.2")
-        file1.write("\nDCN PM GAN Dropout 0.2, Bias att: {0}, SD: {1}"
-                    .format(bias_att_DCN_PM_GAN_02_std, bias_att_DCN_PM_GAN_02_std))
-        file1.write("\nDCN PM GAN Dropout 0.2, Policy Risk: {0}, SD: {1}"
-                    .format(policy_risk_DCN_PM_GAN_02_mean,
-                            policy_risk_DCN_PM_GAN_02_std))
-        file1.write("\n------")
-
-        file1.write("\nModel 6: DCN PM GAN Dropout 0.5")
+        file1.write("\nModel 4: DCN PM GAN Dropout 0.5")
         file1.write("\nDCN PM GAN Dropout 0.5, Bias att: {0}, SD: {1}"
                     .format(bias_att_DCN_PM_GAN_05_mean, bias_att_DCN_PM_GAN_05_std))
         file1.write("\nDCN PM GAN Dropout 0.5, Policy Risk: {0}, SD: {1}"
@@ -615,7 +514,7 @@ class Experiments:
                             policy_risk_DCN_PM_GAN_05_std))
 
         file1.write("\n------")
-        file1.write("\nModel 7: DCN PM GAN PD")
+        file1.write("\nModel 5: DCN PM GAN PD")
         file1.write("\nDCN PM GAN Dropout PD, Bias att: {0}, SD: {1}"
                     .format(bias_att_DCN_PM_GAN_mean_PD, bias_att_DCN_PM_GAN_std_PD))
         file1.write("\nDCN PM GAN Dropout PD, Policy Risk: {0}, SD: {1}"

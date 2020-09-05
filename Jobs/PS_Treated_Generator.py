@@ -215,7 +215,7 @@ class PS_Treated_Generator:
         gan.train_GAN(GAN_train_parameters, device=device)
         print("-> GAN training completed")
         treated_generated, ps_score_list_sim_treated = gan.eval_GAN(tuple_unmatched_control[0].shape[0],
-                                                                device)
+                                                                    device)
 
         ps_matched_control_list = tuple_matched_control[1].tolist()
         ps_un_matched_control_list = tuple_unmatched_control[1].tolist()
@@ -229,39 +229,45 @@ class PS_Treated_Generator:
 
         # # matched control and treated
         self.draw(ps_treated_list, ps_matched_control_list,
-                  label_treated="Matched treated", label_control="Matched control",
-                  fig_name="./Plots/Fig_Iter_id_{0}_Matched treated vs Matched Control"
+                  label_treated="Treated", label_control="Control",
+                  fig_name="./Plots/Fig_Iter_id_{0}_Matched"
                   .format(iter_id),
-                  title="Jobs: PSM dataset")
+                  title="Jobs: PSM dataset",
+                  max_limit=20)
         #
         # # full control and treated
         self.draw(ps_treated_list, ps_control_list,
-                  label_treated="Matched treated", label_control="Unmatched control",
-                  fig_name="./Plots/Fig_Iter_id_{0}_Matched treated vs Unmatched Control"
+                  label_treated="Treated", label_control="Control",
+                  fig_name="./Plots/Fig_Iter_id_{0}_Original"
                   .format(iter_id),
-                  title="Jobs: original dataset")
+                  title="Jobs: original dataset",
+                  max_limit=100)
         # #
         # # # treated by GAN vs unmatched control
-        self.draw(ps_score_list_sim_treated, ps_un_matched_control_list,
-                  label_treated="Synthetic treated", label_control="Unmatched control",
-                  fig_name="./Plots/Fig_Iter_id_{0}_Simulated treated vs Unmatched Control"
+        self.draw(ps_score_list_sim_treated, ps_control_list,
+                  label_treated="Treated", label_control="Control",
+                  fig_name="./Plots/Fig_Iter_id_{0}_Simulated"
                   .format(iter_id),
-                  title="Jobs: original + GAN dataset")
+                  title="Jobs: original + GAN dataset",
+                  max_limit=100)
 
         return treated_generated, ps_score_list_sim_treated, tuple_matched_control, tuple_unmatched_control
 
     @staticmethod
-    def draw(treated_ps_list, control_ps_list, label_treated, label_control, fig_name, title):
-        bins1 = np.linspace(0, 1, 100)
-        pyplot.hist(np.array(treated_ps_list), bins1, alpha=0.5, label=label_treated)
-        pyplot.hist(np.array(control_ps_list), bins1, alpha=0.5, label=label_control)
+    def draw(treated_ps_list, control_ps_list, label_treated, label_control,
+             fig_name, title, max_limit):
+        bins1 = np.linspace(0, 1, 50)
+        pyplot.hist(treated_ps_list, bins1, alpha=0.5, label=label_treated, color='r', histtype="bar",
+                    edgecolor='r')
+        pyplot.hist(control_ps_list, bins1, alpha=0.5, label=label_control, color='g', histtype="bar",
+                    edgecolor='g')
         pyplot.xlabel('Propensity scores', fontsize=10)
         pyplot.ylabel('Frequency', fontsize=10)
         pyplot.title(title)
+        pyplot.ylim(0, max_limit)
         pyplot.xticks(fontsize=7)
         pyplot.yticks(fontsize=7)
         pyplot.legend(loc='upper right')
         pyplot.draw()
-        pyplot.savefig(fig_name, dpi=100)
-        # pyplot.show()
+        pyplot.savefig(fig_name, dpi=220)
         pyplot.clf()
