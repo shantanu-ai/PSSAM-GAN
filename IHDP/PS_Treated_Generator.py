@@ -7,6 +7,7 @@ from GAN_Manager import GAN_Manager
 from PSM_Manager import PSM_Manager
 from TARNet_Experiments import TARNet_Experiments
 from Utils import Utils
+import seaborn as sns
 
 
 class PS_Treated_Generator:
@@ -225,7 +226,7 @@ class PS_Treated_Generator:
         gan.train_GAN(GAN_train_parameters, device=device)
         print("-> GAN training completed")
         treated_generated, ps_score_list_sim_treated = gan.eval_GAN(tuple_unmatched_control[0].shape[0],
-                                                                device)
+                                                                    device)
 
         ps_matched_control_list = tuple_matched_control[1].tolist()
         ps_un_matched_control_list = tuple_unmatched_control[1].tolist()
@@ -235,31 +236,36 @@ class PS_Treated_Generator:
         # matched control and treated
         self.draw(ps_treated_list, ps_matched_control_list,
                   label_treated="Matched treated", label_control="Matched control",
-                  fig_name="./Plots/Fig_Iter_id_{0}_Matched treated vs Matched Control"
-                  .format(iter_id))
+                  fig_name="./Plots/Fig_Iter_id_{0}_Matched treated vs Matched Control".format(iter_id),
+                  title="IHDP: PSM dataset")
 
         # full control and treated
         self.draw(ps_treated_list, ps_control_list,
                   label_treated="Matched treated", label_control="Unmatched control",
-                  fig_name="./Plots/Fig_Iter_id_{0}_Matched treated vs Unmatched Control"
-                  .format(iter_id))
+                  fig_name="./Plots/Fig_Iter_id_{0}_Matched treated vs Unmatched Control".format(iter_id),
+                  title="IHDP: original dataset")
 
         # treated by GAN vs unmatched control
         self.draw(ps_score_list_sim_treated, ps_un_matched_control_list,
                   label_treated="Synthetic treated", label_control="Unmatched control",
-                  fig_name="./Plots/Fig_Iter_id_{0}_Simulated treated vs Unmatched Control"
-                  .format(iter_id))
+                  fig_name="./Plots/Fig_Iter_id_{0}_Simulated treated vs Unmatched Control".format(iter_id),
+                  title="IHDP: original + GAN dataset")
 
         return treated_generated, ps_score_list_sim_treated, tuple_matched_control, tuple_unmatched_control
 
     @staticmethod
-    def draw(treated_ps_list, control_ps_list, label_treated, label_control, fig_name):
+    def draw(treated_ps_list, control_ps_list, label_treated, label_control, fig_name, title):
         bins1 = np.linspace(0, 1, 100)
         pyplot.hist(treated_ps_list, bins1, alpha=0.5, label=label_treated)
         pyplot.hist(control_ps_list, bins1, alpha=0.5, label=label_control)
-
+        pyplot.xlabel('Propensity scores', fontsize=10)
+        pyplot.ylabel('Frequency', fontsize=10)
+        pyplot.title(title)
+        pyplot.xticks(fontsize=7)
+        pyplot.yticks(fontsize=7)
         pyplot.legend(loc='upper right')
         pyplot.draw()
-        pyplot.savefig(fig_name, dpi=100)
+        pyplot.savefig(fig_name)
+
         # pyplot.show()
         pyplot.clf()
