@@ -36,6 +36,12 @@ command:<br/>
 
 By default it will run for 1000 and 10 iterations for IHDP and Jobs dataset respectively.
 
+## Results
+The default results mentioned in the paper is avaliable at the following locations:
+
+<b> [IHDP](https://github.com/Shantanu48114860/PSSAM-GAN/tree/master/Stats/IHDP_Random/1000_iter) </b> 
+
+<b> [Jobs]()</b>
 ## License & copyright
 © DISL, University of Florida
 
