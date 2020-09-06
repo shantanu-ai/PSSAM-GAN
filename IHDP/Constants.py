@@ -1,5 +1,5 @@
 class Constants:
-    ITERATIONS = 1000
+    ITERATIONS = 1
 
     # ps score neural net training parameters
     PROP_SCORE_NN_EPOCHS = 50

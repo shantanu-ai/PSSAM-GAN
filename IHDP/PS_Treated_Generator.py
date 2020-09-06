@@ -236,19 +236,19 @@ class PS_Treated_Generator:
         self.draw(ps_treated_list, ps_matched_control_list,
                   label_treated="Treated", label_control="Control",
                   fig_name="./Plots/Fig_Iter_id_{0}_Matched".format(iter_id),
-                  title="IHDP: PSM dataset", max_limit=15)
+                  title="IHDP: PSM dataset", max_limit=45)
 
         # full control and treated
         self.draw(ps_treated_list, ps_control_list,
                   label_treated="Treated", label_control="Control",
                   fig_name="./Plots/Fig_Iter_id_{0}_Original".format(iter_id),
-                  title="IHDP: original dataset", max_limit=50)
+                  title="IHDP: original dataset", max_limit=45)
 
         # treated by GAN vs unmatched control
         self.draw(ps_score_list_sim_treated, ps_control_list,
                   label_treated="Treated", label_control="Control",
                   fig_name="./Plots/Fig_Iter_id_{0}_Simulated".format(iter_id),
-                  title="IHDP: original + GAN dataset", max_limit=50)
+                  title="IHDP: original + GAN dataset", max_limit=45)
 
         return treated_generated, ps_score_list_sim_treated, tuple_matched_control, tuple_unmatched_control
 
@@ -259,8 +259,8 @@ class PS_Treated_Generator:
                     edgecolor='r')
         pyplot.hist(control_ps_list, bins1, alpha=0.5, label=label_control, color='g', histtype="bar",
                     edgecolor='g')
-        pyplot.xlabel('Propensity scores', fontsize=10)
-        pyplot.ylabel('Frequency', fontsize=10)
+        pyplot.xlabel('Propensity scores', fontsize=12)
+        pyplot.ylabel('Frequency', fontsize=12)
         pyplot.title(title)
         pyplot.ylim(0, max_limit)
         pyplot.xticks(fontsize=7)
