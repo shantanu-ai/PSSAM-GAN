@@ -50,7 +50,20 @@ The codebase is setup with the default hyperparameters depicted in the paper. Ho
 
 <b> [Jobs](https://github.com/Shantanu48114860/PSSAM-GAN/blob/master/Jobs/Constants.py)</b>
 
-# Output
+## Output
+After the run, the outputs will be generated in the following location:
+
+<b>[IHDP](https://github.com/Shantanu48114860/PSSAM-GAN/tree/master/IHDP/MSE) </b>
+
+<b>[Jobs](https://github.com/Shantanu48114860/PSSAM-GAN/tree/master/Jobs/MSE) </b>
+
+Consolidated results will be available in textfile in /IHDP/Details_original.txt and /Jobs/Details_original.txt files.
+
+The details of each run will be avalable in csv files in the following locations:
+
+1) IHDP - /IHDP/MSE/Results_consolidated_NN.csv
+
+2) Jobs - /Jobs/MSE/Results_consolidated_NN.csv
 
 ## License & copyright
 © DISL, University of Florida
