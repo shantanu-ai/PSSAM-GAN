@@ -33,6 +33,7 @@ command:<br/>
   cd Jobs <br/>
   python3 main_PM_GAN.py
 </b>
+
 By default it will run for 1000 and 10 iterations for IHDP and Jobs dataset respectively.
 
 ## License & copyright
