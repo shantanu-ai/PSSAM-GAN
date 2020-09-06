@@ -42,6 +42,14 @@ The default results mentioned in the paper is avaliable at the following locatio
 <b> [IHDP](https://github.com/Shantanu48114860/PSSAM-GAN/tree/master/Stats/IHDP_Random/1000_iter) </b> 
 
 <b> [Jobs](https://github.com/Shantanu48114860/PSSAM-GAN/tree/master/Stats/Jobs/--%3E%3EBest!!90_val__80-20_split_Early_stopping_Tarnet_elu_GAN_10000)</b>
+
+## Hyperparameter
+The codebase is setup with the default hyperparameters depicted in the paper. However, if one wishes to change the hyperparameters, please visit the following files for IHDP and Jobs respectively:
+
+<b> [IHDP](https://github.com/Shantanu48114860/PSSAM-GAN/blob/master/IHDP/Constants.py) </b> 
+
+<b> [Jobs](https://github.com/Shantanu48114860/PSSAM-GAN/blob/master/Jobs/Constants.py)</b>
+
 ## License & copyright
 © DISL, University of Florida
 
