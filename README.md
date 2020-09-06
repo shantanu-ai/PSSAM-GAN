@@ -41,7 +41,7 @@ The default results mentioned in the paper is avaliable at the following locatio
 
 <b> [IHDP](https://github.com/Shantanu48114860/PSSAM-GAN/tree/master/Stats/IHDP_Random/1000_iter) </b> 
 
-<b> [Jobs]()</b>
+<b> [Jobs](https://github.com/Shantanu48114860/PSSAM-GAN/tree/master/Stats/Jobs/--%3E%3EBest!!90_val__80-20_split_Early_stopping_Tarnet_elu_GAN_10000)</b>
 ## License & copyright
 © DISL, University of Florida
 
