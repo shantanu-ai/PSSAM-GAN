@@ -21,14 +21,14 @@ causal AI, biomedical informatics, deep learning, multitask learning, GAN
 
 ## How to run
 To reproduce the experiments mentioned in the paper for IHDP dataset
-command:
+command: <br/>
 <b>
   cd IHDP <br/>
   python3 main_PM_GAN.py
 </b>
 
 To reproduce the experiments mentioned in the paper for Jobs dataset
-command:
+command:<br/>
 <b>
   cd Jobs <br/>
   python3 main_PM_GAN.py
