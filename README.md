@@ -65,6 +65,13 @@ The details of each run will be avalable in csv files in the following locations
 
 2) Jobs - /Jobs/MSE/Results_consolidated_NN.csv
 
+## Plots
+The plots for each run will be found at the following location:
+
+1) IHDP - /IHDP/Plots
+
+2) Jobs - /Jobs/Plots
+
 ## License & copyright
 © DISL, University of Florida
 
