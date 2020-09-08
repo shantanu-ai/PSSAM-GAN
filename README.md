@@ -73,6 +73,5 @@ The plots for each run will be found at the following location:
 2) Jobs - /Jobs/Plots
 
 ## License & copyright
-© DISL, University of Florida
 
 Licensed under the [MIT License](LICENSE)
