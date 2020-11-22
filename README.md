@@ -1,7 +1,7 @@
 ## Description
 Repository of Propensity Score Synthetic Augmentation Matchingusing Generative Adversarial Networks (PSSAM-GAN)
 
-## Requirements and setup
+## Requirements and versions
 pytorch - 1.3.1 <br/>
 numpy - 1.17.2 <br/>
 pandas - 0.25.1 <br/>
@@ -73,6 +73,5 @@ The plots for each run will be found at the following location:
 2) Jobs - /Jobs/Plots
 
 ## License & copyright
-© DISL, University of Florida
 
 Licensed under the [MIT License](LICENSE)
