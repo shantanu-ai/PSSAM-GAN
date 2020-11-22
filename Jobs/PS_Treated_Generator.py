@@ -244,7 +244,7 @@ class PS_Treated_Generator:
                   max_limit=170)
         # #
         # # # treated by GAN vs unmatched control
-        self.draw(ps_score_list_sim_treated, ps_control_list,
+        self.draw(ps_score_list_sim_treated + ps_treated_list, ps_control_list,
                   label_treated="Treated", label_control="Control",
                   fig_name="./Plots/Fig_Iter_id_{0}_Simulated"
                   .format(iter_id),
