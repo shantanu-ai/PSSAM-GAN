@@ -8,7 +8,7 @@ Propensity Score Synthetic Augmentation Matching using Generative Adversarial Ne
 <object data="https://github.com/Shantanu48114860/PSSAM-GAN/blob/master/Figures/Block.pdf" type="application/pdf" width="100%"> 
 </object>
 
-<embed src="https://github.com/Shantanu48114860/PSSAM-GAN/blob/master/Figures/Block.pdf" type="application/pdf">
+<img src="https://github.com/Shantanu48114860/PSSAM-GAN/blob/master/Figures/Block.pdf" type="application/pdf">
 
 
 
