@@ -123,7 +123,8 @@ class TARNet_Experiments:
             Utils.create_tensors_from_tuple(self.data_loader_dict_test["treated_data"])
         tensor_control_test = \
             Utils.create_tensors_from_tuple(self.data_loader_dict_test["control_data"])
-        _test_parameters = self.__get_test_parameters(tensor_treated_test, tensor_control_test)
+        _test_parameters = self.__get_test_parameters(tensor_treated_test,
+                                                      tensor_control_test)
 
         tensor_treated_val = \
             Utils.create_tensors_from_tuple(self.data_loader_dict_val["treated_data"])
