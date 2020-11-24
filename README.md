@@ -5,7 +5,7 @@ Repository of Propensity Score Synthetic Augmentation Matchingusing Generative A
 Propensity Score Synthetic Augmentation Matching using Generative Adversarial Net- works (PSSAM-GAN) - a novel deep learning training algorithm which attempts to make an unbalanced dataset bal- anced to train DCN-PD and TARNET to estimate ITE.
 
 ## Block Diagram
-<img src="https://github.com/Shantanu48114860/PSSAM-GAN/blob/master/Figures/GAN.png" type="application/pdf">
+[embed]https://github.com/Shantanu48114860/PSSAM-GAN/blob/master/Figures/GAN.pdf[/embed]
 
 
 
