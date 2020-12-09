@@ -1,5 +1,5 @@
 ## Description
-Repository of Propensity Score Synthetic Augmentation Matchingusing Generative Adversarial Networks (PSSAM-GAN) - Paper under review at AAAI 2021.
+Repository of Propensity Score Synthetic Augmentation Matchingusing Generative Adversarial Networks (PSSAM-GAN) - Paper under review at the Journal of Computers in Biology and Medicine.
 
 ## Abstract
 Propensity Score Synthetic Augmentation Matching using Generative Adversarial Net- works (PSSAM-GAN) - a novel deep learning training algorithm which attempts to make an unbalanced dataset bal- anced to train DCN-PD and TARNET to estimate ITE.
@@ -15,7 +15,18 @@ python -  3.7.4 <br/>
 
 
 ## Keywords
-causal AI, biomedical informatics, deep learning, multitask learning, GAN
+causal AI; causal inference; deep learning; biomedical informatics; generative
+adversarial networks; propensity score; treatment effect; electronic health record; big
+data
+
+# Contributors
+[Shantanu Ghosh](https://www.linkedin.com/in/shantanu-ghosh-b369783a/)
+
+[Christina Boucher](https://christinaboucher.com/)
+
+[Jiang Bian](http://jiangbian.me/)
+
+[Mattia Prosperi](https://epidemiology.phhp.ufl.edu/profile/prosperi-mattia/)
 
 ## Dependencies
 [python 3.7.7](https://www.python.org/downloads/release/python-374/)
