@@ -19,7 +19,7 @@ causal AI; causal inference; deep learning; biomedical informatics; generative
 adversarial networks; propensity score; treatment effect; electronic health record; big
 data
 
-# Contributors
+## Contributors
 [Shantanu Ghosh](https://www.linkedin.com/in/shantanu-ghosh-b369783a/)
 
 [Christina Boucher](https://christinaboucher.com/)
