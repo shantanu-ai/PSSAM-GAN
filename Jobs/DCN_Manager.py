@@ -93,6 +93,7 @@ class DCN_Manager:
                     ps_score = ps_score.squeeze().to(device)
                     train_set_size += covariates_X.size(0)
                     y1_hat = self.dcn_y1(self.dcn_shared(covariates_X, ps_score), ps_score)
+
                     y_f = y_f.long()
                     if torch.cuda.is_available():
                         loss = lossF(y1_hat.cuda(), y_f.cuda()).to(device)

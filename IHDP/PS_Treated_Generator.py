@@ -245,7 +245,7 @@ class PS_Treated_Generator:
                   title="IHDP: original dataset", max_limit=45)
 
         # treated by GAN vs unmatched control
-        self.draw(ps_score_list_sim_treated, ps_control_list,
+        self.draw(ps_score_list_sim_treated + ps_treated_list, ps_control_list,
                   label_treated="Treated", label_control="Control",
                   fig_name="./Plots/Fig_Iter_id_{0}_Simulated".format(iter_id),
                   title="IHDP: original + GAN dataset", max_limit=45)
@@ -255,7 +255,7 @@ class PS_Treated_Generator:
     @staticmethod
     def draw(treated_ps_list, control_ps_list, label_treated, label_control, fig_name, title, max_limit):
         bins1 = np.linspace(0, 1, 50)
-        pyplot.hist(treated_ps_list, bins1, alpha=0.5, label=label_treated, color='r', histtype="bar",
+        pyplot.hist(treated_ps_list, bins1, alpha=0.5, label=label_treated, color='#B60E0E', histtype="bar",
                     edgecolor='r')
         pyplot.hist(control_ps_list, bins1, alpha=0.5, label=label_control, color='g', histtype="bar",
                     edgecolor='g')

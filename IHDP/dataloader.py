@@ -69,8 +69,11 @@ class DataLoader:
                                is_synthetic):
         # print("ps_np_covariates_X: {0}".format(ps_np_covariates_X.shape))
         # print("ps_np_treatment_Y: {0}".format(ps_np_treatment_Y.shape))
+        print(ps_np_covariates_X.shape)
+        print(ps_np_treatment_Y.shape)
+        print("----------")
         X = Utils.concat_np_arr(ps_np_covariates_X, ps_np_treatment_Y, axis=1)
-
+        print(X.shape)
         # col of X -> x1 .. x25, Y_f, Y_cf, T, Ps
         X = Utils.concat_np_arr(X, np.array([ps_list]).T, axis=1)
         # print("Big X: {0}".format(X.shape))
@@ -95,6 +98,7 @@ class DataLoader:
         print(" Treated Statistics ==>")
         print(np_treated_df_X.shape)
         # print(np_treated_ps_score.shape)
+
 
         print(" Control Statistics ==>")
         print(np_control_df_X.shape)
