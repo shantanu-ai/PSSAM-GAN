@@ -42,8 +42,6 @@ class Propensity_socre_network:
                 covariates, treatment = batch
                 covariates = covariates.to(device)
                 treatment = treatment.squeeze().to(device)
-
-                covariates = covariates[:, :-2]
                 train_set_size += covariates.size(0)
 
                 treatment_pred = self.network(covariates)
@@ -73,9 +71,6 @@ class Propensity_socre_network:
             covariates, treatment = batch
 
             covariates = covariates.to(device)
-            if not eval_from_GAN:
-                covariates = covariates[:, :-2]
-
             eval_set_size += covariates.size(0)
 
             treatment_pred = self.network(covariates)

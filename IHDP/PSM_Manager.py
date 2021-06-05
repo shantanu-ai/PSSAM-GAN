@@ -8,8 +8,10 @@ from Utils import Utils
 class PSM_Manager:
     def match_using_prop_score(self, tuple_treated, tuple_control):
         # do ps match
-        np_treated_df_X, np_treated_ps_score, np_treated_df_Y_f, np_treated_df_Y_cf = tuple_treated
-        np_control_df_X, np_control_ps_score, np_control_df_Y_f, np_control_df_Y_cf = tuple_control
+        np_treated_df_X, np_treated_ps_score, np_treated_df_Y_f, \
+        np_treated_df_Y_cf, np_treated_mu_0, np_treated_mu_1 = tuple_treated
+        np_control_df_X, np_control_ps_score, np_control_df_Y_f, np_control_df_Y_cf, \
+        np_control_mu_0, np_control_mu_1 = tuple_control
 
         # get unmatched controls
         matched_control_indices, unmatched_control_indices = self.get_matched_and_unmatched_control_indices(
@@ -18,8 +20,8 @@ class PSM_Manager:
 
         tuple_matched_control, tuple_unmatched_control = self.filter_matched_and_unmatched_control_samples(
             np_control_df_X, np_control_ps_score,
-            np_control_df_Y_f,
-            np_control_df_Y_cf, matched_control_indices,
+            np_control_df_Y_f, np_control_df_Y_cf, np_control_mu_0, np_control_mu_1,
+            matched_control_indices,
             unmatched_control_indices)
         return {
             "tuple_matched_control": tuple_matched_control,
@@ -28,16 +30,23 @@ class PSM_Manager:
 
     def filter_matched_and_unmatched_control_samples(self, np_control_df_X, np_control_ps_score,
                                                      np_control_df_Y_f,
-                                                     np_control_df_Y_cf, matched_control_indices,
+                                                     np_control_df_Y_cf,
+                                                     np_control_mu_0,
+                                                     np_control_mu_1,
+                                                     matched_control_indices,
                                                      unmatched_control_indices):
         tuple_matched_control = self.filter_control_groups(np_control_df_X, np_control_ps_score,
                                                            np_control_df_Y_f,
                                                            np_control_df_Y_cf,
+                                                           np_control_mu_0,
+                                                           np_control_mu_1,
                                                            matched_control_indices)
 
         tuple_unmatched_control = self.filter_control_groups(np_control_df_X, np_control_ps_score,
                                                              np_control_df_Y_f,
                                                              np_control_df_Y_cf,
+                                                             np_control_mu_0,
+                                                             np_control_mu_1,
                                                              unmatched_control_indices)
 
         return tuple_matched_control, tuple_unmatched_control
@@ -45,13 +54,18 @@ class PSM_Manager:
     @staticmethod
     def filter_control_groups(np_control_df_X, np_control_ps_score,
                               np_control_df_Y_f,
-                              np_control_df_Y_cf, indices):
+                              np_control_df_Y_cf,
+                              np_control_mu_0,
+                              np_control_mu_1, indices):
         np_filter_control_df_X = np.take(np_control_df_X, indices, axis=0)
         np_filter_control_ps_score = np.take(np_control_ps_score, indices, axis=0)
         np_filter_control_df_Y_f = np.take(np_control_df_Y_f, indices, axis=0)
         np_filter_control_df_Y_cf = np.take(np_control_df_Y_cf, indices, axis=0)
+        np_filter_control_mu_0 = np.take(np_control_mu_0, indices, axis=0)
+        np_filter_control_mu_1 = np.take(np_control_mu_1, indices, axis=0)
         tuple_matched_control = (np_filter_control_df_X, np_filter_control_ps_score,
-                                 np_filter_control_df_Y_f, np_filter_control_df_Y_cf)
+                                 np_filter_control_df_Y_f, np_filter_control_df_Y_cf,
+                                 np_filter_control_mu_0, np_filter_control_mu_1)
 
         return tuple_matched_control
 

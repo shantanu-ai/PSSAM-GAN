@@ -77,9 +77,10 @@ class TARNet_Manager:
             self.tarnet_h_y0.train()
 
             for batch in treated_data_loader_train:
-                covariates_X, ps_score, T, y_f, y_cf = batch
+                covariates_X, ps_score, T, y_f, y_cf, _, _ = batch
                 covariates_X = covariates_X.to(device)
                 ps_score = ps_score.squeeze().to(device)
+                y_f = y_f.view(y_f.size(0), -1)
 
                 idx = (T == 1)
                 covariates_X_treated = covariates_X[idx]
@@ -136,9 +137,10 @@ class TARNet_Manager:
 
             # val treated
             for batch in treated_data_loader_val:
-                covariates_X, ps_score, y_f, y_cf = batch
+                covariates_X, ps_score, y_f, y_cf, _, _ = batch
                 covariates_X = covariates_X.to(device)
                 ps_score = ps_score.squeeze().to(device)
+                y_f = y_f.view(y_f.size(0), -1)
                 y1_hat = self.tarnet_h_y1(self.tarnet_phi(covariates_X))
                 if torch.cuda.is_available():
                     loss = lossF(y1_hat.float().cuda(),
@@ -148,13 +150,12 @@ class TARNet_Manager:
                                  y_f.float()).to(device)
                 total_loss_T_val += loss.item()
 
-
             # val control
             for batch in control_data_loader_val:
-                covariates_X, ps_score, y_f, y_cf = batch
+                covariates_X, ps_score, y_f, y_cf, _, _ = batch
                 covariates_X = covariates_X.to(device)
                 ps_score = ps_score.squeeze().to(device)
-
+                y_f = y_f.view(y_f.size(0), -1)
                 y0_hat = self.tarnet_h_y0(self.tarnet_phi(covariates_X))
                 if torch.cuda.is_available():
                     loss = lossF(y0_hat.float().cuda(),
@@ -299,13 +300,13 @@ class TARNet_Manager:
         y0_hat_list = []
 
         for batch in treated_data_loader:
-            covariates_X, ps_score, y_f, y_cf = batch
+            covariates_X, ps_score, y_f, y_cf, mu0, mu1 = batch
             covariates_X = covariates_X.to(device)
             y1_hat = self.tarnet_h_y1(self.tarnet_phi(covariates_X))
             y0_hat = self.tarnet_h_y0(self.tarnet_phi(covariates_X))
 
             predicted_ITE = y1_hat - y0_hat
-            true_ITE = y_f - y_cf
+            true_ITE = mu1 - mu0
 
             if torch.cuda.is_available():
                 diff = true_ITE.float().cuda() - predicted_ITE.float().cuda()
@@ -329,14 +330,14 @@ class TARNet_Manager:
             predicted_ITE_list.append(predicted_ITE.item())
 
         for batch in control_data_loader:
-            covariates_X, ps_score, y_f, y_cf = batch
+            covariates_X, ps_score, y_f, y_cf, mu0, mu1 = batch
             covariates_X = covariates_X.to(device)
 
             y1_hat = self.tarnet_h_y1(self.tarnet_phi(covariates_X))
             y0_hat = self.tarnet_h_y0(self.tarnet_phi(covariates_X))
 
             predicted_ITE = y1_hat - y0_hat
-            true_ITE = y_cf - y_f
+            true_ITE = mu1 - mu0
             if torch.cuda.is_available():
                 diff = true_ITE.float().cuda() - predicted_ITE.float().cuda()
             else:

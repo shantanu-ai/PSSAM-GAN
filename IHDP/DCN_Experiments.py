@@ -147,7 +147,8 @@ class DCN_Experiments:
         dcn_eval_dict = dcn_pd.eval(DCN_test_parameters, self.device)
         return dcn_eval_dict
 
-    def semi_supervised_train_eval(self, treated_tensor_full_train, control_tensor_full_train,
+    def semi_supervised_train_eval(self, treated_tensor_full_train,
+                                   control_tensor_full_train,
                                    data_loader_dict_val,
                                    n_treated,
                                    n_control,

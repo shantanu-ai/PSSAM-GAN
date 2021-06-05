@@ -19,8 +19,11 @@ class Utils:
         return np_arr.reshape(np_arr.shape[0], 1)
 
     @staticmethod
-    def test_train_split(covariates_X, treatment_Y, split_size=0.8):
-        return sklearn.train_test_split(covariates_X, treatment_Y, train_size=split_size)
+    def test_train_split(np_train_X, np_train_T, np_train_yf, np_train_ycf,
+                         np_mu0, np_mu1, split_size=0.8):
+        return sklearn.train_test_split(np_train_X, np_train_T, np_train_yf, np_train_ycf,
+                                        np_mu0, np_mu1,
+                                        train_size=split_size)
 
     @staticmethod
     def convert_to_tensor(X, Y):
@@ -29,14 +32,37 @@ class Utils:
         processed_dataset = torch.utils.data.TensorDataset(tensor_x, tensor_y)
         return processed_dataset
 
+
     @staticmethod
-    def convert_to_tensor_DCN(X, ps_score, Y_f, Y_cf):
+    def convert_to_tensor_ITE(X, T, Y_f, Y_cf, np_mu0, np_mu1, ps_list):
+        tensor_x = torch.stack([torch.Tensor(i) for i in X])
+        tensor_T = torch.from_numpy(T)
+        tensor_y_f = torch.from_numpy(Y_f)
+        tensor_y_cf = torch.from_numpy(Y_cf)
+        tensor_mu0 = torch.from_numpy(np_mu0)
+        tensor_mu1 = torch.from_numpy(np_mu1)
+        tensor_ps = torch.from_numpy(np.array([ps_list]).T)
+
+        processed_dataset = torch.utils.data.TensorDataset(tensor_x,
+                                                           tensor_T,
+                                                           tensor_y_f,
+                                                           tensor_y_cf,
+                                                           tensor_mu0,
+                                                           tensor_mu1,
+                                                           tensor_ps)
+        return processed_dataset
+
+    @staticmethod
+    def convert_to_tensor_DCN(X, ps_score, Y_f, Y_cf, mu_0, mu_1):
         tensor_x = torch.stack([torch.Tensor(i) for i in X])
         tensor_ps_score = torch.from_numpy(ps_score)
         tensor_y_f = torch.from_numpy(Y_f)
         tensor_y_cf = torch.from_numpy(Y_cf)
+        tensor_mu_0 = torch.from_numpy(mu_0)
+        tensor_mu_1 = torch.from_numpy(mu_1)
         processed_dataset = torch.utils.data.TensorDataset(tensor_x, tensor_ps_score,
-                                                           tensor_y_f, tensor_y_cf)
+                                                           tensor_y_f, tensor_y_cf, tensor_mu_0,
+                                                           tensor_mu_1)
         return processed_dataset
 
     @staticmethod
@@ -134,8 +160,11 @@ class Utils:
         np_ps_score = group[1]
         np_df_Y_f = group[2]
         np_df_Y_cf = group[3]
+        np_df_mu_0 = group[4]
+        np_df_mu_1 = group[5]
         tensor = Utils.convert_to_tensor_DCN(np_df_X, np_ps_score,
-                                             np_df_Y_f, np_df_Y_cf)
+                                             np_df_Y_f, np_df_Y_cf,
+                                             np_df_mu_0, np_df_mu_1)
         return tensor
 
     @staticmethod
@@ -145,14 +174,17 @@ class Utils:
         return processed_dataset
 
     @staticmethod
-    def convert_to_tensor_DCN_semi_supervised(X, ps_score, T, Y_f, Y_cf):
+    def convert_to_tensor_DCN_semi_supervised(X, ps_score, T, Y_f, Y_cf, mu_0, mu_1):
         tensor_x = torch.stack([torch.Tensor(i) for i in X])
         tensor_ps_score = torch.from_numpy(ps_score)
         tensor_T = torch.from_numpy(T)
         tensor_y_f = torch.from_numpy(Y_f)
         tensor_y_cf = torch.from_numpy(Y_cf)
+        tensor_mu_0 = torch.from_numpy(mu_0)
+        tensor_mu_1 = torch.from_numpy(mu_1)
         processed_dataset = torch.utils.data.TensorDataset(tensor_x, tensor_ps_score, tensor_T,
-                                                           tensor_y_f, tensor_y_cf)
+                                                           tensor_y_f, tensor_y_cf,
+                                                           tensor_mu_0, tensor_mu_1)
         return processed_dataset
 
     @staticmethod
@@ -162,7 +194,8 @@ class Utils:
         T = group[2]
         np_df_Y_f = group[3]
         np_df_Y_cf = group[4]
-
+        np_df_mu_0 = group[5]
+        np_df_mu_1 = group[6]
         # print(np_df_X.shape)
         # print(np_ps_score.shape)
         # print(T.shape)
@@ -170,7 +203,8 @@ class Utils:
         # print(np_df_Y_cf.shape)
 
         tensor = Utils.convert_to_tensor_DCN_semi_supervised(np_df_X, np_ps_score, T,
-                                                             np_df_Y_f, np_df_Y_cf)
+                                                             np_df_Y_f, np_df_Y_cf,
+                                                             np_df_mu_0, np_df_mu_1)
         return tensor
 
 

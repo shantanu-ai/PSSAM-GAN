@@ -183,6 +183,7 @@ class GAN_Manager:
         prop_loss = self.__cal_propensity_loss(ps_score_control,
                                                fake_data, device)
         error = error_g + (BETA * prop_loss)
+        # error = error_g
         error.backward()
         # Update weights with gradients
         optimizer.step()

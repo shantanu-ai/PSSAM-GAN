@@ -50,7 +50,7 @@ class GAN_Manager:
             total_d_pred_fake = 0
 
             for batch in data_loader_train:
-                covariates_X_control, ps_score_control, y_f, y_cf = batch
+                covariates_X_control, ps_score_control, y_f, y_cf, _, _ = batch
                 covariates_X_control = covariates_X_control.to(device)
                 covariates_X_control_size = covariates_X_control.size(0)
                 ps_score_control = ps_score_control.squeeze().to(device)
@@ -183,6 +183,7 @@ class GAN_Manager:
         prop_loss = self.__cal_propensity_loss(ps_score_control,
                                                fake_data, device)
         error = error_g + (BETA * prop_loss)
+        # error = error_g
         error.backward()
         # Update weights with gradients
         optimizer.step()

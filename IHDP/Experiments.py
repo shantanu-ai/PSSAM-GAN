@@ -17,8 +17,11 @@ class Experiments:
     def __init__(self, running_mode, csv_path, split_size):
         self.dL = DataLoader()
         self.running_mode = running_mode
-        self.np_covariates_X_train, self.np_covariates_X_test, self.np_covariates_X_val, \
-        self.np_covariates_Y_train, self.np_covariates_Y_test, self.np_covariates_Y_val \
+        self.np_train_X, self.np_train_T, self.np_train_yf, self.np_train_ycf, \
+        self.np_test_X, self.np_test_T, self.np_test_yf, self.np_test_ycf, \
+        self.np_val_X, self.np_val_T, self.np_val_yf, self.np_val_ycf, \
+        self.np_train_mu0, self.np_test_mu0, self.np_train_mu1, self.np_test_mu1, \
+        self.np_val_mu0, self.np_val_mu1 \
             = self.__load_data(csv_path, split_size)
 
     def run_all_experiments(self, iterations, ps_model_type):
@@ -45,21 +48,29 @@ class Experiments:
                                         "input_nodes"],
                                     device)
             run_parameters["consolidated_file_path"] = self.get_consolidated_file_name(ps_model_type)
+            data_loader_dict_train = self.dL.prepare_tensor_for_ITE(self.np_train_X,
+                                                                    self.np_train_T,
+                                                                    self.np_train_yf,
+                                                                    self.np_train_ycf,
+                                                                    self.np_train_mu0,
+                                                                    self.np_train_mu1,
+                                                                    ps_score_list_train)
 
-            data_loader_dict_train = self.dL.prepare_tensor_for_DCN(self.np_covariates_X_train,
-                                                                    self.np_covariates_Y_train,
-                                                                    ps_score_list_train,
-                                                                    run_parameters["is_synthetic"])
+            data_loader_dict_val = self.dL.prepare_tensor_for_ITE(self.np_val_X,
+                                                                  self.np_val_T,
+                                                                  self.np_val_yf,
+                                                                  self.np_val_ycf,
+                                                                  self.np_val_mu0,
+                                                                  self.np_val_mu1,
+                                                                  ps_score_list_val)
 
-            data_loader_dict_val = self.dL.prepare_tensor_for_DCN(self.np_covariates_X_val,
-                                                                  self.np_covariates_Y_val,
-                                                                  ps_score_list_val,
-                                                                  run_parameters["is_synthetic"])
-
-            data_loader_dict_test = self.dL.prepare_tensor_for_DCN(self.np_covariates_X_test,
-                                                                   self.np_covariates_Y_test,
-                                                                   ps_score_list_test,
-                                                                   run_parameters["is_synthetic"])
+            data_loader_dict_test = self.dL.prepare_tensor_for_ITE(self.np_test_X,
+                                                                   self.np_test_T,
+                                                                   self.np_test_yf,
+                                                                   self.np_test_ycf,
+                                                                   self.np_test_mu0,
+                                                                   self.np_test_mu1,
+                                                                   ps_score_list_test)
             tensor_treated_train_original = \
                 Utils.create_tensors_from_tuple(data_loader_dict_train["treated_data"])
             tensor_control_train_original = \
@@ -372,7 +383,6 @@ class Experiments:
         predicted_ATE_DCN_PM_GAN_mean = np.mean(np.array(predicted_ATE_DCN_PM_GAN))
         predicted_ATE_DCN_PM_GAN_std = np.std(predicted_ATE_DCN_PM_GAN)
 
-
         PEHE_set_DCN_PM_GAN_05_mean = np.mean(np.array(PEHE_set_DCN_PM_GAN_05))
         PEHE_set_DCN_PM_GAN_05_std = np.std(PEHE_set_DCN_PM_GAN_05)
         ATE_Metric_set_DCN_PM_GAN_05_mean = np.mean(np.array(ATE_Metric_set_DCN_PM_GAN_05))
@@ -650,11 +660,9 @@ class Experiments:
 
     def __get_ps_model(self, ps_model_type, iter_id,
                        input_nodes, device):
-        ps_train_set = self.dL.convert_to_tensor(self.np_covariates_X_train, self.np_covariates_Y_train)
-        ps_val_set = self.dL.convert_to_tensor(self.np_covariates_X_val,
-                                               self.np_covariates_Y_val)
-        ps_test_set = self.dL.convert_to_tensor(self.np_covariates_X_test,
-                                                self.np_covariates_Y_test)
+        ps_train_set = Utils.convert_to_tensor(self.np_train_X, self.np_train_T)
+        ps_val_set = Utils.convert_to_tensor(self.np_val_X, self.np_val_T)
+        ps_test_set = Utils.convert_to_tensor(self.np_test_X, self.np_test_T)
         ps_manager = PS_Manager()
         if ps_model_type == Constants.PS_MODEL_NN:
             return ps_manager.get_propensity_scores(ps_train_set,
@@ -662,18 +670,18 @@ class Experiments:
                                                     ps_test_set, iter_id,
                                                     input_nodes, device)
 
-        elif ps_model_type == Constants.PS_MODEL_LR:
-            return ps_manager.get_propensity_scores_using_LR(self.np_covariates_X_train,
-                                                             self.np_covariates_Y_train,
-                                                             self.np_covariates_X_val,
-                                                             self.np_covariates_X_test,
-                                                             regularized=False)
-        elif ps_model_type == Constants.PS_MODEL_LR_Lasso:
-            return ps_manager.get_propensity_scores_using_LR(self.np_covariates_X_train,
-                                                             self.np_covariates_Y_train,
-                                                             self.np_covariates_X_val,
-                                                             self.np_covariates_X_test,
-                                                             regularized=True)
+        # elif ps_model_type == Constants.PS_MODEL_LR:
+        #     return ps_manager.get_propensity_scores_using_LR(self.np_covariates_X_train,
+        #                                                      self.np_covariates_Y_train,
+        #                                                      self.np_covariates_X_val,
+        #                                                      self.np_covariates_X_test,
+        #                                                      regularized=False)
+        # elif ps_model_type == Constants.PS_MODEL_LR_Lasso:
+        #     return ps_manager.get_propensity_scores_using_LR(self.np_covariates_X_train,
+        #                                                      self.np_covariates_Y_train,
+        #                                                      self.np_covariates_X_val,
+        #                                                      self.np_covariates_X_test,
+        #                                                      regularized=True)
 
     @staticmethod
     def __process_evaluated_metric(y1_true, y0_true, y1_hat, y0_hat,

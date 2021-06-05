@@ -50,16 +50,16 @@ class TARNet_Experiments:
         # Model 1: TARNET
         print("--" * 20)
         print("###### Model 1: TARNET Supervised Training started ######")
-        print("Treated: "+str(tuple_treated_train_original[0].shape[0]))
-        print("Control: "+str(tuple_control_train_original[0].shape[0]))
+        print("Treated: " + str(tuple_treated_train_original[0].shape[0]))
+        print("Control: " + str(tuple_control_train_original[0].shape[0]))
         tarnet_eval_dict = self.evaluate_TARNet(tuple_treated_train_original,
                                                 tuple_control_train_original)
 
         # Model 2: TARNET PM GAN
         print("--" * 20)
         print("###### Model 2: TARNET PM GAN Supervised Training started ######")
-        print("Treated: "+str(n_treated_balanced_tarnet))
-        print("Control: "+str(n_total_balanced_tarnet - n_treated_balanced_tarnet))
+        print("Treated: " + str(n_treated_balanced_tarnet))
+        print("Control: " + str(n_total_balanced_tarnet - n_treated_balanced_tarnet))
         tarnet_pm_gan_eval_dict = self.evaluate_TARNet_PM_GAN(evaluate_TARNet_PM_GAN,
                                                               n_total_balanced_tarnet,
                                                               n_treated_balanced_tarnet)
@@ -70,8 +70,10 @@ class TARNet_Experiments:
 
     def evaluate_TARNet(self, tuple_treated_train_original,
                         tuple_control_train_original):
-        np_treated_x, np_treated_ps, np_treated_f, np_treated_cf = tuple_treated_train_original
-        np_control_x, np_control_ps, np_control_f, np_control_cf = tuple_control_train_original
+        np_treated_x, np_treated_ps, np_treated_f, np_treated_cf, \
+        np_treated_mu0, np_treated_mu1 = tuple_treated_train_original
+        np_control_x, np_control_ps, np_control_f, np_control_cf, \
+        np_control_mu0, np_control_mu1 = tuple_control_train_original
         t_1 = np.ones(np_treated_x.shape[0])
         t_0 = np.zeros(np_control_x.shape[0])
 
@@ -84,10 +86,13 @@ class TARNet_Experiments:
         np_train_ss_T = np.concatenate((t_1, t_0), axis=0)
         np_train_ss_f = np.concatenate((np_treated_f, np_control_f), axis=0)
         np_train_ss_cf = np.concatenate((np_treated_cf, np_control_cf), axis=0)
+        np_train_ss_mu0 = np.concatenate((np_treated_mu0, np_control_mu0), axis=0)
+        np_train_ss_mu1 = np.concatenate((np_treated_mu1, np_control_mu1), axis=0)
 
         train_set = Utils.create_tensors_to_train_DCN_semi_supervised((np_train_ss_X, np_train_ss_ps,
                                                                        np_train_ss_T, np_train_ss_f,
-                                                                       np_train_ss_cf))
+                                                                       np_train_ss_cf, np_train_ss_mu0,
+                                                                       np_train_ss_mu1))
 
         train_parameters = self.__get_train_parameters(train_set)
 
@@ -142,7 +147,6 @@ class TARNet_Experiments:
                                      n_treated_balanced_tarnet, self.device)
         tarnet_eval_dict = tarnet.eval(_test_parameters, self.device)
         return tarnet_eval_dict
-
 
     @staticmethod
     def __get_train_parameters(train_set):

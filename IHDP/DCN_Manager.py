@@ -79,11 +79,14 @@ class DCN_Manager:
                 dataset_loss_train = 0
                 # train treated
                 for batch in treated_data_loader_train:
-                    covariates_X, ps_score, y_f, y_cf = batch
+                    covariates_X, ps_score, y_f, y_cf, _, _ = batch
+
                     covariates_X = covariates_X.to(device)
                     ps_score = ps_score.squeeze().to(device)
                     train_set_size += covariates_X.size(0)
                     y1_hat = self.dcn_y1(self.dcn_shared(covariates_X, ps_score), ps_score)
+                    y_f = y_f.view(y_f.size(0), -1)
+
                     if torch.cuda.is_available():
                         loss = lossF(y1_hat.float().cuda(),
                                      y_f.float().cuda()).to(device)
@@ -106,12 +109,14 @@ class DCN_Manager:
                 # train control
 
                 for batch in control_data_loader_train:
-                    covariates_X, ps_score, y_f, y_cf = batch
+                    covariates_X, ps_score, y_f, y_cf, _, _ = batch
                     covariates_X = covariates_X.to(device)
                     ps_score = ps_score.squeeze().to(device)
 
                     train_set_size += covariates_X.size(0)
                     y0_hat = self.dcn_y0(self.dcn_shared(covariates_X, ps_score), ps_score)
+                    y_f = y_f.view(y_f.size(0), -1)
+
                     if torch.cuda.is_available():
                         loss = lossF(y0_hat.float().cuda(),
                                      y_f.float().cuda()).to(device)
@@ -137,10 +142,12 @@ class DCN_Manager:
                 dataset_loss_val += 0
                 # val treated
                 for batch in treated_data_loader_val:
-                    covariates_X, ps_score, y_f, y_cf = batch
+                    covariates_X, ps_score, y_f, y_cf, _, _ = batch
                     covariates_X = covariates_X.to(device)
                     ps_score = ps_score.squeeze().to(device)
                     y1_hat = self.dcn_y1(self.dcn_shared(covariates_X, ps_score), ps_score)
+                    y_f = y_f.view(y_f.size(0), -1)
+
                     if torch.cuda.is_available():
                         loss = lossF(y1_hat.float().cuda(),
                                      y_f.float().cuda()).to(device)
@@ -155,12 +162,14 @@ class DCN_Manager:
             elif epoch % 2 == 1:
                 # val control
                 for batch in control_data_loader_val:
-                    covariates_X, ps_score, y_f, y_cf = batch
+                    covariates_X, ps_score, y_f, y_cf, _, _ = batch
                     covariates_X = covariates_X.to(device)
                     ps_score = ps_score.squeeze().to(device)
 
                     train_set_size += covariates_X.size(0)
                     y0_hat = self.dcn_y0(self.dcn_shared(covariates_X, ps_score), ps_score)
+                    y_f = y_f.view(y_f.size(0), -1)
+
                     if torch.cuda.is_available():
                         loss = lossF(y0_hat.float().cuda(),
                                      y_f.float().cuda()).to(device)
@@ -222,14 +231,14 @@ class DCN_Manager:
         y0_hat_list = []
 
         for batch in treated_data_loader:
-            covariates_X, ps_score, y_f, y_cf = batch
+            covariates_X, ps_score, y_f, y_cf, mu0, mu1 = batch
             covariates_X = covariates_X.to(device)
             ps_score = ps_score.squeeze().to(device)
             y1_hat = self.dcn_y1(self.dcn_shared(covariates_X, ps_score), ps_score)
             y0_hat = self.dcn_y0(self.dcn_shared(covariates_X, ps_score), ps_score)
             predicted_ITE = y1_hat - y0_hat
 
-            true_ITE = y_f - y_cf
+            true_ITE = mu1 - mu0
             if torch.cuda.is_available():
                 diff = true_ITE.float().cuda() - predicted_ITE.float().cuda()
             else:
@@ -251,13 +260,13 @@ class DCN_Manager:
             predicted_ITE_list.append(predicted_ITE.item())
 
         for batch in control_data_loader:
-            covariates_X, ps_score, y_f, y_cf = batch
+            covariates_X, ps_score, y_f, y_cf, mu0, mu1 = batch
             covariates_X = covariates_X.to(device)
             ps_score = ps_score.squeeze().to(device)
             y1_hat = self.dcn_y1(self.dcn_shared(covariates_X, ps_score), ps_score)
             y0_hat = self.dcn_y0(self.dcn_shared(covariates_X, ps_score), ps_score)
             predicted_ITE = y1_hat - y0_hat
-            true_ITE = y_cf - y_f
+            true_ITE = mu1 - mu0
             if torch.cuda.is_available():
                 diff = true_ITE.float().cuda() - predicted_ITE.float().cuda()
             else:

@@ -26,18 +26,18 @@ class PS_Treated_Generator:
 
         treated_tensor_full_train = Utils.create_tensors_from_tuple(self.treated_tuple_full)
         control_tensor_full_train = Utils.create_tensors_from_tuple(self.control_tuple_full)
-        ps_score_list_treated_np = np.array(ps_treated_simulated)
+        ps_treated_simulated = np.array(ps_treated_simulated)
 
         tensor_treated_balanced_dcn, tensor_control_balanced_dcn, n_treated_balanced_dcn, \
         n_control_balanced_dcn = \
-            self.__get_balanced_dataset_using_DCN(treated_simulated, ps_score_list_treated_np,
+            self.__get_balanced_dataset_using_DCN(treated_simulated, ps_treated_simulated,
                                                   treated_tensor_full_train, control_tensor_full_train,
                                                   tuple_matched_control, tuple_unmatched_control,
                                                   input_nodes, device)
         tensor_balanced_tarnet, n_total, n_treated = \
             self.__get_balanced_dataset_using_TARNet(tuple_matched_control, tuple_unmatched_control,
                                                      treated_simulated,
-                                                     ps_score_list_treated_np, input_nodes, device)
+                                                     ps_treated_simulated, input_nodes, device)
 
         return {
             "tensor_treated_balanced_dcn": tensor_treated_balanced_dcn,
@@ -54,8 +54,10 @@ class PS_Treated_Generator:
                                             tuple_matched_control, tuple_unmatched_control,
                                             treated_simulated,
                                             ps_score_list_treated_np, input_nodes, device):
-        np_treated_x, np_treated_ps, np_treated_f, np_treated_cf = self.treated_tuple_full
-        np_control_x, np_control_ps, np_control_f, np_control_cf = self.control_tuple_full
+        np_treated_x, np_treated_ps, np_treated_f, np_treated_cf, \
+        np_treated_mu_0, np_treated_mu_1 = self.treated_tuple_full
+        np_control_x, np_control_ps, np_control_f, np_control_cf,\
+            np_control_mu_0, np_control_mu_1= self.control_tuple_full
 
         t_1 = np.ones(np_treated_x.shape[0])
         t_0 = np.zeros(np_control_x.shape[0])
@@ -69,10 +71,12 @@ class PS_Treated_Generator:
         np_train_ss_T = np.concatenate((t_1, t_0), axis=0)
         np_train_ss_f = np.concatenate((np_treated_f, np_control_f), axis=0)
         np_train_ss_cf = np.concatenate((np_treated_cf, np_control_cf), axis=0)
+        np_train_mu_0 = np.concatenate((np_treated_mu_0, np_control_mu_0), axis=0)
+        np_train_mu_1 = np.concatenate((np_treated_mu_1, np_control_mu_1), axis=0)
 
         train_set = Utils.create_tensors_to_train_DCN_semi_supervised(
             (np_train_ss_X, np_train_ss_ps, np_train_ss_T, np_train_ss_f,
-             np_train_ss_cf))
+             np_train_ss_cf, np_train_mu_0, np_train_mu_1))
         eval_set = Utils.convert_to_tensor_DCN_PS(treated_simulated,
                                                   ps_score_list_treated_np)
         print("--" * 20)
@@ -86,7 +90,8 @@ class PS_Treated_Generator:
 
         np_treated_gen_f = Utils.convert_to_col_vector(simulated_treated_Y["y_f_list"])
         np_treated_gen_cf = Utils.convert_to_col_vector(simulated_treated_Y["y_cf_list"])
-        np_treated_x, np_treated_ps, np_treated_f, np_treated_cf = \
+        np_treated_x, np_treated_ps, np_treated_f, np_treated_cf, np_treated_mu_0, \
+               np_treated_mu_1 = \
             self.__get_balanced_treated(treated_simulated,
                                         ps_score_list_treated_np,
                                         np_treated_gen_f,
@@ -97,8 +102,19 @@ class PS_Treated_Generator:
         np_train_supervised_X = np.concatenate((np_treated_x, np_control_x), axis=0)
         np_train_supervised_ps = np.concatenate((np_treated_ps, np_control_ps), axis=0)
         np_train_supervised_T = np.concatenate((t_1, t_0), axis=0)
-        np_train_supervised_f = np.concatenate((np_treated_f, np_control_f), axis=0)
-        np_train_supervised_cf = np.concatenate((np_treated_cf, np_control_cf), axis=0)
+
+        np_train_supervised_f = np.concatenate((np_treated_f,
+                                                Utils.convert_to_col_vector(np_control_f)),
+                                               axis=0)
+        np_train_supervised_cf = np.concatenate((np_treated_cf,
+                                                 Utils.convert_to_col_vector(np_control_cf)),
+                                                axis=0)
+        np_train_supervised_mu_0 = np.concatenate((np_treated_mu_0,
+                                                   Utils.convert_to_col_vector(np_control_mu_0)),
+                                                  axis=0)
+        np_train_supervised_mu_1 = np.concatenate((np_treated_mu_1,
+                                                   Utils.convert_to_col_vector(np_control_mu_1)),
+                                                  axis=0)
 
         print("TARnet Supervised Model dataset statistics:")
         print(np_treated_x.shape)
@@ -112,7 +128,11 @@ class PS_Treated_Generator:
         tensor_balanced = Utils.create_tensors_to_train_DCN_semi_supervised(
             (np_train_supervised_X, np_train_supervised_ps, np_train_supervised_T,
              np_train_supervised_f,
-             np_train_supervised_cf))
+             np_train_supervised_cf,
+             np_train_supervised_mu_0,
+             np_train_supervised_mu_1))
+
+        print("------------------------")
 
         # np_control_x, np_control_ps, np_control_f, np_control_cf \
         #     = self.__get_balanced_control(tuple_matched_control,
@@ -139,21 +159,23 @@ class PS_Treated_Generator:
         print("---> Semi supervised training completed...")
         np_treated_gen_f = Utils.convert_to_col_vector(simulated_treated_Y["y_f_list"])
         np_treated_gen_cf = Utils.convert_to_col_vector(simulated_treated_Y["y_cf_list"])
-        np_treated_x, np_treated_ps, np_treated_f, np_treated_cf = \
+        np_treated_x, np_treated_ps, np_treated_f, np_treated_cf, np_treated_mu_0, np_treated_mu_1 = \
             self.__get_balanced_treated(treated_simulated,
                                         ps_score_list_treated_np,
                                         np_treated_gen_f,
                                         np_treated_gen_cf)
 
-        np_control_x, np_control_ps, np_control_f, np_control_cf = \
+        np_control_x, np_control_ps, np_control_f, np_control_cf, np_control_mu_0, np_control_mu_1 = \
             self.__get_balanced_control(tuple_matched_control,
                                         tuple_unmatched_control)
 
         tensor_treated_balanced = Utils.convert_to_tensor_DCN(np_treated_x, np_treated_ps,
-                                                              np_treated_f, np_treated_cf)
+                                                              np_treated_f, np_treated_cf,
+                                                              np_treated_mu_0, np_treated_mu_1)
 
         tensor_control_balanced = Utils.convert_to_tensor_DCN(np_control_x, np_control_ps,
-                                                              np_control_f, np_control_cf)
+                                                              np_control_f, np_control_cf,
+                                                              np_control_mu_0, np_control_mu_1)
 
         n_treated_balanced = np_treated_x.shape[0]
         n_control_balanced = np_control_x.shape[0]
@@ -166,19 +188,25 @@ class PS_Treated_Generator:
         np_ps_score_list_control_unmatched = tuple_unmatched_control[1]
         np_control_unmatched_f = tuple_unmatched_control[2]
         np_control_unmatched_cf = tuple_unmatched_control[3]
+        np_control_unmatched_mu_0 = tuple_unmatched_control[4]
+        np_control_unmatched_mu_1 = tuple_unmatched_control[5]
 
         np_control_matched_X = tuple_matched_control[0]
         np_ps_score_list_control_matched = tuple_matched_control[1]
         np_control_matched_f = tuple_matched_control[2]
         np_control_matched_cf = tuple_matched_control[3]
+        np_control_matched_mu_0 = tuple_matched_control[4]
+        np_control_matched_mu_1 = tuple_matched_control[5]
 
         np_control_x = np.concatenate((np_control_unmatched_X, np_control_matched_X), axis=0)
         np_control_ps = np.concatenate((np_ps_score_list_control_unmatched,
                                         np_ps_score_list_control_matched), axis=0)
         np_control_f = np.concatenate((np_control_unmatched_f, np_control_matched_f), axis=0)
         np_control_cf = np.concatenate((np_control_unmatched_cf, np_control_matched_cf), axis=0)
+        np_control_mu_0 = np.concatenate((np_control_unmatched_mu_0, np_control_matched_mu_0), axis=0)
+        np_control_mu_1 = np.concatenate((np_control_unmatched_mu_1, np_control_matched_mu_1), axis=0)
 
-        return np_control_x, np_control_ps, np_control_f, np_control_cf
+        return np_control_x, np_control_ps, np_control_f, np_control_cf, np_control_mu_0, np_control_mu_1
 
     def __get_balanced_treated(self, treated_simulated, ps_score_list_treated_np,
                                np_treated_gen_f, np_treated_gen_cf):
@@ -186,15 +214,20 @@ class PS_Treated_Generator:
 
         np_original_X = self.treated_tuple_full[0]
         np_original_ps_score = self.treated_tuple_full[1]
-        np_original_Y_f = self.treated_tuple_full[2]
-        np_original_Y_cf = self.treated_tuple_full[3]
+        np_original_Y_f = Utils.convert_to_col_vector(self.treated_tuple_full[2])
+        np_original_Y_cf = Utils.convert_to_col_vector(self.treated_tuple_full[3])
+        np_original_mu_0 = Utils.convert_to_col_vector(self.treated_tuple_full[4])
+        np_original_mu_1 = Utils.convert_to_col_vector(self.treated_tuple_full[5])
 
         np_treated_x = np.concatenate((np_treated_generated, np_original_X), axis=0)
         np_treated_ps = np.concatenate((ps_score_list_treated_np, np_original_ps_score), axis=0)
         np_treated_f = np.concatenate((np_treated_gen_f, np_original_Y_f), axis=0)
         np_treated_cf = np.concatenate((np_treated_gen_cf, np_original_Y_cf), axis=0)
+        np_treated_mu_0 = np.concatenate((np_treated_gen_f, np_original_mu_0), axis=0)
+        np_treated_mu_1 = np.concatenate((np_treated_gen_f, np_original_mu_1), axis=0)
 
-        return np_treated_x, np_treated_ps, np_treated_f, np_treated_cf
+        return np_treated_x, np_treated_ps, np_treated_f, np_treated_cf, np_treated_mu_0, \
+               np_treated_mu_1
 
     def __execute_GAN(self, device, iter_id):
         psm = PSM_Manager()
