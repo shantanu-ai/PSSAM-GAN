@@ -2,6 +2,8 @@ from Constants import Constants
 from Experiments import Experiments
 
 if __name__ == '__main__':
+    # csv_path = "Dataset/methicilin_num.csv"
+    # csv_path = "Dataset/Oxacilin_num.csv"
     csv_path = "Dataset/vancomycin_num.csv"
     split_size = 0.8
     print("--->> !!Using NN prop score!! <<---")

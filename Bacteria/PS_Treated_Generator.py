@@ -57,21 +57,21 @@ class PS_Treated_Generator:
 
         # matched control and treated
         self.draw(ps_treated_list, ps_matched_control_list,
-                  label_treated="R", label_control="S",
+                  label_treated="Treatment Resist", label_control="Treatment Suscept",
                   fig_name="./Plots/Fig_Iter_id_{0}_Matched".format(iter_id),
-                  title="Vancomycin: PSM dataset", max_limit=200)
+                  title="Methicilin: PSM dataset", max_limit=200)
 
         # full control and treated
         self.draw(ps_treated_list, ps_control_list,
-                  label_treated="R", label_control="S",
+                  label_treated="Treatment Resist", label_control="Treatment Suscept",
                   fig_name="./Plots/Fig_Iter_id_{0}_Original".format(iter_id),
-                  title="Vancomycin: original dataset", max_limit=200)
+                  title="Methicilin: original dataset", max_limit=200)
 
         # treated by GAN vs unmatched control
         self.draw(ps_score_list_sim_treated + ps_treated_list, ps_control_list,
-                  label_treated="R", label_control="S",
+                  label_treated="Treatment Resist", label_control="Treatment Suscept",
                   fig_name="./Plots/Fig_Iter_id_{0}_Simulated".format(iter_id),
-                  title="Vancomycin: original + GAN dataset", max_limit=200)
+                  title="Methicilin: original + GAN dataset", max_limit=200)
 
         return treated_generated, ps_score_list_sim_treated, tuple_matched_control, tuple_unmatched_control
 
