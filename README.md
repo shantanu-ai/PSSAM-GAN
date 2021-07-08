@@ -1,5 +1,5 @@
 ## Description
-Repository of Propensity Score Synthetic Augmentation Matchingusing Generative Adversarial Networks (PSSAM-GAN) - Paper under review at the Journal of Computers in Biology and Medicine.
+Repository of Propensity Score Synthetic Augmentation Matchingusing Generative Adversarial Networks (PSSAM-GAN) - Paper accepted at the Journal of Computers in Biology and Medicine.
 
 ## Abstract
 Propensity Score Synthetic Augmentation Matching using Generative Adversarial Net- works (PSSAM-GAN) - a novel deep learning training algorithm which attempts to make an unbalanced dataset bal- anced to train DCN-PD and TARNET to estimate ITE.
