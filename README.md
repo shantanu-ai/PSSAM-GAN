@@ -23,7 +23,7 @@ python -  3.7.4 <br/>
       year={2021},
       publisher={Elsevier}
     }
-    {"mode":"full","isActive":false}
+ 
 
 
 ## Keywords
