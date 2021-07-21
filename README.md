@@ -101,4 +101,5 @@ The plots for each run will be found at the following location:
 
 ## License & copyright
 © DISL, University of Florida
+
 Licensed under the [MIT License](LICENSE)
