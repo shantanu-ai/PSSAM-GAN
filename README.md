@@ -14,15 +14,16 @@ matplotlib - 3.1.1 <br/>
 python -  3.7.4 <br/>
 
 ## Citation
-@article{ghosh2021propensity,
-  title={Propensity Score Synthetic Augmentation Matching using Generative Adversarial Networks (PSSAM-GAN)},
-  author={Ghosh, Shantanu and Boucher, Christina and Bian, Jiang and Prosperi, Mattia},
-  journal={Computer Methods and Programs in Biomedicine Update},
-  pages={100020},
-  year={2021},
-  publisher={Elsevier}
-}
-{"mode":"full","isActive":false}
+    @article{
+      ghosh2021propensity,
+      title={Propensity Score Synthetic Augmentation Matching using Generative Adversarial Networks (PSSAM-GAN)},
+      author={Ghosh, Shantanu and Boucher, Christina and Bian, Jiang and Prosperi, Mattia},
+      journal={Computer Methods and Programs in Biomedicine Update},
+      pages={100020},
+      year={2021},
+      publisher={Elsevier}
+    }
+    {"mode":"full","isActive":false}
 
 
 ## Keywords
