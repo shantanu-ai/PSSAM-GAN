@@ -100,6 +100,6 @@ The plots for each run will be found at the following location:
 2) Jobs - /Jobs/Plots
 
 ## License & copyright
-© DISL, University of Florida
+© [DISL](https://epidemiology.phhp.ufl.edu/research/disl), University of Florida
 
 Licensed under the [MIT License](LICENSE)
